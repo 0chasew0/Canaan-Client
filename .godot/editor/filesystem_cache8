@@ -1,0 +1,12 @@
+ea4bc82a6ad023ab7ee23ee620429895
+::res://::1731049564
+icon.svg::CompressedTexture2D::6373733551754743652::1730948997::1730949056::1::::<><>::
+NetworkingClient.gd::GDScript::-1::1731047780::0::1::::<>Node<>::
+NetworkingClient.tscn::PackedScene::656575761024644187::1731049316::0::1::::<><>::res://NetworkingClient.gd<>uid://b81k73kbrjw18::::res://scenes/game_select.tscn
+README.md::TextFile::-1::1731049421::0::1::::<><>::
+::res://images/::1731046165
+::res://scenes/::1731049358
+canaan.gd::GDScript::-1::1731049358::0::1::::<>Node2D<>::
+canaan.tscn::PackedScene::649491649225409735::1731049358::0::1::::<><>::res://scenes/canaan.gd
+game_select.tscn::PackedScene::4756992146856726629::1731049316::0::1::::<><>::
+::res://scripts/::1731046173
