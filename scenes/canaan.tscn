@@ -1,16 +1,18 @@
-[gd_scene load_steps=17 format=4 uid="uid://jivbdwftiitr"]
+[gd_scene load_steps=16 format=4 uid="uid://jivbdwftiitr"]
 
 [ext_resource type="Script" path="res://scenes/canaan.gd" id="1_d354y"]
-[ext_resource type="Texture2D" uid="uid://nyjy8mp2uftl" path="res://images/Dirt/dirt_06.png" id="2_m2ik4"]
+[ext_resource type="Texture2D" uid="uid://djglnqvthqtah" path="res://images/Dirt/dirt_14.png" id="2_y5yh0"]
 [ext_resource type="Texture2D" uid="uid://bv63g4podrub6" path="res://images/Grass/grass_05.png" id="3_lk8ig"]
 [ext_resource type="Texture2D" uid="uid://b6n4bu03fr25o" path="res://images/Mars/mars_07.png" id="4_t3oo1"]
-[ext_resource type="Texture2D" uid="uid://cqeqhjo34xf1d" path="res://images/Sand/sand_07.png" id="5_axmhx"]
+[ext_resource type="Texture2D" uid="uid://bpyol5iri4dvd" path="res://images/wheat.png" id="5_xcn6w"]
 [ext_resource type="Texture2D" uid="uid://dg2dv2u158wo8" path="res://images/Stone/stone_07.png" id="6_ohhag"]
 [ext_resource type="Texture2D" uid="uid://d3fmtt7g8agjt" path="res://images/Sand/sand_12.png" id="7_ebvpi"]
-[ext_resource type="Texture2D" uid="uid://bbfel7k2t8tga" path="res://images/tiles.png" id="8_gt17d"]
+
+[sub_resource type="TileMapPattern" id="TileMapPattern_or3yt"]
+tile_data = PackedInt32Array(131072, 1, 0, 1, 1, 0, 65536, 1, 0, 131073, 1, 0, 196608, 1, 0, 262145, 1, 0, 2, 1, 0, 65537, 1, 0, 131074, 1, 0, 196609, 1, 0, 262146, 1, 0, 3, 1, 0, 65538, 1, 0, 131075, 1, 0, 196610, 1, 0, 262147, 1, 0, 65539, 1, 0, 131076, 1, 0, 196611, 1, 0)
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_tlbur"]
-texture = ExtResource("2_m2ik4")
+texture = ExtResource("2_y5yh0")
 texture_region_size = Vector2i(120, 140)
 use_texture_padding = false
 2:0/0 = 0
@@ -191,7 +193,7 @@ texture_region_size = Vector2i(120, 140)
 6:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_kjc6j"]
-texture = ExtResource("5_axmhx")
+texture = ExtResource("5_xcn6w")
 texture_region_size = Vector2i(120, 140)
 2:0/0 = 0
 3:0/0 = 0
@@ -370,16 +372,6 @@ texture_region_size = Vector2i(120, 140)
 1:0/0 = 0
 6:0/0 = 0
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_2klro"]
-texture = ExtResource("8_gt17d")
-texture_region_size = Vector2i(120, 140)
-0:0/0 = 0
-7:0/0 = 0
-14:0/0 = 0
-21:0/0 = 0
-28:0/0 = 0
-35:0/0 = 0
-
 [sub_resource type="TileSet" id="TileSet_051m2"]
 tile_shape = 3
 tile_size = Vector2i(120, 140)
@@ -389,10 +381,12 @@ sources/3 = SubResource("TileSetAtlasSource_igenq")
 sources/4 = SubResource("TileSetAtlasSource_kjc6j")
 sources/5 = SubResource("TileSetAtlasSource_7igx8")
 sources/6 = SubResource("TileSetAtlasSource_qx8ov")
-sources/9 = SubResource("TileSetAtlasSource_2klro")
+pattern_0 = SubResource("TileMapPattern_or3yt")
 
 [node name="Canaan" type="Node2D"]
 script = ExtResource("1_d354y")
+
+[node name="Camera2D" type="Camera2D" parent="."]
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
@@ -410,15 +404,15 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -87.5
-offset_top = -47.5
-offset_right = 87.5
-offset_bottom = 47.5
+offset_left = 742.0
+offset_top = 412.0
+offset_right = 917.0
+offset_bottom = 507.0
 grow_horizontal = 2
 grow_vertical = 2
 text = "Roll Dice"
 
-[node name="TileMapLayer" type="TileMapLayer" parent="CanvasLayer"]
+[node name="StandardMap" type="TileMapLayer" parent="CanvasLayer"]
 position = Vector2(958, 542)
 tile_map_data = PackedByteArray("AAAXAC8ACAAAAAYAAAALACAACAAAAAAAAAASACoACAAAAAYAAAAUAC0ACAAAAAYAAAAMACcACAAAAAYAAAAZABYACAANAAAAAABCACIACAAGAAAAAABCACgACAAGAAYAAAA9ACkACAAGAAYAAAAwAC4ACAAAAAYAAAA2ABIACAAGAAAAAAANABkACAAAAAAAAAA=")
 tile_set = SubResource("TileSet_051m2")
