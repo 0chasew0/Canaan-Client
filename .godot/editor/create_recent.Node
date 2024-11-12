@@ -1,7 +1,8 @@
+CanvasLayer
+SubViewport
 Camera2D
 TileMapLayer
 Button
-CanvasLayer
 Node2D
 ColorRect
 Control

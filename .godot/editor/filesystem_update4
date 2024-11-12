@@ -1,4 +1,5 @@
 res://scenes/canaan.tscn
-res://scenes/canaan.gd
+res://scenes/camera_2d.gd
 res://NetworkingClient.tscn
 res://scenes/game_select.tscn
+res://scenes/canaan.gd
