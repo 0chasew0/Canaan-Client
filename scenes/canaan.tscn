@@ -385,6 +385,7 @@ sources/6 = SubResource("TileSetAtlasSource_qx8ov")
 pattern_0 = SubResource("TileMapPattern_or3yt")
 
 [node name="Canaan" type="Node2D"]
+y_sort_enabled = true
 script = ExtResource("1_d354y")
 
 [node name="Camera2D" type="Camera2D" parent="."]

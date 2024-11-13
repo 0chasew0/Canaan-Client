@@ -1,9 +1,9 @@
+Node2D
 CanvasLayer
 SubViewport
 Camera2D
 TileMapLayer
 Button
-Node2D
 ColorRect
 Control
 RichTextLabel

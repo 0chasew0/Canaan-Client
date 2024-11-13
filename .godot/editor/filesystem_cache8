@@ -1,8 +1,8 @@
 ea4bc82a6ad023ab7ee23ee620429895
-::res://::1731380118
+::res://::1731464658
 icon.svg::CompressedTexture2D::6373733551754743652::1730948997::1730949056::1::::<><>::
 NetworkingClient.gd::GDScript::-1::1731047780::0::1::::<>Node<>::
-NetworkingClient.tscn::PackedScene::656575761024644187::1731303636::0::1::::<><>::res://NetworkingClient.gd<>uid://b81k73kbrjw18::::res://scenes/game_select.tscn
+NetworkingClient.tscn::PackedScene::656575761024644187::1731383583::0::1::::<><>::res://NetworkingClient.gd<>uid://b81k73kbrjw18::::res://scenes/game_select.tscn
 README.md::TextFile::-1::1731049421::0::1::::<><>::
 ::res://images/::1731302281
 hexagonAll_sheet.png::CompressedTexture2D::7426068708351339155::1731129327::1731132147::1::::<><>::
@@ -366,8 +366,9 @@ stone_16.png::CompressedTexture2D::6438140811769738770::1731129327::1731138447::
 stone_17.png::CompressedTexture2D::1450681430102861909::1731129327::1731138447::1::::<><>::
 stone_18.png::CompressedTexture2D::3569502330696221612::1731129327::1731138447::1::::<><>::
 stone_19.png::CompressedTexture2D::3217299825431518187::1731129327::1731138447::1::::<><>::
-::res://scenes/::1731303636
-canaan.gd::GDScript::-1::1731303636::0::1::::<>Node2D<>::
-canaan.tscn::PackedScene::649491649225409735::1731303265::0::1::::<><>::res://scenes/canaan.gd<>uid://djglnqvthqtah::::res://images/Dirt/dirt_14.png<>uid://bv63g4podrub6::::res://images/Grass/grass_05.png<>uid://b6n4bu03fr25o::::res://images/Mars/mars_07.png<>uid://bpyol5iri4dvd::::res://images/wheat.png<>uid://dg2dv2u158wo8::::res://images/Stone/stone_07.png<>uid://d3fmtt7g8agjt::::res://images/Sand/sand_12.png
-game_select.tscn::PackedScene::4756992146856726629::1731303215::0::1::::<><>::
+::res://scenes/::1731386941
+camera_2d.gd::GDScript::-1::1731382215::0::1::::<>Camera2D<>::
+canaan.gd::GDScript::-1::1731383537::0::1::::<>Node2D<>::
+canaan.tscn::PackedScene::649491649225409735::1731386941::0::1::::<><>::res://scenes/canaan.gd<>res://scenes/camera_2d.gd<>uid://djglnqvthqtah::::res://images/Dirt/dirt_14.png<>uid://bv63g4podrub6::::res://images/Grass/grass_05.png<>uid://b6n4bu03fr25o::::res://images/Mars/mars_07.png<>uid://bpyol5iri4dvd::::res://images/wheat.png<>uid://dg2dv2u158wo8::::res://images/Stone/stone_07.png<>uid://d3fmtt7g8agjt::::res://images/Sand/sand_12.png
+game_select.tscn::PackedScene::4756992146856726629::1731383583::0::1::::<><>::
 ::res://scripts/::1731046173
