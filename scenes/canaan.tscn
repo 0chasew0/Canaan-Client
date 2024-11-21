@@ -1,4 +1,4 @@
-[gd_scene load_steps=38 format=4 uid="uid://jivbdwftiitr"]
+[gd_scene load_steps=43 format=4 uid="uid://jivbdwftiitr"]
 
 [ext_resource type="Script" path="res://scenes/canaan.gd" id="1_d354y"]
 [ext_resource type="Script" path="res://scenes/camera_2d.gd" id="2_sec5m"]
@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://dg2dv2u158wo8" path="res://images/Stone/stone_07.png" id="6_ohhag"]
 [ext_resource type="Texture2D" uid="uid://d3fmtt7g8agjt" path="res://images/Sand/sand_12.png" id="7_ebvpi"]
 [ext_resource type="Texture2D" uid="uid://i6l1uby721ou" path="res://images/Resource_Numbers/tile2_new.png" id="9_lyjmo"]
+[ext_resource type="Shader" path="res://scenes/resource_num_scaling.gdshader" id="9_qvsvo"]
 [ext_resource type="Texture2D" uid="uid://cmu7h11y77ykt" path="res://images/Resource_Numbers/tile12.png" id="10_4idp2"]
 [ext_resource type="Texture2D" uid="uid://gdsegqt3j67e" path="res://images/Resource_Numbers/tile3.png" id="11_486j8"]
 [ext_resource type="Texture2D" uid="uid://cm38b034qap7q" path="res://images/Resource_Numbers/tile4.png" id="12_lu03k"]
@@ -18,6 +19,7 @@
 [ext_resource type="Texture2D" uid="uid://d4ltpj374puxy" path="res://images/Resource_Numbers/tile9.png" id="16_o88h8"]
 [ext_resource type="Texture2D" uid="uid://cqn0vl10rhjl8" path="res://images/Resource_Numbers/tile10.png" id="17_sve7i"]
 [ext_resource type="Texture2D" uid="uid://bsgxbs4n5jlci" path="res://images/Resource_Numbers/tile11.png" id="18_5q3sy"]
+[ext_resource type="Texture2D" uid="uid://ipi6t7tunf6e" path="res://images/Harbors/generic_harbor.png" id="20_issr1"]
 
 [sub_resource type="TileMapPattern" id="TileMapPattern_or3yt"]
 tile_data = PackedInt32Array(131072, 1, 0, 1, 1, 0, 65536, 1, 0, 131073, 1, 0, 196608, 1, 0, 262145, 1, 0, 2, 1, 0, 65537, 1, 0, 131074, 1, 0, 196609, 1, 0, 262146, 1, 0, 3, 1, 0, 65538, 1, 0, 131075, 1, 0, 196610, 1, 0, 262147, 1, 0, 65539, 1, 0, 131076, 1, 0, 196611, 1, 0)
@@ -56,66 +58,72 @@ texture_region_size = Vector2i(120, 140)
 [sub_resource type="TileSet" id="TileSet_051m2"]
 tile_shape = 3
 tile_size = Vector2i(120, 140)
-sources/1 = SubResource("TileSetAtlasSource_tlbur")
 sources/2 = SubResource("TileSetAtlasSource_bl4lj")
 sources/3 = SubResource("TileSetAtlasSource_igenq")
 sources/4 = SubResource("TileSetAtlasSource_kjc6j")
 sources/5 = SubResource("TileSetAtlasSource_7igx8")
 sources/6 = SubResource("TileSetAtlasSource_qx8ov")
+sources/1 = SubResource("TileSetAtlasSource_tlbur")
 pattern_0 = SubResource("TileMapPattern_or3yt")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_jbqwa"]
+shader = ExtResource("9_qvsvo")
+shader_parameter/scale = Vector2(0.45, 0.45)
+shader_parameter/uv_margin = Vector2(-0.21, -0.085)
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_5ecsg"]
 texture = ExtResource("9_lyjmo")
-texture_region_size = Vector2i(128, 128)
+texture_region_size = Vector2i(130, 130)
 0:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_4jkhf"]
 texture = ExtResource("10_4idp2")
-texture_region_size = Vector2i(128, 128)
+texture_region_size = Vector2i(130, 130)
 0:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_k3sic"]
 texture = ExtResource("11_486j8")
-texture_region_size = Vector2i(128, 128)
+texture_region_size = Vector2i(130, 130)
 0:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_8ypy5"]
 texture = ExtResource("12_lu03k")
-texture_region_size = Vector2i(128, 128)
+texture_region_size = Vector2i(130, 130)
 0:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_yr6ya"]
 texture = ExtResource("13_hvnrt")
-texture_region_size = Vector2i(128, 128)
+texture_region_size = Vector2i(130, 130)
 0:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ad0m0"]
 texture = ExtResource("14_tl4wc")
-texture_region_size = Vector2i(128, 128)
+texture_region_size = Vector2i(130, 130)
 0:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_jueuo"]
 texture = ExtResource("15_rtf0p")
-texture_region_size = Vector2i(128, 128)
+texture_region_size = Vector2i(130, 130)
 0:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bpbkq"]
 texture = ExtResource("16_o88h8")
-texture_region_size = Vector2i(128, 128)
+texture_region_size = Vector2i(130, 130)
 0:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ynsv6"]
 texture = ExtResource("17_sve7i")
-texture_region_size = Vector2i(128, 128)
+texture_region_size = Vector2i(130, 130)
 0:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_1cj5d"]
 texture = ExtResource("18_5q3sy")
-texture_region_size = Vector2i(128, 128)
+texture_region_size = Vector2i(130, 130)
 0:0/0 = 0
 
 [sub_resource type="TileSet" id="TileSet_bq0il"]
-tile_shape = 2
+tile_shape = 3
+tile_size = Vector2i(120, 140)
 sources/1 = SubResource("TileSetAtlasSource_5ecsg")
 sources/2 = SubResource("TileSetAtlasSource_k3sic")
 sources/3 = SubResource("TileSetAtlasSource_8ypy5")
@@ -126,6 +134,16 @@ sources/7 = SubResource("TileSetAtlasSource_bpbkq")
 sources/8 = SubResource("TileSetAtlasSource_ynsv6")
 sources/9 = SubResource("TileSetAtlasSource_1cj5d")
 sources/10 = SubResource("TileSetAtlasSource_4jkhf")
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_cya4c"]
+texture = ExtResource("20_issr1")
+texture_region_size = Vector2i(120, 140)
+0:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_m4nik"]
+tile_shape = 3
+tile_size = Vector2i(120, 140)
+sources/2 = SubResource("TileSetAtlasSource_cya4c")
 
 [node name="Canaan" type="Node2D"]
 y_sort_enabled = true
@@ -157,10 +175,14 @@ tile_map_data = PackedByteArray("AAAXAC8ACAAAAAYAAAALACAACAAAAAAAAAASACoACAAAAAY
 tile_set = SubResource("TileSet_051m2")
 
 [node name="ResourceNumbers" type="TileMapLayer" parent="MapLayer"]
+material = SubResource("ShaderMaterial_jbqwa")
 position = Vector2(908, 873)
-scale = Vector2(0.3, 0.3)
-tile_map_data = PackedByteArray("AAD///n/AgAAAAAAAAAXAPn/CAAAAAAAAAAxAPn/BgAAAAAAAADl//n/CAAAAAAAAADM//n/BAAAAAAAAADz/w8AAgAAAAAAAAALAA8ABQAAAAAAAAAlABAAAwAAAAAAAADm/yUAAwAAAAAAAAD//yUABAAAAAAAAAAZACUABwAAAAAAAADZ/+P/AQAAAAAAAADy/+P/AgAAAAAAAAALAOP/BgAAAAAAAAAkAOP/BwAAAAAAAAAYAM3/CAAAAAAAAAD//83/CAAAAAAAAADm/83/BQAAAAAAAAA=")
 tile_set = SubResource("TileSet_bq0il")
+
+[node name="Harbors" type="TileMapLayer" parent="MapLayer"]
+position = Vector2(908, 873)
+tile_map_data = PackedByteArray("AAD9//7/AgAAAAAAAAD///z/AgAAAAAAAAA=")
+tile_set = SubResource("TileSet_m4nik")
 
 [node name="UILayer" type="CanvasLayer" parent="."]
 
