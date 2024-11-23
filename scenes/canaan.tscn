@@ -1,4 +1,4 @@
-[gd_scene load_steps=43 format=4 uid="uid://jivbdwftiitr"]
+[gd_scene load_steps=53 format=4 uid="uid://jivbdwftiitr"]
 
 [ext_resource type="Script" path="res://scenes/canaan.gd" id="1_d354y"]
 [ext_resource type="Script" path="res://scenes/camera_2d.gd" id="2_sec5m"]
@@ -19,6 +19,7 @@
 [ext_resource type="Texture2D" uid="uid://d4ltpj374puxy" path="res://images/Resource_Numbers/tile9.png" id="16_o88h8"]
 [ext_resource type="Texture2D" uid="uid://cqn0vl10rhjl8" path="res://images/Resource_Numbers/tile10.png" id="17_sve7i"]
 [ext_resource type="Texture2D" uid="uid://bsgxbs4n5jlci" path="res://images/Resource_Numbers/tile11.png" id="18_5q3sy"]
+[ext_resource type="Shader" path="res://scenes/harbor_rotation.gdshader" id="20_bcwju"]
 [ext_resource type="Texture2D" uid="uid://ipi6t7tunf6e" path="res://images/Harbors/generic_harbor.png" id="20_issr1"]
 
 [sub_resource type="TileMapPattern" id="TileMapPattern_or3yt"]
@@ -135,7 +136,52 @@ sources/8 = SubResource("TileSetAtlasSource_ynsv6")
 sources/9 = SubResource("TileSetAtlasSource_1cj5d")
 sources/10 = SubResource("TileSetAtlasSource_4jkhf")
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_evleq"]
+shader = ExtResource("20_bcwju")
+shader_parameter/angle = 29.917
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_budli"]
+texture = ExtResource("20_issr1")
+texture_region_size = Vector2i(120, 140)
+0:0/0 = 0
+0:0/0/material = SubResource("ShaderMaterial_evleq")
+
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_cya4c"]
+texture = ExtResource("20_issr1")
+texture_region_size = Vector2i(120, 140)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_4r4km"]
+texture = ExtResource("20_issr1")
+texture_region_size = Vector2i(120, 140)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_cga06"]
+texture = ExtResource("20_issr1")
+texture_region_size = Vector2i(120, 140)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_aft66"]
+texture = ExtResource("20_issr1")
+texture_region_size = Vector2i(120, 140)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_huu54"]
+texture = ExtResource("20_issr1")
+texture_region_size = Vector2i(120, 140)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wecpy"]
+texture = ExtResource("20_issr1")
+texture_region_size = Vector2i(120, 140)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_atw5d"]
+texture = ExtResource("20_issr1")
+texture_region_size = Vector2i(120, 140)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_5aaxl"]
 texture = ExtResource("20_issr1")
 texture_region_size = Vector2i(120, 140)
 0:0/0 = 0
@@ -143,7 +189,15 @@ texture_region_size = Vector2i(120, 140)
 [sub_resource type="TileSet" id="TileSet_m4nik"]
 tile_shape = 3
 tile_size = Vector2i(120, 140)
-sources/2 = SubResource("TileSetAtlasSource_cya4c")
+sources/1 = SubResource("TileSetAtlasSource_cya4c")
+sources/0 = SubResource("TileSetAtlasSource_budli")
+sources/2 = SubResource("TileSetAtlasSource_4r4km")
+sources/3 = SubResource("TileSetAtlasSource_cga06")
+sources/4 = SubResource("TileSetAtlasSource_aft66")
+sources/5 = SubResource("TileSetAtlasSource_huu54")
+sources/6 = SubResource("TileSetAtlasSource_wecpy")
+sources/7 = SubResource("TileSetAtlasSource_atw5d")
+sources/8 = SubResource("TileSetAtlasSource_5aaxl")
 
 [node name="Canaan" type="Node2D"]
 y_sort_enabled = true
@@ -157,10 +211,10 @@ script = ExtResource("2_sec5m")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -40856.0
-offset_top = -19680.0
-offset_right = 39883.0
-offset_bottom = 17467.0
+offset_left = -40870.0
+offset_top = -19764.0
+offset_right = 39869.0
+offset_bottom = 17383.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -181,7 +235,7 @@ tile_set = SubResource("TileSet_bq0il")
 
 [node name="Harbors" type="TileMapLayer" parent="MapLayer"]
 position = Vector2(908, 873)
-tile_map_data = PackedByteArray("AAD9//7/AgAAAAAAAAD///z/AgAAAAAAAAA=")
+tile_map_data = PackedByteArray("AAD+//z/AQAAAAAAAAA=")
 tile_set = SubResource("TileSet_m4nik")
 
 [node name="UILayer" type="CanvasLayer" parent="."]

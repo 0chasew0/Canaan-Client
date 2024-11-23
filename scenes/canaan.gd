@@ -2,6 +2,8 @@ extends Node2D
 
 @onready var standard_map = $MapLayer/StandardMap
 @onready var resource_num_map_layer = $MapLayer/ResourceNumbers
+@onready var harbor_map_layer = $MapLayer/Harbors
+
 @onready var roll_dice_btn = $UILayer/Roll_Dice
 @onready var global_vertices = null
 @onready var VP = 0
@@ -157,6 +159,7 @@ func generate_rand_standard_map() -> Array[Vector2i]:
 	
 	var possible_placements_for_resource = possible_placements.duplicate(true)
 	var possible_placements_read = possible_placements.duplicate(true)
+	var possible_placements_harbours = possible_placements.duplicate(true)
 	
 	# Place tiles randomly, removing the selections from the list of possible placements each time
 	# And assigning a random resource number, also removing from the list of possibilities each time
@@ -239,4 +242,70 @@ func generate_rand_standard_map() -> Array[Vector2i]:
 				resource_num_map_layer.set_cell(possible_placements_for_resource[random_placement], int(rand_resource_num), Vector2i(0,0))
 				possible_placements_for_resource.pop_at(random_placement)
 				break
+				
+	# Place the harbors at exact points on the Harbor Layer
+	var harbor_positions: Array[Vector2i] = [
+		Vector2i(-2, -4), Vector2i(-3, -2), Vector2i(-3, 0), 
+		Vector2i(-2, 2), Vector2i(0, 2), Vector2i(1, 1), 
+		Vector2i(2, -1), Vector2i(1, -3), Vector2i(0, -4)
+	]
+	
+	# Not used
+	var tiles_with_harbors: Array[Vector2i] = [
+		Vector2i(-2, -3), Vector2i(-2, -2), Vector2i(-2, 0), 
+		Vector2i(-2, 1), Vector2i(-1, 1), Vector2i(1, 0), 
+		Vector2i(1, -1), Vector2i(1, -2), Vector2i(-1, -3)
+	]
+	
+	# Iterate through all tiles, see if there are any neighors at DIRECTION -- if not, a HARBOUR can be placed here
+	# then, choose correct placement for this harbour (standard map only) -- change direction of harbour depending on what DIRECTION the edge is
+	var directions = [
+		TileSet.CellNeighbor.CELL_NEIGHBOR_BOTTOM_LEFT_SIDE,
+		TileSet.CellNeighbor.CELL_NEIGHBOR_BOTTOM_RIGHT_SIDE,
+		TileSet.CellNeighbor.CELL_NEIGHBOR_LEFT_SIDE,
+		TileSet.CellNeighbor.CELL_NEIGHBOR_RIGHT_SIDE,
+		TileSet.CellNeighbor.CELL_NEIGHBOR_TOP_LEFT_SIDE,
+		TileSet.CellNeighbor.CELL_NEIGHBOR_TOP_RIGHT_SIDE
+	]
+	var harbor_cells = {}
+	for i in range(len(possible_placements_harbours)):
+		
+		# Sides of a pointy-topped hexagon
+		
+		for j in len(directions):
+			var surrounding_cell = standard_map.get_neighbor_cell(possible_placements_harbours[i], directions[j])
+			# Check if surrounding cell contains a tile
+			# if not, add it to the list along with the direction
+			if standard_map.get_cell_tile_data(surrounding_cell) == null:
+				harbor_cells[surrounding_cell] = directions[j]
+				
+	print(harbor_cells, len(harbor_cells))
+	
+	var angle_mapping = {
+		0: 270,
+		2: 215,
+		6: 145,
+		8: 90,
+		10: 30,
+		14: 320
+	}
+	for i in range(len(harbor_positions)):
+		harbor_map_layer.set_cell(harbor_positions[i], i, Vector2i(0,0))
+		# Grab direction for this position
+		var direction = harbor_cells[harbor_positions[i]]
+		var angle = angle_mapping[direction] # Returns an angle given a direction
+		
+		print(harbor_positions[i], " | ", direction)
+		
+		if i > 0:
+			var tile_material = harbor_map_layer.get_cell_tile_data(harbor_positions[0]).get_material()
+			var copied_material = tile_material.duplicate()
+			
+			copied_material.set_shader_parameter("angle", angle)
+			
+			harbor_map_layer.get_cell_tile_data(harbor_positions[i]).set_material(copied_material)
+		else:
+			var tile_material = harbor_map_layer.get_cell_tile_data(harbor_positions[i]).get_material()
+			tile_material.set_shader_parameter("angle", angle)
+	
 	return possible_placements_read
