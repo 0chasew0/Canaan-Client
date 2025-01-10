@@ -1,8 +1,8 @@
 ea4bc82a6ad023ab7ee23ee620429895
-::res://::1732334136
+::res://::1736484682
 icon.svg::CompressedTexture2D::6373733551754743652::1730948997::1730949056::1::::<><>::
 NetworkingClient.gd::GDScript::-1::1731047780::0::1::::<>Node<>::
-NetworkingClient.tscn::PackedScene::656575761024644187::1732253682::0::1::::<><>::res://NetworkingClient.gd<>uid://b81k73kbrjw18::::res://scenes/game_select.tscn
+NetworkingClient.tscn::PackedScene::656575761024644187::1736484682::0::1::::<><>::res://NetworkingClient.gd<>uid://b81k73kbrjw18::::res://scenes/game_select.tscn
 README.md::TextFile::-1::1731049421::0::1::::<><>::
 ::res://images/::1732169368
 hexagonAll_sheet.png::CompressedTexture2D::7426068708351339155::1731129327::1731132147::1::::<><>::
@@ -74,9 +74,11 @@ grass_16.png::CompressedTexture2D::5938494235744237581::1731129326::1731138447::
 grass_17.png::CompressedTexture2D::4762694947289845202::1731129326::1731138447::1::::<><>::
 grass_18.png::CompressedTexture2D::2965232289231967405::1731129327::1731138447::1::::<><>::
 grass_19.png::CompressedTexture2D::8482304445763104081::1731129327::1731138447::1::::<><>::
-::res://images/Harbors/::1732170966
-generic_harbor.png::CompressedTexture2D::593018559236250814::1732170964::1732170966::1::::<><>::
-generic_harbor_small.png::CompressedTexture2D::7602957575433499866::1732170503::1732170506::1::::<><>::
+::res://images/Harbors/::1736484561
+generic_harbor.png::CompressedTexture2D::593018559236250814::1736484706::1736484711::1::::<><>::
+harbor_template.png::CompressedTexture2D::8730355143793654224::1736482660::1736482947::1::::<><>::
+ship (1).png::CompressedTexture2D::4349031998686598207::1731129525::1736313438::1::::<><>::
+wood (4).png::CompressedTexture2D::3644042995009202546::1731129524::1736313438::1::::<><>::
 ::res://images/Mars/::1731138447
 mars_01.png::CompressedTexture2D::1987342954768426154::1731129327::1731138447::1::::<><>::
 mars_02.png::CompressedTexture2D::152818440541730406::1731129327::1731138447::1::::<><>::
@@ -380,12 +382,12 @@ stone_16.png::CompressedTexture2D::6438140811769738770::1731129327::1731138447::
 stone_17.png::CompressedTexture2D::1450681430102861909::1731129327::1731138447::1::::<><>::
 stone_18.png::CompressedTexture2D::3569502330696221612::1731129327::1731138447::1::::<><>::
 stone_19.png::CompressedTexture2D::3217299825431518187::1731129327::1731138447::1::::<><>::
-::res://scenes/::1732253682
+::res://scenes/::1736484692
 camera_2d.gd::GDScript::-1::1731382215::0::1::::<>Camera2D<>::
-canaan.gd::GDScript::-1::1732249380::0::1::::<>Node2D<>::
-canaan.tscn::PackedScene::649491649225409735::1732253682::0::1::::<><>::res://scenes/canaan.gd<>res://scenes/camera_2d.gd<>uid://djglnqvthqtah::::res://images/Dirt/dirt_14.png<>uid://bv63g4podrub6::::res://images/Grass/grass_05.png<>uid://b6n4bu03fr25o::::res://images/Mars/mars_07.png<>uid://bpyol5iri4dvd::::res://images/wheat.png<>uid://dg2dv2u158wo8::::res://images/Stone/stone_07.png<>uid://d3fmtt7g8agjt::::res://images/Sand/sand_12.png<>uid://i6l1uby721ou::::res://images/Resource_Numbers/tile2_new.png<>res://scenes/resource_num_scaling.gdshader<>uid://cmu7h11y77ykt::::res://images/Resource_Numbers/tile12.png<>uid://gdsegqt3j67e::::res://images/Resource_Numbers/tile3.png<>uid://cm38b034qap7q::::res://images/Resource_Numbers/tile4.png<>uid://bggbks5nhm88n::::res://images/Resource_Numbers/tile5.png<>uid://chjv2wh07vwnn::::res://images/Resource_Numbers/tile6.png<>uid://dsy07w1lk71t2::::res://images/Resource_Numbers/tile8.png<>uid://d4ltpj374puxy::::res://images/Resource_Numbers/tile9.png<>uid://cqn0vl10rhjl8::::res://images/Resource_Numbers/tile10.png<>uid://bsgxbs4n5jlci::::res://images/Resource_Numbers/tile11.png<>res://scenes/harbor_rotation.gdshader<>uid://ipi6t7tunf6e::::res://images/Harbors/generic_harbor.png
-game_select.tscn::PackedScene::4756992146856726629::1732253682::0::1::::<><>::
-harbor_rotation.gdshader::Shader::-1::1732253682::0::1::::<><>::
-resource_num_scaling.gdshader::Shader::-1::1732253682::0::1::::<><>::
+canaan.gd::GDScript::-1::1736483246::0::1::::<>Node2D<>::
+canaan.tscn::PackedScene::649491649225409735::1736484692::0::1::::<><>::res://scenes/canaan.gd<>res://scenes/camera_2d.gd<>uid://djglnqvthqtah::::res://images/Dirt/dirt_14.png<>uid://bv63g4podrub6::::res://images/Grass/grass_05.png<>uid://b6n4bu03fr25o::::res://images/Mars/mars_07.png<>uid://bpyol5iri4dvd::::res://images/wheat.png<>uid://dg2dv2u158wo8::::res://images/Stone/stone_07.png<>uid://d3fmtt7g8agjt::::res://images/Sand/sand_12.png<>uid://i6l1uby721ou::::res://images/Resource_Numbers/tile2_new.png<>res://scenes/resource_num_scaling.gdshader<>uid://cmu7h11y77ykt::::res://images/Resource_Numbers/tile12.png<>uid://gdsegqt3j67e::::res://images/Resource_Numbers/tile3.png<>uid://cm38b034qap7q::::res://images/Resource_Numbers/tile4.png<>uid://bggbks5nhm88n::::res://images/Resource_Numbers/tile5.png<>uid://chjv2wh07vwnn::::res://images/Resource_Numbers/tile6.png<>uid://dsy07w1lk71t2::::res://images/Resource_Numbers/tile8.png<>uid://d4ltpj374puxy::::res://images/Resource_Numbers/tile9.png<>uid://cqn0vl10rhjl8::::res://images/Resource_Numbers/tile10.png<>uid://bsgxbs4n5jlci::::res://images/Resource_Numbers/tile11.png<>res://scenes/harbor_rotation.gdshader<>uid://ipi6t7tunf6e::::res://images/Harbors/generic_harbor.png
+game_select.tscn::PackedScene::4756992146856726629::1736484682::0::1::::<><>::
+harbor_rotation.gdshader::Shader::-1::1736484692::0::1::::<><>::
+resource_num_scaling.gdshader::Shader::-1::1736484692::0::1::::<><>::
 ::res://scripts/::1731559323
 Vertex.gd::GDScript::-1::1731559323::0::1::::Vertex<>RefCounted<>::

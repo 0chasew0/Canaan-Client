@@ -272,6 +272,7 @@ func generate_rand_standard_map() -> Array[Vector2i]:
 		
 		# Sides of a pointy-topped hexagon
 		
+		
 		for j in len(directions):
 			var surrounding_cell = standard_map.get_neighbor_cell(possible_placements_harbours[i], directions[j])
 			# Check if surrounding cell contains a tile
@@ -287,15 +288,24 @@ func generate_rand_standard_map() -> Array[Vector2i]:
 		6: 145,
 		8: 90,
 		10: 30,
-		14: 320
+		14: 325
 	}
+	
+	var harbor_angles: Array[int] = [
+		10, 8, 8, 6, 2, 2, 0, 14, 14
+	]
+	
 	for i in range(len(harbor_positions)):
 		harbor_map_layer.set_cell(harbor_positions[i], i, Vector2i(0,0))
 		# Grab direction for this position
-		var direction = harbor_cells[harbor_positions[i]]
-		var angle = angle_mapping[direction] # Returns an angle given a direction
 		
-		print(harbor_positions[i], " | ", direction)
+		# Hardcoded angles for a standard map, the skeleton is still here for dynamic harbor angle decision making
+		#var direction = harbor_cells[harbor_positions[i]]
+		#var angle = angle_mapping[direction] # Returns an angle given a direction
+		
+		#print(harbor_positions[i], " | ", direction)
+		
+		var angle = angle_mapping[harbor_angles[i]] # Should always be the same length as harbor_positions
 		
 		if i > 0:
 			var tile_material = harbor_map_layer.get_cell_tile_data(harbor_positions[0]).get_material()
@@ -307,5 +317,7 @@ func generate_rand_standard_map() -> Array[Vector2i]:
 		else:
 			var tile_material = harbor_map_layer.get_cell_tile_data(harbor_positions[i]).get_material()
 			tile_material.set_shader_parameter("angle", angle)
+	
+	# DYNAMIC: Add check that two harbors are at least two or more "edges" away from each other
 	
 	return possible_placements_read

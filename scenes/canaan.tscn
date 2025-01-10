@@ -235,7 +235,7 @@ tile_set = SubResource("TileSet_bq0il")
 
 [node name="Harbors" type="TileMapLayer" parent="MapLayer"]
 position = Vector2(908, 873)
-tile_map_data = PackedByteArray("AAD+//z/AQAAAAAAAAA=")
+tile_map_data = PackedByteArray("AAD+//z/AQAAAAAAAAAAAPz/CQAAAAAAAAA=")
 tile_set = SubResource("TileSet_m4nik")
 
 [node name="UILayer" type="CanvasLayer" parent="."]

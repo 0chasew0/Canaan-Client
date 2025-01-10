@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dgk6uoesfxc5o"
-path="res://.godot/imported/generic_harbor_small.png-58fdc79d01ca65ff74d6f7bbfe9d419b.ctex"
+uid="uid://b27x6lnh07fsx"
+path="res://.godot/imported/ship (1).png-e61e3e77de6f3f5b231c3975360c9910.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://images/Harbors/generic_harbor_small.png"
-dest_files=["res://.godot/imported/generic_harbor_small.png-58fdc79d01ca65ff74d6f7bbfe9d419b.ctex"]
+source_file="res://images/Harbors/ship (1).png"
+dest_files=["res://.godot/imported/ship (1).png-e61e3e77de6f3f5b231c3975360c9910.ctex"]
 
 [params]
 

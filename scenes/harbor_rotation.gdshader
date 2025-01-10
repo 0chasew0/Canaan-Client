@@ -12,7 +12,7 @@ void fragment() {
     // Move UV coordinates to the origin (center of the texture)
     vec2 rotated_uv = UV - center;
 
-    // Apply rotation transformation
+    // Apply rotation transformationrotated_uv = clamp(rotated_uv, vec2(0.0), vec2(1.0));
     rotated_uv = vec2(
         rotated_uv.x * cos(radians) - rotated_uv.y * sin(radians),
         rotated_uv.x * sin(radians) + rotated_uv.y * cos(radians)
@@ -20,7 +20,12 @@ void fragment() {
 
     // Move UV coordinates back to their original position
     rotated_uv += center;
-
-    // Sample the texture using the rotated UVs
-    COLOR = texture(TEXTURE, rotated_uv);
+	
+	if (rotated_uv.x < 0.0 || rotated_uv.x > 1.0 || rotated_uv.y < 0.0 || rotated_uv.y > 1.0) {
+    		COLOR = vec4(0.0, 0.0, 0.0, 0.0); // Use a fallback color (e.g., black)
+	} else {
+		COLOR = texture(TEXTURE, rotated_uv);
+	}
+	
+	//COLOR = texture(TEXTURE, rotated_uv);
 }
