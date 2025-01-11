@@ -1,4 +1,4 @@
-[gd_scene load_steps=53 format=4 uid="uid://jivbdwftiitr"]
+[gd_scene load_steps=58 format=4 uid="uid://jivbdwftiitr"]
 
 [ext_resource type="Script" path="res://scenes/canaan.gd" id="1_d354y"]
 [ext_resource type="Script" path="res://scenes/camera_2d.gd" id="2_sec5m"]
@@ -21,6 +21,11 @@
 [ext_resource type="Texture2D" uid="uid://bsgxbs4n5jlci" path="res://images/Resource_Numbers/tile11.png" id="18_5q3sy"]
 [ext_resource type="Shader" path="res://scenes/harbor_rotation.gdshader" id="20_bcwju"]
 [ext_resource type="Texture2D" uid="uid://ipi6t7tunf6e" path="res://images/Harbors/generic_harbor.png" id="20_issr1"]
+[ext_resource type="Texture2D" uid="uid://banatarpnxdpj" path="res://images/Harbors/brick_harbor.png" id="22_2wc0e"]
+[ext_resource type="Texture2D" uid="uid://c8rq22diap2nq" path="res://images/Harbors/sheep_harbor.png" id="23_jgflf"]
+[ext_resource type="Texture2D" uid="uid://bk6m2j4v01x3f" path="res://images/Harbors/stone_harbor.png" id="24_mkde2"]
+[ext_resource type="Texture2D" uid="uid://5plym3wvhuun" path="res://images/Harbors/wheat_harbor.png" id="25_c08q8"]
+[ext_resource type="Texture2D" uid="uid://cxelann5cdetv" path="res://images/Harbors/wood_harbor.png" id="26_clk17"]
 
 [sub_resource type="TileMapPattern" id="TileMapPattern_or3yt"]
 tile_data = PackedInt32Array(131072, 1, 0, 1, 1, 0, 65536, 1, 0, 131073, 1, 0, 196608, 1, 0, 262145, 1, 0, 2, 1, 0, 65537, 1, 0, 131074, 1, 0, 196609, 1, 0, 262146, 1, 0, 3, 1, 0, 65538, 1, 0, 131075, 1, 0, 196610, 1, 0, 262147, 1, 0, 65539, 1, 0, 131076, 1, 0, 196611, 1, 0)
@@ -162,27 +167,27 @@ texture_region_size = Vector2i(120, 140)
 0:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_aft66"]
-texture = ExtResource("20_issr1")
+texture = ExtResource("22_2wc0e")
 texture_region_size = Vector2i(120, 140)
 0:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_huu54"]
-texture = ExtResource("20_issr1")
+texture = ExtResource("23_jgflf")
 texture_region_size = Vector2i(120, 140)
 0:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wecpy"]
-texture = ExtResource("20_issr1")
+texture = ExtResource("24_mkde2")
 texture_region_size = Vector2i(120, 140)
 0:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_atw5d"]
-texture = ExtResource("20_issr1")
+texture = ExtResource("25_c08q8")
 texture_region_size = Vector2i(120, 140)
 0:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_5aaxl"]
-texture = ExtResource("20_issr1")
+texture = ExtResource("26_clk17")
 texture_region_size = Vector2i(120, 140)
 0:0/0 = 0
 
@@ -235,7 +240,7 @@ tile_set = SubResource("TileSet_bq0il")
 
 [node name="Harbors" type="TileMapLayer" parent="MapLayer"]
 position = Vector2(908, 873)
-tile_map_data = PackedByteArray("AAD+//z/AQAAAAAAAAAAAPz/CQAAAAAAAAA=")
+tile_map_data = PackedByteArray("AAD+//z/AQAAAAAAAAA=")
 tile_set = SubResource("TileSet_m4nik")
 
 [node name="UILayer" type="CanvasLayer" parent="."]

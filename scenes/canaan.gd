@@ -280,7 +280,7 @@ func generate_rand_standard_map() -> Array[Vector2i]:
 			if standard_map.get_cell_tile_data(surrounding_cell) == null:
 				harbor_cells[surrounding_cell] = directions[j]
 				
-	print(harbor_cells, len(harbor_cells))
+	#print(harbor_cells, len(harbor_cells))
 	
 	var angle_mapping = {
 		0: 270,
@@ -295,8 +295,22 @@ func generate_rand_standard_map() -> Array[Vector2i]:
 		10, 8, 8, 6, 2, 2, 0, 14, 14
 	]
 	
+	var harbor_types: Array[int] = [
+		1, 2, 3, 4, 5, 6, 7, 8
+	]
+	
 	for i in range(len(harbor_positions)):
-		harbor_map_layer.set_cell(harbor_positions[i], i, Vector2i(0,0))
+		# Choose a random harbor type and then remove it from the array so it can't be selected again
+		if i > 0:
+			var rand_harbor_selection = randi_range(0, len(harbor_types)-1)
+			var harbor_type = harbor_types[rand_harbor_selection]
+			harbor_types.pop_at(rand_harbor_selection)
+		
+			print(rand_harbor_selection, harbor_types)
+		
+			harbor_map_layer.set_cell(harbor_positions[i], harbor_type, Vector2i(0,0))
+		else:
+			harbor_map_layer.set_cell(harbor_positions[i], 0, Vector2i(0,0))
 		# Grab direction for this position
 		
 		# Hardcoded angles for a standard map, the skeleton is still here for dynamic harbor angle decision making
