@@ -251,12 +251,50 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = 742.0
-offset_top = 412.0
-offset_right = 917.0
-offset_bottom = 507.0
+offset_left = 769.0
+offset_top = 422.0
+offset_right = 944.0
+offset_bottom = 517.0
 grow_horizontal = 2
 grow_vertical = 2
 text = "Roll Dice"
+
+[node name="Chat" type="ColorRect" parent="UILayer"]
+offset_left = 1349.0
+offset_top = 8.0
+offset_right = 1903.0
+offset_bottom = 293.0
+color = Color(1, 0.701961, 0.168627, 1)
+
+[node name="Supply" type="ColorRect" parent="UILayer"]
+offset_left = 1547.0
+offset_top = 307.0
+offset_right = 1903.0
+offset_bottom = 422.0
+color = Color(1, 0.701961, 1, 1)
+
+[node name="Player1Background" type="ColorRect" parent="UILayer"]
+offset_left = 1547.0
+offset_top = 435.0
+offset_right = 1903.0
+offset_bottom = 550.0
+
+[node name="Player2Background" type="ColorRect" parent="UILayer"]
+offset_left = 1547.0
+offset_top = 564.0
+offset_right = 1903.0
+offset_bottom = 679.0
+
+[node name="Player3Background" type="ColorRect" parent="UILayer"]
+offset_left = 1547.0
+offset_top = 695.0
+offset_right = 1903.0
+offset_bottom = 810.0
+
+[node name="Player4Background" type="ColorRect" parent="UILayer"]
+offset_left = 1547.0
+offset_top = 827.0
+offset_right = 1903.0
+offset_bottom = 942.0
 
 [connection signal="pressed" from="UILayer/Roll_Dice" to="." method="_on_roll_dice_pressed"]

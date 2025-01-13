@@ -1,10 +1,10 @@
+Button
+ColorRect
 TileMapLayer
 Node2D
 CanvasLayer
 SubViewport
 Camera2D
-Button
-ColorRect
 Control
 RichTextLabel
 TextureRect

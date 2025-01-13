@@ -7,6 +7,11 @@ extends Node2D
 @onready var roll_dice_btn = $UILayer/Roll_Dice
 @onready var global_vertices = null
 @onready var VP = 0
+@onready var NUM_PLAYERS = 4 # Server side variable
+@onready var PLAYER_TURN = 1 # Server side variable
+@onready var PLAYER_NUM = 1 # Client/server side variable
+@onready var DIE_ROLL_NUM = 0
+@onready var is_roll_for_turn = true
 
 func _ready() -> void:
 	randomize() # Initializes randomizer, only call this once
@@ -14,6 +19,27 @@ func _ready() -> void:
 	
 	global_vertices = generate_tile_vertices(tile_positions, standard_map)
 	
+	while true:
+		# Determine who goes first by rolling for it
+		
+		# Upate player_turn var from server?
+		for i in range(1, NUM_PLAYERS):
+			# Server: hide all dice button presses for all other players who aren't rolling
+			# Bots will automatically roll dice
+			
+			# If it is this client's turn
+			if PLAYER_NUM == PLAYER_TURN:
+				await _on_roll_dice_pressed()
+			else: # Either a bot will roll or a player
+				pass
+			
+		is_roll_for_turn = false
+			
+func add_player_to_game():
+	# Determine if player is bot or real
+	# For now, bots (4 of them)
+	
+	pass
 
 # A normal turn
 	# Roll dice, roll_dice() -> send result to server
@@ -32,7 +58,7 @@ func _ready() -> void:
 			# Road, play_road() -> check for longest road (and win)
 			# Year of Plenty, play_year_of_plenty()
 			# Monopoly, play_monopoly()
-			
+	
 	# All functions require a sync to the server!
 
 func generate_resources():
@@ -59,11 +85,9 @@ func end_game():
 	pass
 	
 func build_city():
-	
 	pass
 	
 func build_road():
-	
 	pass
 
 # Debug func
@@ -106,11 +130,16 @@ func _on_roll_dice_pressed() -> void:
 	var result_1 = roll_dice()
 	var result_2 = roll_dice()
 	if result_1 + result_2 == 7:
+		if is_roll_for_turn:
+			DIE_ROLL_NUM = 7
+			emit_signal("roll_for_turn")
 		roll_dice_btn.text = "ROBBER!"
 	else:
+		if is_roll_for_turn:
+			DIE_ROLL_NUM = result_1 + result_2
+			emit_signal("roll_for_turn")
 		roll_dice_btn.text = "Rolled a " + str(result_1 + result_2) + " (" + str(result_1) + "," + str(result_2) + ")"
 
-# TODO: Add ports on tiles to map generation
 func generate_rand_standard_map() -> Array[Vector2i]:
 	
 	# Resource tile amounts
@@ -306,7 +335,7 @@ func generate_rand_standard_map() -> Array[Vector2i]:
 			var harbor_type = harbor_types[rand_harbor_selection]
 			harbor_types.pop_at(rand_harbor_selection)
 		
-			print(rand_harbor_selection, harbor_types)
+			#print(rand_harbor_selection, harbor_types)
 		
 			harbor_map_layer.set_cell(harbor_positions[i], harbor_type, Vector2i(0,0))
 		else:
