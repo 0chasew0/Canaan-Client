@@ -1,17 +1,35 @@
 extends Node2D
 
+# UI
 @onready var standard_map = $MapLayer/StandardMap
 @onready var resource_num_map_layer = $MapLayer/ResourceNumbers
 @onready var harbor_map_layer = $MapLayer/Harbors
-
 @onready var roll_dice_btn = $UILayer/Roll_Dice
+@onready var chat_log = $UILayer/Chat/Chat_Log
+
+# Game state variables
 @onready var global_vertices = null
 @onready var VP = 0
 @onready var NUM_PLAYERS = 4 # Server side variable
-@onready var PLAYER_TURN = 1 # Server side variable
-@onready var PLAYER_NUM = 1 # Client/server side variable
-@onready var DIE_ROLL_NUM = 0
+@onready var GLOBAL_TURN_NUM = 1 # Server side variable, all clients will have the same value
+@onready var PLAYER_NUM = 1 # Client/server side variable, unique to this client
+@onready var PLAYER_TURN_NUM = 0 # What turn does this player go on
+@onready var DIE_ROLL_NUM = 0 # Client variable, gets sent to server
 @onready var is_roll_for_turn = true
+
+# Debug vars
+@export var DEBUG_map_vertex_offset = Vector2(905, 671) # For the map vertices
+
+# Server side simulated variables -- basically IDs for other players
+@onready var BOT_1_PLAYER_NUM = 2
+@onready var BOT_2_PLAYER_NUM = 3
+@onready var BOT_3_PLAYER_NUM = 4
+@onready var BOT_1_DIE_ROLL_NUM = 0
+@onready var BOT_2_DIE_ROLL_NUM = 0
+@onready var BOT_3_DIE_ROLL_NUM = 0
+@onready var BOT_1_TURN_NUM = 0
+@onready var BOT_2_TURN_NUM = 0
+@onready var BOT_3_TURN_NUM = 0
 
 func _ready() -> void:
 	randomize() # Initializes randomizer, only call this once
@@ -19,26 +37,75 @@ func _ready() -> void:
 	
 	global_vertices = generate_tile_vertices(tile_positions, standard_map)
 	
+	## Main game loop for a client
+	#while true:
+		#pass
+	roll_for_who_goes_first()
+
+# A client will only roll once
+func roll_for_who_goes_first():
+	# Determine who goes first by rolling for it
+	# Upate player_turn var from server?
+	chat_log.append_text("\n Roll for turn order!")
+	
+	var turn_order: Array[Vector2i] = []
 	while true:
-		# Determine who goes first by rolling for it
-		
-		# Upate player_turn var from server?
-		for i in range(1, NUM_PLAYERS):
+		for i in range(1, NUM_PLAYERS + 1): # This will end up as server code
 			# Server: hide all dice button presses for all other players who aren't rolling
 			# Bots will automatically roll dice
 			
 			# If it is this client's turn
-			if PLAYER_NUM == PLAYER_TURN:
-				await _on_roll_dice_pressed()
-			else: # Either a bot will roll or a player
-				pass
-			
-		is_roll_for_turn = false
-			
+			if PLAYER_NUM == GLOBAL_TURN_NUM:
+				await roll_dice_btn.pressed # Wait for user to roll dice before continuing
+				DIE_ROLL_NUM = _on_roll_dice_pressed()
+				turn_order.append(Vector2i(DIE_ROLL_NUM, PLAYER_NUM))
+				
+				# Update the chat log
+				var fmt_str = "\n Player %s rolled a %s"
+				var act_str = fmt_str % [PLAYER_NUM, DIE_ROLL_NUM]
+				chat_log.append_text(act_str)
+			elif BOT_1_PLAYER_NUM == GLOBAL_TURN_NUM: # Server: either a bot will roll or a player. For now, only bots, so simulate their rolls
+				BOT_1_DIE_ROLL_NUM = _on_roll_dice_pressed()
+				turn_order.append(Vector2i(BOT_1_DIE_ROLL_NUM, BOT_1_PLAYER_NUM))
+				var fmt_str = "\n Player %s rolled a %s"
+				var act_str = fmt_str % [BOT_1_PLAYER_NUM, BOT_1_DIE_ROLL_NUM]
+				chat_log.append_text(act_str)
+			elif BOT_2_PLAYER_NUM == GLOBAL_TURN_NUM:
+				BOT_2_DIE_ROLL_NUM = _on_roll_dice_pressed()
+				turn_order.append(Vector2i(BOT_2_DIE_ROLL_NUM, BOT_2_PLAYER_NUM))
+				var fmt_str = "\n Player %s rolled a %s"
+				var act_str = fmt_str % [BOT_2_PLAYER_NUM, BOT_2_DIE_ROLL_NUM]
+				chat_log.append_text(act_str)
+			elif BOT_3_PLAYER_NUM == GLOBAL_TURN_NUM: 
+				BOT_3_DIE_ROLL_NUM = _on_roll_dice_pressed()
+				turn_order.append(Vector2i(BOT_3_DIE_ROLL_NUM, BOT_3_PLAYER_NUM))
+				var fmt_str = "\n Player %s rolled a %s"
+				var act_str = fmt_str % [BOT_3_PLAYER_NUM, BOT_3_DIE_ROLL_NUM]
+				chat_log.append_text(act_str)
+			GLOBAL_TURN_NUM += 1
+		# Server: compare all nums, make sure there is a clear winner -- else reroll until order is decided
+		turn_order.sort_custom(func(a, b): return a > b)
+		print(turn_order)
+		
+		# turn_order[i].y will be a players_id, so assign player turn nums from that
+		for i in range(len(turn_order)):
+			if turn_order[i].y == PLAYER_NUM:
+				PLAYER_TURN_NUM = i+1
+			elif turn_order[i].y == BOT_1_TURN_NUM:
+				BOT_1_TURN_NUM = i+1
+			elif turn_order[i].y == BOT_2_TURN_NUM:
+				BOT_2_TURN_NUM = i+1
+			elif turn_order[i].y == BOT_3_TURN_NUM:
+				BOT_3_TURN_NUM = i+1
+		print(PLAYER_TURN_NUM)
+		
+		
+		await get_tree().create_timer(1000).timeout
+	is_roll_for_turn = false
+
 func add_player_to_game():
 	# Determine if player is bot or real
 	# For now, bots (4 of them)
-	
 	pass
 
 # A normal turn
@@ -120,25 +187,31 @@ func generate_tile_vertices(tile_positions: Array[Vector2i], map_data: TileMapLa
 		var world_pos = map_data.map_to_local(tile_positions[i])
 		
 		for vertex in local_vertices:
-			global_vertices.append(world_pos + vertex + Vector2(200,550))
+			global_vertices.append(world_pos + vertex + DEBUG_map_vertex_offset)
+	
+	# Remove floating points from vertices
+	for i in range(len(global_vertices)):
+		global_vertices[i] = floor(global_vertices[i])
+	
+	# Deduplicate array
+	var temp_dict = {}
+	for vertex in global_vertices:
+		temp_dict[vertex] = null # doesn't need to be set to anything, we only care about keys
+	global_vertices = temp_dict.keys()
+	
 	return global_vertices
 
 func roll_dice() -> int:
 	return randi_range(1,6)
 
-func _on_roll_dice_pressed() -> void:
+func _on_roll_dice_pressed() -> int:
 	var result_1 = roll_dice()
 	var result_2 = roll_dice()
 	if result_1 + result_2 == 7:
-		if is_roll_for_turn:
-			DIE_ROLL_NUM = 7
-			emit_signal("roll_for_turn")
 		roll_dice_btn.text = "ROBBER!"
 	else:
-		if is_roll_for_turn:
-			DIE_ROLL_NUM = result_1 + result_2
-			emit_signal("roll_for_turn")
 		roll_dice_btn.text = "Rolled a " + str(result_1 + result_2) + " (" + str(result_1) + "," + str(result_2) + ")"
+	return result_1 + result_2
 
 func generate_rand_standard_map() -> Array[Vector2i]:
 	

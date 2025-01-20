@@ -1,3 +1,4 @@
+RichTextLabel
 Button
 ColorRect
 TileMapLayer
@@ -6,6 +7,5 @@ CanvasLayer
 SubViewport
 Camera2D
 Control
-RichTextLabel
 TextureRect
 Node

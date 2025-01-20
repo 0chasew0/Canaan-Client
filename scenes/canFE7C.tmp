@@ -206,9 +206,7 @@ sources/8 = SubResource("TileSetAtlasSource_5aaxl")
 
 [node name="Canaan" type="Node2D"]
 y_sort_enabled = true
-position = Vector2(1, 8)
 script = ExtResource("1_d354y")
-DEBUG_map_vertex_offset = Vector2(908, 671)
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(960, 536)
