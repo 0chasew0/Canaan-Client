@@ -1,4 +1,4 @@
-[gd_scene load_steps=58 format=4 uid="uid://jivbdwftiitr"]
+[gd_scene load_steps=60 format=4 uid="uid://jivbdwftiitr"]
 
 [ext_resource type="Script" path="res://scenes/canaan.gd" id="1_d354y"]
 [ext_resource type="Script" path="res://scenes/camera_2d.gd" id="2_sec5m"]
@@ -26,6 +26,8 @@
 [ext_resource type="Texture2D" uid="uid://bk6m2j4v01x3f" path="res://images/Harbors/stone_harbor.png" id="24_mkde2"]
 [ext_resource type="Texture2D" uid="uid://5plym3wvhuun" path="res://images/Harbors/wheat_harbor.png" id="25_c08q8"]
 [ext_resource type="Texture2D" uid="uid://cxelann5cdetv" path="res://images/Harbors/wood_harbor.png" id="26_clk17"]
+[ext_resource type="Texture2D" uid="uid://cskq1akso1233" path="res://images/UI_Place_Settlement_Indicator.png" id="27_fb148"]
+[ext_resource type="Texture2D" uid="uid://cxftq3mpksgb8" path="res://images/Pieces (Yellow)/pieceYellow_single07.png" id="28_lla6v"]
 
 [sub_resource type="TileMapPattern" id="TileMapPattern_or3yt"]
 tile_data = PackedInt32Array(131072, 1, 0, 1, 1, 0, 65536, 1, 0, 131073, 1, 0, 196608, 1, 0, 262145, 1, 0, 2, 1, 0, 65537, 1, 0, 131074, 1, 0, 196609, 1, 0, 262146, 1, 0, 3, 1, 0, 65538, 1, 0, 131075, 1, 0, 196610, 1, 0, 262147, 1, 0, 65539, 1, 0, 131076, 1, 0, 196611, 1, 0)
@@ -208,6 +210,7 @@ sources/8 = SubResource("TileSetAtlasSource_5aaxl")
 y_sort_enabled = true
 position = Vector2(1, 8)
 script = ExtResource("1_d354y")
+chat_log_font_size = 22
 DEBUG_map_vertex_offset = Vector2(908, 671)
 
 [node name="Camera2D" type="Camera2D" parent="."]
@@ -244,6 +247,32 @@ tile_set = SubResource("TileSet_bq0il")
 position = Vector2(908, 679)
 tile_map_data = PackedByteArray("AAD+//z/AQAAAAAAAAA=")
 tile_set = SubResource("TileSet_m4nik")
+
+[node name="Possible_Placement_Settlement" type="TextureButton" parent="MapLayer"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -16.5
+offset_top = -16.5
+offset_right = 16.5
+offset_bottom = 16.5
+grow_horizontal = 2
+grow_vertical = 2
+texture_normal = ExtResource("27_fb148")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Player1_Settlement" type="TextureRect" parent="MapLayer"]
+visible = false
+offset_left = 834.0
+offset_top = 593.0
+offset_right = 859.0
+offset_bottom = 617.0
+texture = ExtResource("28_lla6v")
+expand_mode = 1
 
 [node name="UILayer" type="CanvasLayer" parent="."]
 

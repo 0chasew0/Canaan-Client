@@ -20,12 +20,12 @@ void fragment() {
 
     // Move UV coordinates back to their original position
     rotated_uv += center;
-	
+
 	if (rotated_uv.x < 0.0 || rotated_uv.x > 1.0 || rotated_uv.y < 0.0 || rotated_uv.y > 1.0) {
     		COLOR = vec4(0.0, 0.0, 0.0, 0.0); // Use a fallback color (e.g., black)
 	} else {
 		COLOR = texture(TEXTURE, rotated_uv);
 	}
-	
+
 	//COLOR = texture(TEXTURE, rotated_uv);
 }

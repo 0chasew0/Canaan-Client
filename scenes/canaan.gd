@@ -6,6 +6,7 @@ extends Node2D
 @onready var harbor_map_layer = $MapLayer/Harbors
 @onready var roll_dice_btn = $UILayer/Roll_Dice
 @onready var chat_log = $UILayer/Chat/Chat_Log
+@export var chat_log_font_size = 30
 
 # Game state variables
 @onready var global_vertices = null
@@ -13,9 +14,10 @@ extends Node2D
 @onready var NUM_PLAYERS = 4 # Server side variable
 @onready var GLOBAL_TURN_NUM = 1 # Server side variable, all clients will have the same value
 @onready var PLAYER_NUM = 1 # Client/server side variable, unique to this client
-@onready var PLAYER_TURN_NUM = 0 # What turn does this player go on
+@onready var PLAYER_TURN_NUM = 1 # What turn does this player go on
 @onready var DIE_ROLL_NUM = 0 # Client variable, gets sent to server
 @onready var is_roll_for_turn = true
+@onready var is_initial_settlements = true
 
 # Debug vars
 @export var DEBUG_map_vertex_offset = Vector2(905, 671) # For the map vertices
@@ -27,9 +29,9 @@ extends Node2D
 @onready var BOT_1_DIE_ROLL_NUM = 0
 @onready var BOT_2_DIE_ROLL_NUM = 0
 @onready var BOT_3_DIE_ROLL_NUM = 0
-@onready var BOT_1_TURN_NUM = 0
-@onready var BOT_2_TURN_NUM = 0
-@onready var BOT_3_TURN_NUM = 0
+@onready var BOT_1_TURN_NUM = 2
+@onready var BOT_2_TURN_NUM = 3
+@onready var BOT_3_TURN_NUM = 4
 
 func _ready() -> void:
 	randomize() # Initializes randomizer, only call this once
@@ -37,76 +39,100 @@ func _ready() -> void:
 	
 	global_vertices = generate_tile_vertices(tile_positions, standard_map)
 	
+	# Initialize chat box setting(s)
+	chat_log.append_text("[font_size=%s]Welcome to Canaan!" % chat_log_font_size)
+	
 	## Main game loop for a client
 	#while true:
 		#pass
-	roll_for_who_goes_first()
-
-# A client will only roll once
-func roll_for_who_goes_first():
-	# Determine who goes first by rolling for it
-	# Upate player_turn var from server?
-	chat_log.append_text("\n Roll for turn order!")
-	
-	var turn_order: Array[Vector2i] = []
-	while true:
-		for i in range(1, NUM_PLAYERS + 1): # This will end up as server code
-			# Server: hide all dice button presses for all other players who aren't rolling
-			# Bots will automatically roll dice
-			
-			# If it is this client's turn
-			if PLAYER_NUM == GLOBAL_TURN_NUM:
-				await roll_dice_btn.pressed # Wait for user to roll dice before continuing
-				DIE_ROLL_NUM = _on_roll_dice_pressed()
-				turn_order.append(Vector2i(DIE_ROLL_NUM, PLAYER_NUM))
-				
-				# Update the chat log
-				var fmt_str = "\n Player %s rolled a %s"
-				var act_str = fmt_str % [PLAYER_NUM, DIE_ROLL_NUM]
-				chat_log.append_text(act_str)
-			elif BOT_1_PLAYER_NUM == GLOBAL_TURN_NUM: # Server: either a bot will roll or a player. For now, only bots, so simulate their rolls
-				BOT_1_DIE_ROLL_NUM = _on_roll_dice_pressed()
-				turn_order.append(Vector2i(BOT_1_DIE_ROLL_NUM, BOT_1_PLAYER_NUM))
-				var fmt_str = "\n Player %s rolled a %s"
-				var act_str = fmt_str % [BOT_1_PLAYER_NUM, BOT_1_DIE_ROLL_NUM]
-				chat_log.append_text(act_str)
-			elif BOT_2_PLAYER_NUM == GLOBAL_TURN_NUM:
-				BOT_2_DIE_ROLL_NUM = _on_roll_dice_pressed()
-				turn_order.append(Vector2i(BOT_2_DIE_ROLL_NUM, BOT_2_PLAYER_NUM))
-				var fmt_str = "\n Player %s rolled a %s"
-				var act_str = fmt_str % [BOT_2_PLAYER_NUM, BOT_2_DIE_ROLL_NUM]
-				chat_log.append_text(act_str)
-			elif BOT_3_PLAYER_NUM == GLOBAL_TURN_NUM: 
-				BOT_3_DIE_ROLL_NUM = _on_roll_dice_pressed()
-				turn_order.append(Vector2i(BOT_3_DIE_ROLL_NUM, BOT_3_PLAYER_NUM))
-				var fmt_str = "\n Player %s rolled a %s"
-				var act_str = fmt_str % [BOT_3_PLAYER_NUM, BOT_3_DIE_ROLL_NUM]
-				chat_log.append_text(act_str)
-			GLOBAL_TURN_NUM += 1
-		# Server: compare all nums, make sure there is a clear winner -- else reroll until order is decided
-		turn_order.sort_custom(func(a, b): return a > b)
-		print(turn_order)
-		
-		# turn_order[i].y will be a players_id, so assign player turn nums from that
-		for i in range(len(turn_order)):
-			if turn_order[i].y == PLAYER_NUM:
-				PLAYER_TURN_NUM = i+1
-			elif turn_order[i].y == BOT_1_TURN_NUM:
-				BOT_1_TURN_NUM = i+1
-			elif turn_order[i].y == BOT_2_TURN_NUM:
-				BOT_2_TURN_NUM = i+1
-			elif turn_order[i].y == BOT_3_TURN_NUM:
-				BOT_3_TURN_NUM = i+1
-		print(PLAYER_TURN_NUM)
-		
-		
-		await get_tree().create_timer(1000).timeout
-	is_roll_for_turn = false
+	await roll_for_who_goes_first()
+	place_initial_settlements_and_roads(GLOBAL_TURN_NUM)
 
 func add_player_to_game():
 	# Determine if player is bot or real
 	# For now, bots (4 of them)
 	pass
+
+# A client will only roll once
+func roll_for_who_goes_first():
+	# Determine who goes first by rolling for it
+	# Upate player_turn var from server?
+	chat_log.append_text("[font_size=%s]\nRoll for turn order!" % chat_log_font_size)
+	
+	var turn_order: Array[Vector2i] = []
+	for i in range(1, NUM_PLAYERS + 1): # This will end up as server code
+		# Server: hide all dice button presses for all other players who aren't rolling
+		# Bots will automatically roll dice
+		
+		# If it is this client's turn
+		if PLAYER_NUM == GLOBAL_TURN_NUM:
+			await roll_dice_btn.pressed # Wait for user to roll dice before continuing
+			DIE_ROLL_NUM = _on_roll_dice_pressed()
+			turn_order.append(Vector2i(DIE_ROLL_NUM, PLAYER_NUM))
+			
+			# Update the chat log
+			var fmt_str = "[font_size=%s]\nPlayer %s rolled a %s"
+			var act_str = fmt_str % [chat_log_font_size, PLAYER_NUM, DIE_ROLL_NUM]
+			chat_log.append_text(act_str)
+		elif BOT_1_PLAYER_NUM == GLOBAL_TURN_NUM: # Server: either a bot will roll or a player. For now, only bots, so simulate their rolls
+			BOT_1_DIE_ROLL_NUM = _on_roll_dice_pressed()
+			turn_order.append(Vector2i(BOT_1_DIE_ROLL_NUM, BOT_1_PLAYER_NUM))
+			var fmt_str = "[font_size=%s]\nPlayer %s rolled a %s"
+			var act_str = fmt_str % [chat_log_font_size, BOT_1_PLAYER_NUM, BOT_1_DIE_ROLL_NUM]
+			chat_log.append_text(act_str)
+		elif BOT_2_PLAYER_NUM == GLOBAL_TURN_NUM:
+			BOT_2_DIE_ROLL_NUM = _on_roll_dice_pressed()
+			turn_order.append(Vector2i(BOT_2_DIE_ROLL_NUM, BOT_2_PLAYER_NUM))
+			var fmt_str = "[font_size=%s]\nPlayer %s rolled a %s"
+			var act_str = fmt_str % [chat_log_font_size, BOT_2_PLAYER_NUM, BOT_2_DIE_ROLL_NUM]
+			chat_log.append_text(act_str)
+		elif BOT_3_PLAYER_NUM == GLOBAL_TURN_NUM: 
+			BOT_3_DIE_ROLL_NUM = _on_roll_dice_pressed()
+			turn_order.append(Vector2i(BOT_3_DIE_ROLL_NUM, BOT_3_PLAYER_NUM))
+			var fmt_str = "[font_size=%s]\nPlayer %s rolled a %s"
+			var act_str = fmt_str % [chat_log_font_size, BOT_3_PLAYER_NUM, BOT_3_DIE_ROLL_NUM]
+			chat_log.append_text(act_str)
+		GLOBAL_TURN_NUM += 1
+		
+	turn_order.sort_custom(custom_sort_for_first_roll)
+	print(turn_order)
+	
+	# turn_order[i].y will be a players_id, so assign player turn nums from that
+	for i in range(len(turn_order)):
+		if turn_order[i].y == PLAYER_NUM:
+			PLAYER_TURN_NUM = i+1
+		elif turn_order[i].y == BOT_1_TURN_NUM:
+			BOT_1_TURN_NUM = i+1
+		elif turn_order[i].y == BOT_2_TURN_NUM:
+			BOT_2_TURN_NUM = i+1
+		elif turn_order[i].y == BOT_3_TURN_NUM:
+			BOT_3_TURN_NUM = i+1
+	print(PLAYER_TURN_NUM)
+	
+	chat_log.append_text("\n")
+	for i in range(len(turn_order)):
+		var placement_str = ""
+		if i == 0:
+			placement_str = "first"
+		elif i == 1:
+			placement_str = "second"
+		elif i == 2:
+			placement_str = "third"
+		elif i == 3:
+			placement_str = "fourth"
+		var fmt_str = "[font_size=%s]\nPlayer %s goes %s!"
+		var act_str = fmt_str % [chat_log_font_size, turn_order[i].y, placement_str]
+		chat_log.append_text(act_str)
+		
+	is_roll_for_turn = false
+	GLOBAL_TURN_NUM = 1
+
+func custom_sort_for_first_roll(a, b):
+	if a.x > b.x:
+		return true
+	elif a.x == b.x:
+		return false
+	return false
 
 # A normal turn
 	# Roll dice, roll_dice() -> send result to server
@@ -128,8 +154,41 @@ func add_player_to_game():
 	
 	# All functions require a sync to the server!
 
-func generate_resources():
+# A client will only do this once when it is their turn, bot functionality is added here for testing
+func place_initial_settlements_and_roads(GLOBAL_TURN_NUM):
+	var settlement_placement_offset = Vector2(-12, -9)
+
+	#if GLOBAL_TURN_NUM == PLAYER_TURN_NUM:
+		
+	# Update the chat log
+	var fmt_str = "[font_size=%s]\nPlayer %s place a settlement and road."
+	var act_str = fmt_str % [chat_log_font_size, PLAYER_NUM]
+	chat_log.append_text(act_str)
 	
+	# Show the UI element for possible settlement placements
+	var eligible_vertices = global_vertices # For now
+	var UI_elements = []
+	for vertex in eligible_vertices:
+		var curr_UI_element = $MapLayer/Possible_Placement_Settlement.duplicate()
+		UI_elements.append(curr_UI_element)
+		$MapLayer.add_child(curr_UI_element)
+		curr_UI_element.show()
+		curr_UI_element.position = vertex + settlement_placement_offset
+		curr_UI_element.pressed.connect(settlement_placement_pressed.bind(curr_UI_element.name))
+	
+	# Change this to a timer eventually
+	while true: # Wait for button to be pressed
+		await settlement_placement_pressed()
+	#elif GLOBAL_TURN_NUM == BOT_1_TURN_NUM:
+		#pass
+	#elif GLOBAL_TURN_NUM == BOT_2_TURN_NUM:
+		#pass
+	#elif GLOBAL_TURN_NUM == BOT_3_TURN_NUM:
+		#pass
+func settlement_placement_pressed(id):
+	print("Button %s pressed" % id)
+
+func generate_resources():
 	pass
 
 # Triggers when a Player selects to build a settlement only
@@ -143,13 +202,6 @@ func build_settlement():
 		
 	# If successfully built, increment VP and add settlement (visually and to player) and check for win
 	pass
-
-func check_win():
-	if VP >= 10:
-		end_game()
-
-func end_game():
-	pass
 	
 func build_city():
 	pass
@@ -158,14 +210,10 @@ func build_road():
 	pass
 
 # Debug func
-func _draw():
-	for x in global_vertices:
-		draw_circle(x, 5, Color(Color.RED), 5.0)
+#func _draw():
+	#for x in global_vertices:
+		#draw_circle(x, 5, Color(Color.RED), 5.0)
 
-#func _process(delta: float) -> void:
-	#generate_rand_standard_map()
-	#
-	
 func generate_tile_vertices(tile_positions: Array[Vector2i], map_data: TileMapLayer):
 	
 	# Get radius of a tile in the tile set of the tile map
@@ -437,3 +485,10 @@ func generate_rand_standard_map() -> Array[Vector2i]:
 	# DYNAMIC: Add check that two harbors are at least two or more "edges" away from each other
 	
 	return possible_placements_read
+	
+func check_win():
+	if VP >= 10:
+		end_game()
+
+func end_game():
+	pass

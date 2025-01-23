@@ -1,11 +1,12 @@
+TextureRect
+TextureButton
+TileMapLayer
 RichTextLabel
 Button
 ColorRect
-TileMapLayer
 Node2D
 CanvasLayer
 SubViewport
 Camera2D
 Control
-TextureRect
 Node
