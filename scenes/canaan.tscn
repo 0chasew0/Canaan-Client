@@ -267,12 +267,15 @@ stretch_mode = 0
 
 [node name="Player1_Settlement" type="TextureRect" parent="MapLayer"]
 visible = false
-offset_left = 834.0
-offset_top = 593.0
-offset_right = 859.0
-offset_bottom = 617.0
+offset_left = 826.0
+offset_top = 577.0
+offset_right = 874.0
+offset_bottom = 625.0
 texture = ExtResource("28_lla6v")
 expand_mode = 1
+
+[node name="Player1_Settlement_Timer" type="Timer" parent="MapLayer"]
+wait_time = 5.0
 
 [node name="UILayer" type="CanvasLayer" parent="."]
 
@@ -335,4 +338,5 @@ offset_top = 827.0
 offset_right = 1903.0
 offset_bottom = 942.0
 
+[connection signal="timeout" from="MapLayer/Player1_Settlement_Timer" to="." method="_on_player_1_settlement_timer_timeout" binds= [true]]
 [connection signal="pressed" from="UILayer/Roll_Dice" to="." method="_on_roll_dice_pressed"]

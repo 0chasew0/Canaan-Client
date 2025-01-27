@@ -18,6 +18,7 @@ extends Node2D
 @onready var DIE_ROLL_NUM = 0 # Client variable, gets sent to server
 @onready var is_roll_for_turn = true
 @onready var is_initial_settlements = true
+@onready var PLAYER_SETTLEMENTS = [] # Holds the positions of all settlements this player owns
 
 # Debug vars
 @export var DEBUG_map_vertex_offset = Vector2(905, 671) # For the map vertices
@@ -174,19 +175,53 @@ func place_initial_settlements_and_roads(GLOBAL_TURN_NUM):
 		$MapLayer.add_child(curr_UI_element)
 		curr_UI_element.show()
 		curr_UI_element.position = vertex + settlement_placement_offset
-		curr_UI_element.pressed.connect(settlement_placement_pressed.bind(curr_UI_element.name))
+		curr_UI_element.pressed.connect(settlement_placement_pressed.bind(curr_UI_element.name, GLOBAL_TURN_NUM))
 	
-	# Change this to a timer eventually
-	while true: # Wait for button to be pressed
-		await settlement_placement_pressed()
+	# Await a timer timeout -- timeout the timer in settlement_placement_pressed() when a settlement is chosen before the timer runs out.
+	# otherwise, if timer runs out before settlement is chosen, place settlement randomly for this player using GLOBAL_TURN_NUM
+	$MapLayer/Player1_Settlement_Timer.start()
+	await $MapLayer/Player1_Settlement_Timer.timeout
+	$MapLayer/Player1_Settlement_Timer.stop()
+	print("Back in function, place road now...")
+	for x in UI_elements:
+		x.queue_free()
+	
+
 	#elif GLOBAL_TURN_NUM == BOT_1_TURN_NUM:
 		#pass
 	#elif GLOBAL_TURN_NUM == BOT_2_TURN_NUM:
 		#pass
 	#elif GLOBAL_TURN_NUM == BOT_3_TURN_NUM:
 		#pass
-func settlement_placement_pressed(id):
-	print("Button %s pressed" % id)
+# Should only fire if logic from place_initial_settlements() is correct
+func settlement_placement_pressed(id, global_turn_num):
+	# add settlement to player
+	# increment VP
+	# add settlement to UI layer for all players
+	# check for win
+	
+	var offset_position = Vector2(-10, -10)
+	#print("Button %s pressed" % id)
+	var selected_nodes_position = get_node("MapLayer/%s" % id).position
+	var ui_element_for_selected_settlement = $MapLayer/Player1_Settlement.duplicate()
+	$MapLayer.add_child(ui_element_for_selected_settlement)
+	ui_element_for_selected_settlement.show()
+	ui_element_for_selected_settlement.position = selected_nodes_position + offset_position
+	#print("Whose turn: ", global_turn_num)
+	
+	# Add settlement to player
+	PLAYER_SETTLEMENTS.append(selected_nodes_position)
+	
+	$MapLayer/Player1_Settlement_Timer.emit_signal("timeout", false) # Tells the timeout function not to place a random settlement
+
+# USES ADVANCED SETTINGS ON TIMER TIMEOUT() IN SIGNALS TO BIND ARGUMENT FOR NON-FALSE PATH
+func _on_player_1_settlement_timer_timeout(is_timeout_or_success) -> void:
+	if is_timeout_or_success == false:
+		# Don't place random settlement
+		print("Timer done, not placing random settlement and returning to function...")
+		return
+	print("Timer done, placing random settlement and returning to function...")
+	# Messy, but redo algorithm for checking eligible vertices in separate function here
 
 func generate_resources():
 	pass
