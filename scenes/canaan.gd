@@ -23,7 +23,7 @@ extends Node2D
 # Debug vars
 @export var DEBUG_map_vertex_offset = Vector2(905, 671) # For the map vertices
 
-# Server side simulated variables -- basically IDs for other players
+# Server side simulated variables
 @onready var BOT_1_PLAYER_NUM = 2
 @onready var BOT_2_PLAYER_NUM = 3
 @onready var BOT_3_PLAYER_NUM = 4
@@ -33,12 +33,18 @@ extends Node2D
 @onready var BOT_1_TURN_NUM = 2
 @onready var BOT_2_TURN_NUM = 3
 @onready var BOT_3_TURN_NUM = 4
+@onready var ELIGIBLE_SETTLEMENT_VERTICES = [] # Contains a list of eligible vertices for settlement placement. This is shared between all players
+
+# Signals
+signal selection_finished # Used for returning control back to a main function after a user selects an action or they timeout from that action
 
 func _ready() -> void:
 	randomize() # Initializes randomizer, only call this once
 	var tile_positions = generate_rand_standard_map() # Map data contains coordinates of all cells of the map
 	
 	global_vertices = generate_tile_vertices(tile_positions, standard_map)
+	ELIGIBLE_SETTLEMENT_VERTICES = global_vertices # At the beginning of the game, all vertices are eligible
+	init_settlement_buttons(global_vertices)
 	
 	# Initialize chat box setting(s)
 	chat_log.append_text("[font_size=%s]Welcome to Canaan!" % chat_log_font_size)
@@ -47,7 +53,8 @@ func _ready() -> void:
 	#while true:
 		#pass
 	await roll_for_who_goes_first()
-	place_initial_settlements_and_roads(GLOBAL_TURN_NUM)
+	await place_initial_settlements_and_roads(GLOBAL_TURN_NUM)
+	await place_initial_settlements_and_roads(GLOBAL_TURN_NUM)
 
 func add_player_to_game():
 	# Determine if player is bot or real
@@ -157,8 +164,8 @@ func custom_sort_for_first_roll(a, b):
 
 # A client will only do this once when it is their turn, bot functionality is added here for testing
 func place_initial_settlements_and_roads(GLOBAL_TURN_NUM):
-	var settlement_placement_offset = Vector2(-12, -9)
-
+	for node in get_tree().get_nodes_in_group("UI_settlement_buttons"):
+		node.show()
 	#if GLOBAL_TURN_NUM == PLAYER_TURN_NUM:
 		
 	# Update the chat log
@@ -166,26 +173,15 @@ func place_initial_settlements_and_roads(GLOBAL_TURN_NUM):
 	var act_str = fmt_str % [chat_log_font_size, PLAYER_NUM]
 	chat_log.append_text(act_str)
 	
-	# Show the UI element for possible settlement placements
-	var eligible_vertices = global_vertices # For now
-	var UI_elements = []
-	for vertex in eligible_vertices:
-		var curr_UI_element = $MapLayer/Possible_Placement_Settlement.duplicate()
-		UI_elements.append(curr_UI_element)
-		$MapLayer.add_child(curr_UI_element)
-		curr_UI_element.show()
-		curr_UI_element.position = vertex + settlement_placement_offset
-		curr_UI_element.pressed.connect(settlement_placement_pressed.bind(curr_UI_element.name, GLOBAL_TURN_NUM))
-	
 	# Await a timer timeout -- timeout the timer in settlement_placement_pressed() when a settlement is chosen before the timer runs out.
 	# otherwise, if timer runs out before settlement is chosen, place settlement randomly for this player using GLOBAL_TURN_NUM
 	$MapLayer/Player1_Settlement_Timer.start()
-	await $MapLayer/Player1_Settlement_Timer.timeout
+	await selection_finished # Wait for user input, else timer will timeout and do the same stuff as below
 	$MapLayer/Player1_Settlement_Timer.stop()
 	print("Back in function, place road now...")
-	for x in UI_elements:
-		x.queue_free()
-	
+	print(get_tree().get_node_count_in_group("UI_settlement_buttons"))
+	for node in get_tree().get_nodes_in_group("UI_settlement_buttons"):
+		node.hide()
 
 	#elif GLOBAL_TURN_NUM == BOT_1_TURN_NUM:
 		#pass
@@ -193,35 +189,94 @@ func place_initial_settlements_and_roads(GLOBAL_TURN_NUM):
 		#pass
 	#elif GLOBAL_TURN_NUM == BOT_3_TURN_NUM:
 		#pass
+		
+# Initialize settlement placement buttons group -- this is done once for each game!
+# Afterwards, make changes to the group
+func init_settlement_buttons(global_vertices):
+	var settlement_placement_offset = Vector2(-12, -9)
+	# Show the UI element for possible settlement placements
+	var UI_elements = []
+	for vertex in ELIGIBLE_SETTLEMENT_VERTICES:
+		var curr_UI_element = $MapLayer/Possible_Placement_Settlement.duplicate()
+		curr_UI_element.add_to_group("UI_settlement_buttons")
+		UI_elements.append(curr_UI_element)
+		$MapLayer.add_child(curr_UI_element)
+		curr_UI_element.hide()
+		curr_UI_element.position = vertex + settlement_placement_offset
+		curr_UI_element.pressed.connect(settlement_placement_pressed.bind(curr_UI_element.name, GLOBAL_TURN_NUM, vertex))
+
 # Should only fire if logic from place_initial_settlements() is correct
-func settlement_placement_pressed(id, global_turn_num):
-	# add settlement to player
+func settlement_placement_pressed(id, global_turn_num, vertex_selection):
 	# increment VP
-	# add settlement to UI layer for all players
 	# check for win
 	
+	#print("vertex_selection: ", vertex_selection)
+	
+	# Add settlement as UI element
 	var offset_position = Vector2(-10, -10)
-	#print("Button %s pressed" % id)
-	var selected_nodes_position = get_node("MapLayer/%s" % id).position
+	var selected_node = get_node("MapLayer/%s" % id)
+	var selected_node_position = get_node("MapLayer/%s" % id).position
 	var ui_element_for_selected_settlement = $MapLayer/Player1_Settlement.duplicate()
 	$MapLayer.add_child(ui_element_for_selected_settlement)
 	ui_element_for_selected_settlement.show()
-	ui_element_for_selected_settlement.position = selected_nodes_position + offset_position
-	#print("Whose turn: ", global_turn_num)
+	ui_element_for_selected_settlement.position = selected_node_position + offset_position
 	
 	# Add settlement to player
-	PLAYER_SETTLEMENTS.append(selected_nodes_position)
+	PLAYER_SETTLEMENTS.append(selected_node_position)
 	
-	$MapLayer/Player1_Settlement_Timer.emit_signal("timeout", false) # Tells the timeout function not to place a random settlement
+	# Update eligible vertices
+	update_eligible_settlement_vertices(vertex_selection, selected_node)
+	
+	emit_signal("selection_finished")
 
-# USES ADVANCED SETTINGS ON TIMER TIMEOUT() IN SIGNALS TO BIND ARGUMENT FOR NON-FALSE PATH
-func _on_player_1_settlement_timer_timeout(is_timeout_or_success) -> void:
-	if is_timeout_or_success == false:
-		# Don't place random settlement
-		print("Timer done, not placing random settlement and returning to function...")
-		return
-	print("Timer done, placing random settlement and returning to function...")
-	# Messy, but redo algorithm for checking eligible vertices in separate function here
+func _on_player_1_settlement_timer_non_timeout() -> void:
+	$MapLayer/Player1_Settlement_Timer.stop()
+	print("Timer exited early due to settlement placement, returning to function...")
+
+func _on_player_1_settlement_timer_timeout() -> void:
+	# If timer runs out place settlement randomly
+	$MapLayer/Player1_Settlement_Timer.stop()
+	print("Timer done, placing random settlement...")
+	
+	var rand_index = randi_range(0, len(ELIGIBLE_SETTLEMENT_VERTICES))
+	# Add random settlement as UI element
+	var offset_position = Vector2(-10, -10)
+	var selected_node_position = ELIGIBLE_SETTLEMENT_VERTICES[rand_index]
+	var ui_element_for_selected_settlement = $MapLayer/Player1_Settlement.duplicate()
+	$MapLayer.add_child(ui_element_for_selected_settlement)
+	ui_element_for_selected_settlement.show()
+	ui_element_for_selected_settlement.position = selected_node_position + offset_position
+	
+	# Add settlement to player
+	PLAYER_SETTLEMENTS.append(selected_node_position)
+	
+	# Update eligible vertices
+	var selected_node
+	for node in get_node("MapLayer").get_children(): # node.position is offset
+		if "TextureButton" in node.name:
+			#print(node.position, selected_node_position + Vector2(-12, -9))
+			if node.position == (selected_node_position + Vector2(-12, -9)):
+				selected_node = node
+				#print("timeout_selected_node: ", selected_node)
+	
+	update_eligible_settlement_vertices(selected_node_position, selected_node)
+	
+	# Return to main function
+	emit_signal("selection_finished")
+
+# Updates the global array for eligible vertices for settlement placement
+func update_eligible_settlement_vertices(vertex, node) -> void:
+	for x in get_tree().get_nodes_in_group("UI_settlement_buttons"):
+		if x == node:
+			print("removing from group: ", x, node)
+			x.remove_from_group("UI_settlement_buttons")
+			node.queue_free()
+	#for i in range(len(ELIGIBLE_SETTLEMENT_VERTICES)):
+		#if ELIGIBLE_SETTLEMENT_VERTICES[i] == vertex:
+			#print("popping vertex: ", vertex)
+			#ELIGIBLE_SETTLEMENT_VERTICES.remove_at(i)
+		#break
+	return
 
 func generate_resources():
 	pass
@@ -274,7 +329,7 @@ func generate_tile_vertices(tile_positions: Array[Vector2i], map_data: TileMapLa
 	
 	# Remove floating points from vertices
 	for i in range(len(global_vertices)):
-		global_vertices[i] = floor(global_vertices[i])
+		global_vertices[i] = round(global_vertices[i] / 10) * 10
 	
 	# Deduplicate array
 	var temp_dict = {}

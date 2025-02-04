@@ -338,5 +338,5 @@ offset_top = 827.0
 offset_right = 1903.0
 offset_bottom = 942.0
 
-[connection signal="timeout" from="MapLayer/Player1_Settlement_Timer" to="." method="_on_player_1_settlement_timer_timeout" binds= [true]]
+[connection signal="timeout" from="MapLayer/Player1_Settlement_Timer" to="." method="_on_player_1_settlement_timer_timeout"]
 [connection signal="pressed" from="UILayer/Roll_Dice" to="." method="_on_roll_dice_pressed"]
