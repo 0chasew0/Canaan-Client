@@ -19,6 +19,8 @@ extends Node2D
 @onready var is_roll_for_turn = true
 @onready var is_initial_settlements = true
 @onready var PLAYER_SETTLEMENTS = [] # Holds the positions of all settlements this player owns
+@onready var PLAYER_ROAD_GRAPHS = [] # Holds the positions of all connected points branching out from a settlement/city
+									  # example: [[(0,0), (0,1), (0,2)], [()], []] 
 
 # Debug vars
 @export var DEBUG_map_vertex_offset = Vector2(905, 671) # For the map vertices
@@ -179,9 +181,24 @@ func place_initial_settlements_and_roads(GLOBAL_TURN_NUM):
 	await selection_finished # Wait for user input, else timer will timeout and do the same stuff as below
 	$MapLayer/Player1_Settlement_Timer.stop()
 	print("Back in function, place road now...")
-	print(get_tree().get_node_count_in_group("UI_settlement_buttons"))
+	
+	# Hide settlment_placement_buttons
 	for node in get_tree().get_nodes_in_group("UI_settlement_buttons"):
 		node.hide()
+	
+	# Place a road
+	# Roads in this init function will never branch from an existing road -- they will only extend from a settlement
+	# Player settlements array should hold latest settlement position -- always use last one
+	var settlement_pos = PLAYER_SETTLEMENTS.back()
+	init_possible_road_placements(settlement_pos)
+	await selection_finished
+	print("Done placing road.")
+	var i = 2
+	for node in get_node("MapLayer").get_children():
+		if node.name == "Possible_Placement_Road%s" % i:
+			i+=1
+			node.queue_free()
+		
 
 	#elif GLOBAL_TURN_NUM == BOT_1_TURN_NUM:
 		#pass
@@ -189,7 +206,42 @@ func place_initial_settlements_and_roads(GLOBAL_TURN_NUM):
 		#pass
 	#elif GLOBAL_TURN_NUM == BOT_3_TURN_NUM:
 		#pass
-		
+func init_possible_road_placements(settlement_pos) -> void:
+	# Distance around 70
+	# Given a single point -- find all possible road placements branching from it using distance formula
+	# TODO: take into account own player and other players roads/settlements/cities
+	
+	var road_ui_btn_offset = Vector2(-10, -3.5)
+	
+	for vertex in ELIGIBLE_SETTLEMENT_VERTICES:
+		var distance = sqrt(((vertex.x - settlement_pos.x)**2) + ((vertex.y - settlement_pos.y)**2))
+		if distance > 50 and distance < 75:
+			# Find midpoint to place UI element
+			var midpoint = Vector2(((vertex.x + settlement_pos.x) / 2), ((vertex.y + settlement_pos.y) / 2))
+
+			var curr_UI_element = $MapLayer/Possible_Placement_Road.duplicate()
+			$MapLayer.add_child(curr_UI_element, true)
+			curr_UI_element.show()
+			curr_UI_element.position = midpoint + road_ui_btn_offset
+			# Pass vertex here is the vertex that connects the settlement vertex to the next vertex
+			curr_UI_element.pressed.connect(road_placement_pressed.bind(curr_UI_element, GLOBAL_TURN_NUM, vertex))
+
+func road_placement_pressed(midpoint_btn_node, GLOBAL_TURN_NUM, connected_vertex):
+	
+	# When the midpoint button is pressed -- show a road between the two points and add those two points as a road to this player
+	var road_ui_offset = Vector2(-25, 7.5)
+	var road_ui_rotation = 30
+	var ui_element_for_road = $MapLayer/Player1_Road.duplicate()
+	$MapLayer.add_child(ui_element_for_road)
+	ui_element_for_road.show()
+	ui_element_for_road.pivot_offset = Vector2(ui_element_for_road.size.x / 2, ui_element_for_road.size.y / 2)
+	ui_element_for_road.position = midpoint_btn_node.position + road_ui_offset # Place road at midpoint then rotate
+	
+	# Use slope between two points to calculate how to rotate the UI element
+	ui_element_for_road.rotation_degrees = 30
+	
+	emit_signal("selection_finished")
+
 # Initialize settlement placement buttons group -- this is done once for each game!
 # Afterwards, make changes to the group
 func init_settlement_buttons(global_vertices):
@@ -201,6 +253,7 @@ func init_settlement_buttons(global_vertices):
 		curr_UI_element.add_to_group("UI_settlement_buttons")
 		UI_elements.append(curr_UI_element)
 		$MapLayer.add_child(curr_UI_element)
+		curr_UI_element.tooltip_text = str(vertex + settlement_placement_offset) # DEBUG!
 		curr_UI_element.hide()
 		curr_UI_element.position = vertex + settlement_placement_offset
 		curr_UI_element.pressed.connect(settlement_placement_pressed.bind(curr_UI_element.name, GLOBAL_TURN_NUM, vertex))
@@ -210,10 +263,8 @@ func settlement_placement_pressed(id, global_turn_num, vertex_selection):
 	# increment VP
 	# check for win
 	
-	#print("vertex_selection: ", vertex_selection)
-	
 	# Add settlement as UI element
-	var offset_position = Vector2(-10, -10)
+	var offset_position = Vector2(-15, -15)
 	var selected_node = get_node("MapLayer/%s" % id)
 	var selected_node_position = get_node("MapLayer/%s" % id).position
 	var ui_element_for_selected_settlement = $MapLayer/Player1_Settlement.duplicate()
@@ -221,8 +272,8 @@ func settlement_placement_pressed(id, global_turn_num, vertex_selection):
 	ui_element_for_selected_settlement.show()
 	ui_element_for_selected_settlement.position = selected_node_position + offset_position
 	
-	# Add settlement to player
-	PLAYER_SETTLEMENTS.append(selected_node_position)
+	# Add settlement (position) to player
+	PLAYER_SETTLEMENTS.append(vertex_selection)
 	
 	# Update eligible vertices
 	update_eligible_settlement_vertices(vertex_selection, selected_node)
@@ -240,7 +291,7 @@ func _on_player_1_settlement_timer_timeout() -> void:
 	
 	var rand_index = randi_range(0, len(ELIGIBLE_SETTLEMENT_VERTICES))
 	# Add random settlement as UI element
-	var offset_position = Vector2(-10, -10)
+	var offset_position = Vector2(-15, -15)
 	var selected_node_position = ELIGIBLE_SETTLEMENT_VERTICES[rand_index]
 	var ui_element_for_selected_settlement = $MapLayer/Player1_Settlement.duplicate()
 	$MapLayer.add_child(ui_element_for_selected_settlement)
@@ -254,10 +305,8 @@ func _on_player_1_settlement_timer_timeout() -> void:
 	var selected_node
 	for node in get_node("MapLayer").get_children(): # node.position is offset
 		if "TextureButton" in node.name:
-			#print(node.position, selected_node_position + Vector2(-12, -9))
 			if node.position == (selected_node_position + Vector2(-12, -9)):
 				selected_node = node
-				#print("timeout_selected_node: ", selected_node)
 	
 	update_eligible_settlement_vertices(selected_node_position, selected_node)
 	
@@ -268,14 +317,8 @@ func _on_player_1_settlement_timer_timeout() -> void:
 func update_eligible_settlement_vertices(vertex, node) -> void:
 	for x in get_tree().get_nodes_in_group("UI_settlement_buttons"):
 		if x == node:
-			print("removing from group: ", x, node)
 			x.remove_from_group("UI_settlement_buttons")
 			node.queue_free()
-	#for i in range(len(ELIGIBLE_SETTLEMENT_VERTICES)):
-		#if ELIGIBLE_SETTLEMENT_VERTICES[i] == vertex:
-			#print("popping vertex: ", vertex)
-			#ELIGIBLE_SETTLEMENT_VERTICES.remove_at(i)
-		#break
 	return
 
 func generate_resources():
