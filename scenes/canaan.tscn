@@ -309,7 +309,7 @@ texture = ExtResource("29_qc4eu")
 expand_mode = 1
 
 [node name="Player1_Settlement_Timer" type="Timer" parent="MapLayer"]
-wait_time = 5.0
+wait_time = 120.0
 
 [node name="UILayer" type="CanvasLayer" parent="."]
 

@@ -21,6 +21,9 @@ extends Node2D
 @onready var PLAYER_SETTLEMENTS = [] # Holds the positions of all settlements this player owns
 @onready var PLAYER_ROAD_GRAPHS = [] # Holds the positions of all connected points branching out from a settlement/city
 									  # example: [[(0,0), (0,1), (0,2)], [()], []] 
+@onready var PLAYER_COUNT = 4 # Will never be less than 2, and for now, more than 4
+@onready var PLAYER_LAST_VERTEX_SELECTED = null
+@onready var PLAYER_LAST_NODE_SELECTED = null
 
 # Debug vars
 @export var DEBUG_map_vertex_offset = Vector2(905, 671) # For the map vertices
@@ -38,7 +41,14 @@ extends Node2D
 @onready var BOT_1_SETTLEMENTS = []
 @onready var BOT_2_SETTLEMENTS = []
 @onready var BOT_3_SETTLEMENTS = []
+@onready var BOT_1_LAST_VERTEX_SELECTED = null
+@onready var BOT_1_LAST_NODE_SELECTED = null
+@onready var BOT_2_LAST_VERTEX_SELECTED = null
+@onready var BOT_2_LAST_NODE_SELECTED = null
+@onready var BOT_3_LAST_VERTEX_SELECTED = null
+@onready var BOT_3_LAST_NODE_SELECTED = null
 @onready var ELIGIBLE_SETTLEMENT_VERTICES = [] # Contains a list of eligible vertices for settlement placement. This is shared between all players
+@onready var ELIGIBLE_ROAD_VERTICES = [] # Contains a list of eligible vertices to connect a road from an original vertex. For example -- a settlement may be on a vertex and prevent settlement placement but a road could still be placed by another player that "touches" that settlement
 
 # Signals
 signal selection_finished # Used for returning control back to a main function after a user selects an action or they timeout from that action
@@ -59,14 +69,23 @@ func _ready() -> void:
 	#while true:
 		#pass
 	await roll_for_who_goes_first()
-	for j in range(2):
-		for i in range(NUM_PLAYERS):
-			print("global turn num: ", GLOBAL_TURN_NUM)
-			await place_initial_settlements_and_roads(GLOBAL_TURN_NUM)
-			GLOBAL_TURN_NUM += 1
-			if GLOBAL_TURN_NUM > 4:
-				GLOBAL_TURN_NUM = 1
-				break
+	# Place initial settlements and roads for all players
+	# First round
+	for i in range(PLAYER_COUNT):
+		print(ELIGIBLE_SETTLEMENT_VERTICES)
+		await place_initial_settlements_and_roads(GLOBAL_TURN_NUM)
+		GLOBAL_TURN_NUM += 1
+		if GLOBAL_TURN_NUM > PLAYER_COUNT:
+			GLOBAL_TURN_NUM = PLAYER_COUNT
+			break
+	# Second round
+	for i in range(PLAYER_COUNT):
+
+		await place_initial_settlements_and_roads(GLOBAL_TURN_NUM)
+		GLOBAL_TURN_NUM -= 1
+		if GLOBAL_TURN_NUM < 1:
+			GLOBAL_TURN_NUM = 1
+			break
 	chat_log.append_text("[font_size=%s]\nAll players done placing settlements and roads." % chat_log_font_size)
 
 func add_player_to_game():
@@ -175,14 +194,14 @@ func custom_sort_for_first_roll(a, b):
 
 # A client will only do this once when it is their turn, bot functionality is added here for testing
 func place_initial_settlements_and_roads(GLOBAL_TURN_NUM):
-	# Update the chat log
-	var fmt_str = "[font_size=%s]\nPlayer %s place a settlement and road."
-	var act_str = fmt_str % [chat_log_font_size, GLOBAL_TURN_NUM]
-	chat_log.append_text(act_str)
 	
 	# If it is the client's turn and the client is not a bot
 	if GLOBAL_TURN_NUM == PLAYER_TURN_NUM:
+		var fmt_str = "[font_size=%s]\nPlayer %s place a settlement and road."
+		var act_str = fmt_str % [chat_log_font_size, PLAYER_NUM]
+		chat_log.append_text(act_str)
 		print("player turn")
+		
 		for node in get_tree().get_nodes_in_group("UI_settlement_buttons"):
 			node.show()
 		
@@ -214,39 +233,48 @@ func place_initial_settlements_and_roads(GLOBAL_TURN_NUM):
 		
 	# If the client is a bot
 	elif GLOBAL_TURN_NUM == BOT_1_TURN_NUM:
+		var fmt_str = "[font_size=%s]\nBot %s place a settlement and road."
+		var act_str = fmt_str % [chat_log_font_size, BOT_1_PLAYER_NUM]
+		chat_log.append_text(act_str)
 		print("Bot 1 turn")
+		
 		await bot_place_initial_settlement(GLOBAL_TURN_NUM, BOT_1_SETTLEMENTS)
-		var settlement_pos = BOT_1_SETTLEMENTS.back()
-		await bot_place_initial_road(settlement_pos, GLOBAL_TURN_NUM)
+		
 		print("bot 1 turn done")
 		emit_signal("end_turn")
 	elif GLOBAL_TURN_NUM == BOT_2_TURN_NUM:
+		var fmt_str = "[font_size=%s]\nBot %s place a settlement and road."
+		var act_str = fmt_str % [chat_log_font_size, BOT_2_PLAYER_NUM]
+		chat_log.append_text(act_str)
 		print("Bot 2 turn")
+		
 		await bot_place_initial_settlement(GLOBAL_TURN_NUM, BOT_2_SETTLEMENTS)
-		var settlement_pos = BOT_2_SETTLEMENTS.back()
-		await bot_place_initial_road(settlement_pos, GLOBAL_TURN_NUM)
+		
 		print("bot 2 turn done")
 		emit_signal("end_turn")
 	elif GLOBAL_TURN_NUM == BOT_3_TURN_NUM:
+		var fmt_str = "[font_size=%s]\nBot %s place a settlement and road."
+		var act_str = fmt_str % [chat_log_font_size, BOT_3_PLAYER_NUM]
+		chat_log.append_text(act_str)
 		print("Bot 3 turn")
+
 		await bot_place_initial_settlement(GLOBAL_TURN_NUM, BOT_3_SETTLEMENTS)
-		var settlement_pos = BOT_3_SETTLEMENTS.back()
-		await bot_place_initial_road(settlement_pos, GLOBAL_TURN_NUM)
+		
 		print("bot 3 turn done")
 		emit_signal("end_turn")
+		
 func init_possible_road_placements(settlement_pos) -> void:
-	# Distance around 70
 	# Given a single point -- find all possible road placements branching from it using distance formula
 	# TODO: take into account own player and other players roads/settlements/cities
 	
 	var road_ui_btn_offset = Vector2(-10, -3.5)
 	
+	print(ELIGIBLE_SETTLEMENT_VERTICES)
 	for vertex in ELIGIBLE_SETTLEMENT_VERTICES:
 		var distance = sqrt(((vertex.x - settlement_pos.x)**2) + ((vertex.y - settlement_pos.y)**2))
-		if distance > 50 and distance < 75:
+		if distance > 45 and distance < 95:
 			# Find midpoint to place UI element
 			var midpoint = Vector2(((vertex.x + settlement_pos.x) / 2), ((vertex.y + settlement_pos.y) / 2))
-
 			var curr_UI_element = $MapLayer/Possible_Placement_Road.duplicate()
 			$MapLayer.add_child(curr_UI_element, true)
 			curr_UI_element.show()
@@ -268,6 +296,8 @@ func road_placement_pressed(midpoint_btn_node, GLOBAL_TURN_NUM, connected_vertex
 	var slope = ((connected_vertex.y - settlement_vertex.y) / (connected_vertex.x - settlement_vertex.x))
 	var degrees = rad_to_deg(atan(slope))
 	ui_element_for_road.rotation_degrees = degrees
+	
+	update_eligible_settlement_vertices(PLAYER_LAST_VERTEX_SELECTED, PLAYER_LAST_NODE_SELECTED)
 	
 	emit_signal("selection_finished")
 
@@ -293,7 +323,6 @@ func bot_place_initial_road(settlement_pos, GLOBAL_TURN_NUM) -> void:
 	var slope = ((chosen_road.y - settlement_pos.y) / (chosen_road.x - settlement_pos.x))
 	var degrees = rad_to_deg(atan(slope))
 	ui_element_for_road.rotation_degrees = degrees
-	
 
 # Initialize settlement placement buttons group -- this is done once for each game!
 # Afterwards, make changes to the group
@@ -325,11 +354,10 @@ func settlement_placement_pressed(id, global_turn_num, vertex_selection):
 	ui_element_for_selected_settlement.show()
 	ui_element_for_selected_settlement.position = selected_node_position + offset_position
 	
-	# Add settlement (position) to player
+	# Add settlement (position) to player, save selections, will need after placing road to remove
 	PLAYER_SETTLEMENTS.append(vertex_selection)
-	
-	# Update eligible vertices
-	update_eligible_settlement_vertices(vertex_selection, selected_node)
+	PLAYER_LAST_VERTEX_SELECTED = vertex_selection
+	PLAYER_LAST_NODE_SELECTED = selected_node
 	
 	emit_signal("selection_finished")
 
@@ -380,23 +408,44 @@ func bot_place_initial_settlement(GLOBAL_TURN_NUM, BOT_SETTLEMENT_ARRAY) -> void
 	# Add settlement to bot
 	BOT_SETTLEMENT_ARRAY.append(selected_node_position)
 	
-	# Update eligible vertices
 	var selected_node
 	for node in get_node("MapLayer").get_children(): # node.position is offset
 		if "TextureButton" in node.name:
 			if node.position == (selected_node_position + Vector2(-12, -9)):
 				selected_node = node
 	
+	bot_place_initial_road(selected_node_position, GLOBAL_TURN_NUM)
 	update_eligible_settlement_vertices(selected_node_position, selected_node)
+	
+	await get_tree().create_timer(2).timeout
 	
 	emit_signal("selection_finished")
 
 # Updates the global array for eligible vertices for settlement placement
-func update_eligible_settlement_vertices(vertex, node) -> void:
+func update_eligible_settlement_vertices(vertex, selected_node) -> void:
+	
+	# Removes vertex itself and surrounding vertices due to distance rule
+	var vertices_to_remove = []
+	vertices_to_remove.append(vertex)
+	for i in range(len(ELIGIBLE_SETTLEMENT_VERTICES)-1):
+		var distance = sqrt(((vertex.x - ELIGIBLE_SETTLEMENT_VERTICES[i].x)**2) + ((vertex.y - ELIGIBLE_SETTLEMENT_VERTICES[i].y)**2))
+		if distance > 50 and distance < 75: # These are the closest vertices
+				vertices_to_remove.append(ELIGIBLE_SETTLEMENT_VERTICES[i])
+	print("vertices_to_remove", vertices_to_remove)
+	for i in range(len(vertices_to_remove)-1):
+		if vertices_to_remove[i] in ELIGIBLE_SETTLEMENT_VERTICES:
+			ELIGIBLE_SETTLEMENT_VERTICES.remove_at(ELIGIBLE_SETTLEMENT_VERTICES.find(vertices_to_remove[i])) # Should AT MOST remove 4 vertices -- 3 surrounding + 1 selected
+	
+	# Removes the UI element
+	selected_node.position = selected_node.position + Vector2(-12, -9)
 	for x in get_tree().get_nodes_in_group("UI_settlement_buttons"):
-		if x == node:
+		var distance = sqrt(((selected_node.position.x - x.position.x)**2) + ((selected_node.position.y - x.position.y)**2))
+		if x == selected_node:
 			x.remove_from_group("UI_settlement_buttons")
-			node.queue_free()
+			selected_node.queue_free()
+		elif (distance > 45 and distance < 90):
+			x.remove_from_group("UI_settlement_buttons")
+			x.queue_free()
 	return
 
 func generate_resources():
