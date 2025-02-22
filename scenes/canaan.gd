@@ -60,6 +60,7 @@ func _ready() -> void:
 	
 	global_vertices = generate_tile_vertices(tile_positions, standard_map)
 	ELIGIBLE_SETTLEMENT_VERTICES = global_vertices # At the beginning of the game, all vertices are eligible
+	_draw()
 	init_settlement_buttons(global_vertices)
 	
 	# Initialize chat box setting(s)
@@ -72,7 +73,6 @@ func _ready() -> void:
 	# Place initial settlements and roads for all players
 	# First round
 	for i in range(PLAYER_COUNT):
-		print(ELIGIBLE_SETTLEMENT_VERTICES)
 		await place_initial_settlements_and_roads(GLOBAL_TURN_NUM)
 		GLOBAL_TURN_NUM += 1
 		if GLOBAL_TURN_NUM > PLAYER_COUNT:
@@ -87,6 +87,11 @@ func _ready() -> void:
 			GLOBAL_TURN_NUM = 1
 			break
 	chat_log.append_text("[font_size=%s]\nAll players done placing settlements and roads." % chat_log_font_size)
+
+# Debug func
+func _draw():
+	for x in ELIGIBLE_SETTLEMENT_VERTICES:
+		draw_circle(x, 5, Color(Color.RED), 5.0)
 
 func add_player_to_game():
 	# Determine if player is bot or real
@@ -210,7 +215,6 @@ func place_initial_settlements_and_roads(GLOBAL_TURN_NUM):
 		$MapLayer/Player1_Settlement_Timer.start()
 		await selection_finished # Wait for user input, else timer will timeout and do the same stuff as below
 		$MapLayer/Player1_Settlement_Timer.stop()
-		print("Back in function, place road now...")
 		
 		# Hide settlment_placement_buttons
 		for node in get_tree().get_nodes_in_group("UI_settlement_buttons"):
@@ -222,7 +226,7 @@ func place_initial_settlements_and_roads(GLOBAL_TURN_NUM):
 		var settlement_pos = PLAYER_SETTLEMENTS.back()
 		init_possible_road_placements(settlement_pos)
 		await selection_finished
-		print("Done placing road.")
+
 		var i = 2
 		for node in get_node("MapLayer").get_children():
 			if node.name == "Possible_Placement_Road%s" % i:
@@ -269,7 +273,6 @@ func init_possible_road_placements(settlement_pos) -> void:
 	
 	var road_ui_btn_offset = Vector2(-10, -3.5)
 	
-	print(ELIGIBLE_SETTLEMENT_VERTICES)
 	for vertex in ELIGIBLE_SETTLEMENT_VERTICES:
 		var distance = sqrt(((vertex.x - settlement_pos.x)**2) + ((vertex.y - settlement_pos.y)**2))
 		if distance > 45 and distance < 95:
@@ -297,6 +300,7 @@ func road_placement_pressed(midpoint_btn_node, GLOBAL_TURN_NUM, connected_vertex
 	var degrees = rad_to_deg(atan(slope))
 	ui_element_for_road.rotation_degrees = degrees
 	
+	
 	update_eligible_settlement_vertices(PLAYER_LAST_VERTEX_SELECTED, PLAYER_LAST_NODE_SELECTED)
 	
 	emit_signal("selection_finished")
@@ -305,14 +309,14 @@ func bot_place_initial_road(settlement_pos, GLOBAL_TURN_NUM) -> void:
 	var eligible_road_placements = []
 	for vertex in ELIGIBLE_SETTLEMENT_VERTICES:
 		var distance = sqrt(((vertex.x - settlement_pos.x)**2) + ((vertex.y - settlement_pos.y)**2))
-		if distance > 50 and distance < 75:
+		if distance > 50 and distance < 75: # May need to slightly adjust this range
 			# Find midpoint to place UI element
 			eligible_road_placements.append(vertex)
 	var rand_num = randi_range(0, len(eligible_road_placements)-1)
 	var chosen_road = eligible_road_placements[rand_num]
 	var midpoint = Vector2(((chosen_road.x + settlement_pos.x) / 2), ((chosen_road.y + settlement_pos.y) / 2))
 	
-	var road_ui_offset = Vector2(-25, 7.5)
+	var road_ui_offset = Vector2(-25, 7.5) + Vector2(-10, -3.5)
 	var ui_element_for_road = $MapLayer/Player1_Road.duplicate()
 	$MapLayer.add_child(ui_element_for_road)
 	ui_element_for_road.show()
@@ -348,11 +352,12 @@ func settlement_placement_pressed(id, global_turn_num, vertex_selection):
 	# Add settlement as UI element
 	var offset_position = Vector2(-15, -15)
 	var selected_node = get_node("MapLayer/%s" % id)
-	var selected_node_position = get_node("MapLayer/%s" % id).position
+	var selected_node_position = selected_node.position
 	var ui_element_for_selected_settlement = $MapLayer/Player1_Settlement.duplicate()
 	$MapLayer.add_child(ui_element_for_selected_settlement)
 	ui_element_for_selected_settlement.show()
 	ui_element_for_selected_settlement.position = selected_node_position + offset_position
+	print(selected_node_position)
 	
 	# Add settlement (position) to player, save selections, will need after placing road to remove
 	PLAYER_SETTLEMENTS.append(vertex_selection)
@@ -396,23 +401,27 @@ func _on_player_1_settlement_timer_timeout() -> void:
 
 # Use Global turn num to match texture to correct bot (player too?)
 func bot_place_initial_settlement(GLOBAL_TURN_NUM, BOT_SETTLEMENT_ARRAY) -> void:
-	var rand_index = randi_range(0, len(ELIGIBLE_SETTLEMENT_VERTICES))
+	var rand_index = randi_range(0, len(ELIGIBLE_SETTLEMENT_VERTICES)-1)
 	# Add random settlement as UI element
-	var offset_position = Vector2(-15, -15)
+	var offset_position = Vector2(-15, -15) + Vector2(-12, -9)
 	var selected_node_position = ELIGIBLE_SETTLEMENT_VERTICES[rand_index]
 	var ui_element_for_selected_settlement = $MapLayer/Player1_Settlement.duplicate()
 	$MapLayer.add_child(ui_element_for_selected_settlement)
 	ui_element_for_selected_settlement.show()
 	ui_element_for_selected_settlement.position = selected_node_position + offset_position
+	print(selected_node_position)
 	
 	# Add settlement to bot
 	BOT_SETTLEMENT_ARRAY.append(selected_node_position)
 	
 	var selected_node
-	for node in get_node("MapLayer").get_children(): # node.position is offset
+	for node in get_node("MapLayer").get_children(): # node.position is offset by Vector2(-12, -9)
 		if "TextureButton" in node.name:
-			if node.position == (selected_node_position + Vector2(-12, -9)):
+			var distance = sqrt(((node.position.x - (selected_node_position + Vector2(-12, -9)).x)**2) + ((node.position.y - (selected_node_position + Vector2(-12, -9)).y)**2))
+			#print(distance)
+			if distance < 5:
 				selected_node = node
+				break
 	
 	bot_place_initial_road(selected_node_position, GLOBAL_TURN_NUM)
 	update_eligible_settlement_vertices(selected_node_position, selected_node)
@@ -429,12 +438,11 @@ func update_eligible_settlement_vertices(vertex, selected_node) -> void:
 	vertices_to_remove.append(vertex)
 	for i in range(len(ELIGIBLE_SETTLEMENT_VERTICES)-1):
 		var distance = sqrt(((vertex.x - ELIGIBLE_SETTLEMENT_VERTICES[i].x)**2) + ((vertex.y - ELIGIBLE_SETTLEMENT_VERTICES[i].y)**2))
-		if distance > 50 and distance < 75: # These are the closest vertices
+		if distance < 90: # These are the closest vertices
 				vertices_to_remove.append(ELIGIBLE_SETTLEMENT_VERTICES[i])
-	print("vertices_to_remove", vertices_to_remove)
-	for i in range(len(vertices_to_remove)-1):
+	for i in range(len(vertices_to_remove)):
 		if vertices_to_remove[i] in ELIGIBLE_SETTLEMENT_VERTICES:
-			ELIGIBLE_SETTLEMENT_VERTICES.remove_at(ELIGIBLE_SETTLEMENT_VERTICES.find(vertices_to_remove[i])) # Should AT MOST remove 4 vertices -- 3 surrounding + 1 selected
+			ELIGIBLE_SETTLEMENT_VERTICES.remove_at(ELIGIBLE_SETTLEMENT_VERTICES.find(vertices_to_remove[i]))
 	
 	# Removes the UI element
 	selected_node.position = selected_node.position + Vector2(-12, -9)
@@ -443,9 +451,12 @@ func update_eligible_settlement_vertices(vertex, selected_node) -> void:
 		if x == selected_node:
 			x.remove_from_group("UI_settlement_buttons")
 			selected_node.queue_free()
-		elif (distance > 45 and distance < 90):
+		elif distance < 90:
 			x.remove_from_group("UI_settlement_buttons")
-			x.queue_free()
+			selected_node.queue_free()
+	
+	print(ELIGIBLE_SETTLEMENT_VERTICES)
+	
 	return
 
 func generate_resources():
@@ -497,17 +508,24 @@ func generate_tile_vertices(tile_positions: Array[Vector2i], map_data: TileMapLa
 		for vertex in local_vertices:
 			global_vertices.append(world_pos + vertex + DEBUG_map_vertex_offset)
 	
-	# Remove floating points from vertices
+	global_vertices.sort()
+	
+	## Deduplicate array
+	var elements_to_remove = []
 	for i in range(len(global_vertices)):
-		global_vertices[i] = round(global_vertices[i] / 10) * 10
+		for j in range(i+1, len(global_vertices)):
+			var distance = get_distance(global_vertices[i], global_vertices[j])
+			if distance < 10:
+				elements_to_remove.append(global_vertices[j])
 	
-	# Deduplicate array
-	var temp_dict = {}
-	for vertex in global_vertices:
-		temp_dict[vertex] = null # doesn't need to be set to anything, we only care about keys
-	global_vertices = temp_dict.keys()
-	
+	#remove the elements...
+	for i in range(len(elements_to_remove)):
+		if elements_to_remove[i] in global_vertices:
+			global_vertices.remove_at(global_vertices.find(elements_to_remove[i]))
 	return global_vertices
+
+func get_distance(point1: Vector2, point2: Vector2) -> float:
+	return sqrt((point1.x - point2.x)**2 + (point1.y - point2.y)**2)
 
 func roll_dice() -> int:
 	return randi_range(1,6)
@@ -690,7 +708,6 @@ func generate_rand_standard_map() -> Array[Vector2i]:
 			if standard_map.get_cell_tile_data(surrounding_cell) == null:
 				harbor_cells[surrounding_cell] = directions[j]
 				
-	#print(harbor_cells, len(harbor_cells))
 	
 	var angle_mapping = {
 		0: 270,
@@ -716,7 +733,6 @@ func generate_rand_standard_map() -> Array[Vector2i]:
 			var harbor_type = harbor_types[rand_harbor_selection]
 			harbor_types.pop_at(rand_harbor_selection)
 		
-			#print(rand_harbor_selection, harbor_types)
 		
 			harbor_map_layer.set_cell(harbor_positions[i], harbor_type, Vector2i(0,0))
 		else:
@@ -727,7 +743,6 @@ func generate_rand_standard_map() -> Array[Vector2i]:
 		#var direction = harbor_cells[harbor_positions[i]]
 		#var angle = angle_mapping[direction] # Returns an angle given a direction
 		
-		#print(harbor_positions[i], " | ", direction)
 		
 		var angle = angle_mapping[harbor_angles[i]] # Should always be the same length as harbor_positions
 		
@@ -741,8 +756,7 @@ func generate_rand_standard_map() -> Array[Vector2i]:
 		else:
 			var tile_material = harbor_map_layer.get_cell_tile_data(harbor_positions[i]).get_material()
 			tile_material.set_shader_parameter("angle", angle)
-	
-	# DYNAMIC: Add check that two harbors are at least two or more "edges" away from each other
+
 	
 	return possible_placements_read
 	
