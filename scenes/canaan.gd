@@ -59,7 +59,8 @@ func _ready() -> void:
 	var tile_positions = generate_rand_standard_map() # Map data contains coordinates of all cells of the map
 	
 	global_vertices = generate_tile_vertices(tile_positions, standard_map)
-	ELIGIBLE_SETTLEMENT_VERTICES = global_vertices # At the beginning of the game, all vertices are eligible
+	ELIGIBLE_SETTLEMENT_VERTICES = global_vertices.duplicate() # At the beginning of the game, all vertices are eligible
+	ELIGIBLE_ROAD_VERTICES = global_vertices.duplicate()
 	_draw()
 	init_settlement_buttons(global_vertices)
 	
@@ -266,16 +267,17 @@ func place_initial_settlements_and_roads(GLOBAL_TURN_NUM):
 		
 		print("bot 3 turn done")
 		emit_signal("end_turn")
-		
+
+# Only used for the initial settlement placements, hence "init"
 func init_possible_road_placements(settlement_pos) -> void:
 	# Given a single point -- find all possible road placements branching from it using distance formula
-	# TODO: take into account own player and other players roads/settlements/cities
 	
 	var road_ui_btn_offset = Vector2(-10, -3.5)
 	
-	for vertex in ELIGIBLE_SETTLEMENT_VERTICES:
+	for vertex in ELIGIBLE_ROAD_VERTICES:
 		var distance = sqrt(((vertex.x - settlement_pos.x)**2) + ((vertex.y - settlement_pos.y)**2))
-		if distance > 45 and distance < 95:
+		print(distance)
+		if distance > 45 and distance < 75:
 			# Find midpoint to place UI element
 			var midpoint = Vector2(((vertex.x + settlement_pos.x) / 2), ((vertex.y + settlement_pos.y) / 2))
 			var curr_UI_element = $MapLayer/Possible_Placement_Road.duplicate()
@@ -300,14 +302,22 @@ func road_placement_pressed(midpoint_btn_node, GLOBAL_TURN_NUM, connected_vertex
 	var degrees = rad_to_deg(atan(slope))
 	ui_element_for_road.rotation_degrees = degrees
 	
-	
 	update_eligible_settlement_vertices(PLAYER_LAST_VERTEX_SELECTED, PLAYER_LAST_NODE_SELECTED)
 	
 	emit_signal("selection_finished")
 
 func bot_place_initial_road(settlement_pos, GLOBAL_TURN_NUM) -> void:
+	
+	var ui_element_for_road = null
+	if GLOBAL_TURN_NUM == BOT_1_TURN_NUM:
+		ui_element_for_road = $MapLayer/Bot1_Road.duplicate()
+	if GLOBAL_TURN_NUM == BOT_2_TURN_NUM:
+		ui_element_for_road = $MapLayer/Bot2_Road.duplicate()
+	if GLOBAL_TURN_NUM == BOT_3_TURN_NUM:
+		ui_element_for_road = $MapLayer/Bot3_Road.duplicate()
+	
 	var eligible_road_placements = []
-	for vertex in ELIGIBLE_SETTLEMENT_VERTICES:
+	for vertex in ELIGIBLE_ROAD_VERTICES:
 		var distance = sqrt(((vertex.x - settlement_pos.x)**2) + ((vertex.y - settlement_pos.y)**2))
 		if distance > 50 and distance < 75: # May need to slightly adjust this range
 			# Find midpoint to place UI element
@@ -317,7 +327,6 @@ func bot_place_initial_road(settlement_pos, GLOBAL_TURN_NUM) -> void:
 	var midpoint = Vector2(((chosen_road.x + settlement_pos.x) / 2), ((chosen_road.y + settlement_pos.y) / 2))
 	
 	var road_ui_offset = Vector2(-25, 7.5) + Vector2(-10, -3.5)
-	var ui_element_for_road = $MapLayer/Player1_Road.duplicate()
 	$MapLayer.add_child(ui_element_for_road)
 	ui_element_for_road.show()
 	ui_element_for_road.pivot_offset = Vector2(ui_element_for_road.size.x / 2, ui_element_for_road.size.y / 2)
@@ -401,15 +410,21 @@ func _on_player_1_settlement_timer_timeout() -> void:
 
 # Use Global turn num to match texture to correct bot (player too?)
 func bot_place_initial_settlement(GLOBAL_TURN_NUM, BOT_SETTLEMENT_ARRAY) -> void:
+	var ui_element_for_selected_settlement = null
+	if GLOBAL_TURN_NUM == BOT_1_TURN_NUM:
+		ui_element_for_selected_settlement = $MapLayer/Bot1_Settlement.duplicate()
+	if GLOBAL_TURN_NUM == BOT_2_TURN_NUM:
+		ui_element_for_selected_settlement = $MapLayer/Bot2_Settlement.duplicate()
+	if GLOBAL_TURN_NUM == BOT_3_TURN_NUM:
+		ui_element_for_selected_settlement = $MapLayer/Bot3_Settlement.duplicate()
+		
 	var rand_index = randi_range(0, len(ELIGIBLE_SETTLEMENT_VERTICES)-1)
 	# Add random settlement as UI element
 	var offset_position = Vector2(-15, -15) + Vector2(-12, -9)
 	var selected_node_position = ELIGIBLE_SETTLEMENT_VERTICES[rand_index]
-	var ui_element_for_selected_settlement = $MapLayer/Player1_Settlement.duplicate()
 	$MapLayer.add_child(ui_element_for_selected_settlement)
 	ui_element_for_selected_settlement.show()
 	ui_element_for_selected_settlement.position = selected_node_position + offset_position
-	print(selected_node_position)
 	
 	# Add settlement to bot
 	BOT_SETTLEMENT_ARRAY.append(selected_node_position)
@@ -418,7 +433,6 @@ func bot_place_initial_settlement(GLOBAL_TURN_NUM, BOT_SETTLEMENT_ARRAY) -> void
 	for node in get_node("MapLayer").get_children(): # node.position is offset by Vector2(-12, -9)
 		if "TextureButton" in node.name:
 			var distance = sqrt(((node.position.x - (selected_node_position + Vector2(-12, -9)).x)**2) + ((node.position.y - (selected_node_position + Vector2(-12, -9)).y)**2))
-			#print(distance)
 			if distance < 5:
 				selected_node = node
 				break
@@ -454,8 +468,6 @@ func update_eligible_settlement_vertices(vertex, selected_node) -> void:
 		elif distance < 90:
 			x.remove_from_group("UI_settlement_buttons")
 			selected_node.queue_free()
-	
-	print(ELIGIBLE_SETTLEMENT_VERTICES)
 	
 	return
 

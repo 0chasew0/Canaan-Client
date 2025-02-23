@@ -1,4 +1,4 @@
-[gd_scene load_steps=61 format=4 uid="uid://jivbdwftiitr"]
+[gd_scene load_steps=67 format=4 uid="uid://jivbdwftiitr"]
 
 [ext_resource type="Script" path="res://scenes/canaan.gd" id="1_d354y"]
 [ext_resource type="Script" path="res://scenes/camera_2d.gd" id="2_sec5m"]
@@ -27,8 +27,14 @@
 [ext_resource type="Texture2D" uid="uid://5plym3wvhuun" path="res://images/Harbors/wheat_harbor.png" id="25_c08q8"]
 [ext_resource type="Texture2D" uid="uid://cxelann5cdetv" path="res://images/Harbors/wood_harbor.png" id="26_clk17"]
 [ext_resource type="Texture2D" uid="uid://cskq1akso1233" path="res://images/UI_Place_Settlement_Indicator.png" id="27_fb148"]
-[ext_resource type="Texture2D" uid="uid://cxftq3mpksgb8" path="res://images/Pieces (Yellow)/pieceYellow_single07.png" id="28_lla6v"]
+[ext_resource type="Texture2D" uid="uid://bbm1kg3uwpf0v" path="res://images/Pieces (White)/pieceWhite_border08.png" id="28_ot51o"]
+[ext_resource type="Texture2D" uid="uid://bp8dh6srxprvm" path="res://images/Pieces (White)/pieceWhite_border12.png" id="29_cprfm"]
 [ext_resource type="Texture2D" uid="uid://knqxx5mol0j8" path="res://images/Pieces (Yellow)/pieceYellow_border11.png" id="29_qc4eu"]
+[ext_resource type="Texture2D" uid="uid://or4ge4y23xg2" path="res://images/Pieces (Red)/pieceRed_border08.png" id="30_btiyb"]
+[ext_resource type="Texture2D" uid="uid://ukynd5n8ewos" path="res://images/Pieces (Red)/pieceRed_border12.png" id="31_nllux"]
+[ext_resource type="Texture2D" uid="uid://ctkx6eiltpvxy" path="res://images/Pieces (Blue)/pieceBlue_border09.png" id="32_bfw5m"]
+[ext_resource type="Texture2D" uid="uid://dyrdhhvmrnv83" path="res://images/Pieces (Blue)/pieceBlue_border13.png" id="33_8ntd2"]
+[ext_resource type="Texture2D" uid="uid://bx2eqmglx0kkd" path="res://images/Pieces (Yellow)/pieceYellow_border07.png" id="34_lxjc8"]
 
 [sub_resource type="TileMapPattern" id="TileMapPattern_or3yt"]
 tile_data = PackedInt32Array(131072, 1, 0, 1, 1, 0, 65536, 1, 0, 131073, 1, 0, 196608, 1, 0, 262145, 1, 0, 2, 1, 0, 65537, 1, 0, 131074, 1, 0, 196609, 1, 0, 262146, 1, 0, 3, 1, 0, 65538, 1, 0, 131075, 1, 0, 196610, 1, 0, 262147, 1, 0, 65539, 1, 0, 131076, 1, 0, 196611, 1, 0)
@@ -288,6 +294,87 @@ texture_normal = ExtResource("27_fb148")
 ignore_texture_size = true
 stretch_mode = 0
 
+[node name="Bot1_Settlement" type="TextureRect" parent="MapLayer"]
+visible = false
+z_index = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -24.0
+offset_top = -24.0
+offset_right = 24.0
+offset_bottom = 24.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("28_ot51o")
+expand_mode = 1
+
+[node name="Bot1_Road" type="TextureRect" parent="MapLayer"]
+visible = false
+z_index = 3
+offset_left = 728.0
+offset_top = 674.0
+offset_right = 806.0
+offset_bottom = 685.0
+texture = ExtResource("29_cprfm")
+expand_mode = 1
+
+[node name="Bot2_Settlement" type="TextureRect" parent="MapLayer"]
+visible = false
+z_index = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -24.0
+offset_top = -24.0
+offset_right = 24.0
+offset_bottom = 24.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("30_btiyb")
+expand_mode = 1
+
+[node name="Bot2_Road" type="TextureRect" parent="MapLayer"]
+visible = false
+z_index = 3
+offset_left = 728.0
+offset_top = 674.0
+offset_right = 806.0
+offset_bottom = 685.0
+texture = ExtResource("31_nllux")
+expand_mode = 1
+
+[node name="Bot3_Settlement" type="TextureRect" parent="MapLayer"]
+visible = false
+z_index = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -24.0
+offset_top = -24.0
+offset_right = 24.0
+offset_bottom = 24.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("32_bfw5m")
+expand_mode = 1
+
+[node name="Bot3_Road" type="TextureRect" parent="MapLayer"]
+visible = false
+z_index = 3
+offset_left = 728.0
+offset_top = 674.0
+offset_right = 806.0
+offset_bottom = 685.0
+texture = ExtResource("33_8ntd2")
+expand_mode = 1
+
 [node name="Player1_Settlement" type="TextureRect" parent="MapLayer"]
 visible = false
 z_index = 3
@@ -302,7 +389,7 @@ offset_right = 24.0
 offset_bottom = 24.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("28_lla6v")
+texture = ExtResource("34_lxjc8")
 expand_mode = 1
 
 [node name="Player1_Road" type="TextureRect" parent="MapLayer"]
