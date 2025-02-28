@@ -1,10 +1,10 @@
-Timer
+RichTextLabel
 TextureRect
+ColorRect
+Timer
 TextureButton
 TileMapLayer
-RichTextLabel
 Button
-ColorRect
 Node2D
 CanvasLayer
 SubViewport

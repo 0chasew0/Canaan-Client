@@ -1,4 +1,4 @@
-[gd_scene load_steps=67 format=4 uid="uid://jivbdwftiitr"]
+[gd_scene load_steps=72 format=4 uid="uid://jivbdwftiitr"]
 
 [ext_resource type="Script" path="res://scenes/canaan.gd" id="1_d354y"]
 [ext_resource type="Script" path="res://scenes/camera_2d.gd" id="2_sec5m"]
@@ -35,6 +35,11 @@
 [ext_resource type="Texture2D" uid="uid://ctkx6eiltpvxy" path="res://images/Pieces (Blue)/pieceBlue_border09.png" id="32_bfw5m"]
 [ext_resource type="Texture2D" uid="uid://dyrdhhvmrnv83" path="res://images/Pieces (Blue)/pieceBlue_border13.png" id="33_8ntd2"]
 [ext_resource type="Texture2D" uid="uid://bx2eqmglx0kkd" path="res://images/Pieces (Yellow)/pieceYellow_border07.png" id="34_lxjc8"]
+[ext_resource type="Texture2D" uid="uid://cxrlfge3dtkrn" path="res://images/Resource_Cards/brick.png" id="36_vhk21"]
+[ext_resource type="Texture2D" uid="uid://ffptporsopha" path="res://images/Resource_Cards/sheep.png" id="37_doxtf"]
+[ext_resource type="Texture2D" uid="uid://b80kxahhsfvqb" path="res://images/Resource_Cards/stone.png" id="38_ai2yn"]
+[ext_resource type="Texture2D" uid="uid://d0qovvy8by45j" path="res://images/Resource_Cards/tree.png" id="39_6qd3u"]
+[ext_resource type="Texture2D" uid="uid://c8l7lbpbq5huv" path="res://images/Resource_Cards/wheat.png" id="40_65qm3"]
 
 [sub_resource type="TileMapPattern" id="TileMapPattern_or3yt"]
 tile_data = PackedInt32Array(131072, 1, 0, 1, 1, 0, 65536, 1, 0, 131073, 1, 0, 196608, 1, 0, 262145, 1, 0, 2, 1, 0, 65537, 1, 0, 131074, 1, 0, 196609, 1, 0, 262146, 1, 0, 3, 1, 0, 65538, 1, 0, 131075, 1, 0, 196610, 1, 0, 262147, 1, 0, 65539, 1, 0, 131076, 1, 0, 196611, 1, 0)
@@ -442,11 +447,212 @@ offset_right = 1903.0
 offset_bottom = 422.0
 color = Color(1, 0.701961, 1, 1)
 
+[node name="Supply" type="RichTextLabel" parent="UILayer/Supply"]
+layout_mode = 0
+offset_left = 126.0
+offset_right = 239.0
+offset_bottom = 27.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center][b]Supply"
+scroll_active = false
+
+[node name="Brick_Supply" type="TextureRect" parent="UILayer/Supply"]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 27.0
+offset_right = 144.0
+offset_bottom = 217.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("36_vhk21")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Supply/Brick_Supply"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Sheep_Supply" type="TextureRect" parent="UILayer/Supply"]
+layout_mode = 0
+offset_left = 61.0
+offset_top = 27.0
+offset_right = 201.0
+offset_bottom = 217.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("37_doxtf")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Supply/Sheep_Supply"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 6.81821
+offset_right = 133.0
+offset_bottom = 47.8182
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Stone_Supply" type="TextureRect" parent="UILayer/Supply"]
+layout_mode = 0
+offset_left = 119.0
+offset_top = 27.0
+offset_right = 259.0
+offset_bottom = 217.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("38_ai2yn")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Supply/Stone_Supply"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 6.81821
+offset_right = 133.0
+offset_bottom = 47.8182
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Tree_Supply" type="TextureRect" parent="UILayer/Supply"]
+layout_mode = 0
+offset_left = 178.0
+offset_top = 27.0
+offset_right = 318.0
+offset_bottom = 217.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("39_6qd3u")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Supply/Tree_Supply"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 6.81821
+offset_right = 133.0
+offset_bottom = 47.8182
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Wheat_Supply" type="TextureRect" parent="UILayer/Supply"]
+layout_mode = 0
+offset_left = 237.0
+offset_top = 27.0
+offset_right = 377.0
+offset_bottom = 217.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("40_65qm3")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Supply/Wheat_Supply"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 6.81821
+offset_right = 133.0
+offset_bottom = 47.8182
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Development_Card_Supply" type="TextureRect" parent="UILayer/Supply"]
+visible = false
+layout_mode = 0
+offset_left = 296.0
+offset_top = 27.0
+offset_right = 436.0
+offset_bottom = 217.0
+scale = Vector2(0.4, 0.44)
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Supply/Development_Card_Supply"]
+visible = false
+layout_mode = 0
+offset_left = 85.0
+offset_top = 9.09094
+offset_right = 133.0
+offset_bottom = 50.0909
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
 [node name="Player1Background" type="ColorRect" parent="UILayer"]
 offset_left = 1547.0
 offset_top = 435.0
 offset_right = 1903.0
 offset_bottom = 550.0
+
+[node name="PlayerName" type="RichTextLabel" parent="UILayer/Player1Background"]
+layout_mode = 0
+offset_left = 13.0
+offset_top = 6.0
+offset_right = 126.0
+offset_bottom = 33.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center][b]Player Name"
+scroll_active = false
+
+[node name="VP" type="RichTextLabel" parent="UILayer/Player1Background"]
+layout_mode = 0
+offset_left = 13.0
+offset_top = 64.0
+offset_right = 126.0
+offset_bottom = 115.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Victory Points: 0"
+scroll_active = false
+
+[node name="Resource_Num" type="RichTextLabel" parent="UILayer/Player1Background"]
+layout_mode = 0
+offset_left = 133.0
+offset_top = 6.0
+offset_right = 246.0
+offset_bottom = 32.0
+theme_override_colors/table_border = Color(0, 0, 0, 1)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Resources: 0"
+scroll_active = false
+
+[node name="Dev_Card_Num" type="RichTextLabel" parent="UILayer/Player1Background"]
+layout_mode = 0
+offset_left = 133.0
+offset_top = 64.0
+offset_right = 246.0
+offset_bottom = 90.0
+theme_override_colors/table_border = Color(0, 0, 0, 1)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Dev Cards: 0"
+scroll_active = false
+
+[node name="Knights_Played" type="RichTextLabel" parent="UILayer/Player1Background"]
+layout_mode = 0
+offset_left = 246.0
+offset_top = 6.0
+offset_right = 359.0
+offset_bottom = 32.0
+theme_override_colors/table_border = Color(0, 0, 0, 1)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Knights: 0"
+scroll_active = false
+
+[node name="Longest_Road" type="RichTextLabel" parent="UILayer/Player1Background"]
+layout_mode = 0
+offset_left = 246.0
+offset_top = 64.0
+offset_right = 359.0
+offset_bottom = 115.0
+theme_override_colors/table_border = Color(0, 0, 0, 1)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Longest Road: 0"
+scroll_active = false
 
 [node name="Player2Background" type="ColorRect" parent="UILayer"]
 offset_left = 1547.0
@@ -454,17 +660,234 @@ offset_top = 564.0
 offset_right = 1903.0
 offset_bottom = 679.0
 
+[node name="PlayerName" type="RichTextLabel" parent="UILayer/Player2Background"]
+layout_mode = 0
+offset_left = 13.0
+offset_top = 6.0
+offset_right = 126.0
+offset_bottom = 33.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center][b]Player Name"
+scroll_active = false
+
+[node name="VP" type="RichTextLabel" parent="UILayer/Player2Background"]
+layout_mode = 0
+offset_left = 13.0
+offset_top = 64.0
+offset_right = 126.0
+offset_bottom = 115.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Victory Points: 0"
+scroll_active = false
+
+[node name="Resource_Num" type="RichTextLabel" parent="UILayer/Player2Background"]
+layout_mode = 0
+offset_left = 133.0
+offset_top = 6.0
+offset_right = 246.0
+offset_bottom = 32.0
+theme_override_colors/table_border = Color(0, 0, 0, 1)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Resources: 0"
+scroll_active = false
+
+[node name="Dev_Card_Num" type="RichTextLabel" parent="UILayer/Player2Background"]
+layout_mode = 0
+offset_left = 133.0
+offset_top = 64.0
+offset_right = 246.0
+offset_bottom = 90.0
+theme_override_colors/table_border = Color(0, 0, 0, 1)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Dev Cards: 0"
+scroll_active = false
+
+[node name="Knights_Played" type="RichTextLabel" parent="UILayer/Player2Background"]
+layout_mode = 0
+offset_left = 246.0
+offset_top = 6.0
+offset_right = 359.0
+offset_bottom = 32.0
+theme_override_colors/table_border = Color(0, 0, 0, 1)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Knights: 0"
+scroll_active = false
+
+[node name="Longest_Road" type="RichTextLabel" parent="UILayer/Player2Background"]
+layout_mode = 0
+offset_left = 246.0
+offset_top = 64.0
+offset_right = 359.0
+offset_bottom = 115.0
+theme_override_colors/table_border = Color(0, 0, 0, 1)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Longest Road: 0"
+scroll_active = false
+
 [node name="Player3Background" type="ColorRect" parent="UILayer"]
 offset_left = 1547.0
-offset_top = 695.0
+offset_top = 694.0
 offset_right = 1903.0
-offset_bottom = 810.0
+offset_bottom = 809.0
+
+[node name="PlayerName" type="RichTextLabel" parent="UILayer/Player3Background"]
+layout_mode = 0
+offset_left = 13.0
+offset_top = 6.0
+offset_right = 126.0
+offset_bottom = 33.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center][b]Player Name"
+scroll_active = false
+
+[node name="VP" type="RichTextLabel" parent="UILayer/Player3Background"]
+layout_mode = 0
+offset_left = 13.0
+offset_top = 64.0
+offset_right = 126.0
+offset_bottom = 115.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Victory Points: 0"
+scroll_active = false
+
+[node name="Resource_Num" type="RichTextLabel" parent="UILayer/Player3Background"]
+layout_mode = 0
+offset_left = 133.0
+offset_top = 6.0
+offset_right = 246.0
+offset_bottom = 32.0
+theme_override_colors/table_border = Color(0, 0, 0, 1)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Resources: 0"
+scroll_active = false
+
+[node name="Dev_Card_Num" type="RichTextLabel" parent="UILayer/Player3Background"]
+layout_mode = 0
+offset_left = 133.0
+offset_top = 64.0
+offset_right = 246.0
+offset_bottom = 90.0
+theme_override_colors/table_border = Color(0, 0, 0, 1)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Dev Cards: 0"
+scroll_active = false
+
+[node name="Knights_Played" type="RichTextLabel" parent="UILayer/Player3Background"]
+layout_mode = 0
+offset_left = 246.0
+offset_top = 6.0
+offset_right = 359.0
+offset_bottom = 32.0
+theme_override_colors/table_border = Color(0, 0, 0, 1)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Knights: 0"
+scroll_active = false
+
+[node name="Longest_Road" type="RichTextLabel" parent="UILayer/Player3Background"]
+layout_mode = 0
+offset_left = 246.0
+offset_top = 64.0
+offset_right = 359.0
+offset_bottom = 115.0
+theme_override_colors/table_border = Color(0, 0, 0, 1)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Longest Road: 0"
+scroll_active = false
 
 [node name="Player4Background" type="ColorRect" parent="UILayer"]
 offset_left = 1547.0
-offset_top = 827.0
+offset_top = 823.0
 offset_right = 1903.0
-offset_bottom = 942.0
+offset_bottom = 938.0
+
+[node name="PlayerName" type="RichTextLabel" parent="UILayer/Player4Background"]
+layout_mode = 0
+offset_left = 13.0
+offset_top = 6.0
+offset_right = 126.0
+offset_bottom = 33.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center][b]Player Name"
+scroll_active = false
+
+[node name="VP" type="RichTextLabel" parent="UILayer/Player4Background"]
+layout_mode = 0
+offset_left = 13.0
+offset_top = 64.0
+offset_right = 126.0
+offset_bottom = 115.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Victory Points: 0"
+scroll_active = false
+
+[node name="Resource_Num" type="RichTextLabel" parent="UILayer/Player4Background"]
+layout_mode = 0
+offset_left = 133.0
+offset_top = 6.0
+offset_right = 246.0
+offset_bottom = 32.0
+theme_override_colors/table_border = Color(0, 0, 0, 1)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Resources: 0"
+scroll_active = false
+
+[node name="Dev_Card_Num" type="RichTextLabel" parent="UILayer/Player4Background"]
+layout_mode = 0
+offset_left = 133.0
+offset_top = 64.0
+offset_right = 246.0
+offset_bottom = 90.0
+theme_override_colors/table_border = Color(0, 0, 0, 1)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Dev Cards: 0"
+scroll_active = false
+
+[node name="Knights_Played" type="RichTextLabel" parent="UILayer/Player4Background"]
+layout_mode = 0
+offset_left = 246.0
+offset_top = 6.0
+offset_right = 359.0
+offset_bottom = 32.0
+theme_override_colors/table_border = Color(0, 0, 0, 1)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Knights: 0"
+scroll_active = false
+
+[node name="Longest_Road" type="RichTextLabel" parent="UILayer/Player4Background"]
+layout_mode = 0
+offset_left = 246.0
+offset_top = 64.0
+offset_right = 359.0
+offset_bottom = 115.0
+theme_override_colors/table_border = Color(0, 0, 0, 1)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Longest Road: 0"
+scroll_active = false
+
+[node name="Resource Bar" type="ColorRect" parent="UILayer"]
+offset_left = 1.0
+offset_top = 981.0
+offset_right = 908.0
+offset_bottom = 1080.0
+color = Color(0.999998, 0.996531, 0.729055, 1)
 
 [connection signal="timeout" from="MapLayer/Player1_Settlement_Timer" to="." method="_on_player_1_settlement_timer_timeout"]
 [connection signal="pressed" from="UILayer/Roll_Dice" to="." method="_on_roll_dice_pressed"]

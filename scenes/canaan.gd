@@ -7,10 +7,14 @@ extends Node2D
 @onready var roll_dice_btn = $UILayer/Roll_Dice
 @onready var chat_log = $UILayer/Chat/Chat_Log
 @export var chat_log_font_size = 30
+@onready var PLAYER_UI_BOX = $UILayer/Player1Background
+@onready var BOT_1_UI_BOX = $UILayer/Player2Background
+@onready var BOT_2_UI_BOX = $UILayer/Player3Background
+@onready var BOT_3_UI_BOX = $UILayer/Player4Background
 
 # Game state variables
 @onready var global_vertices = null
-@onready var VP = 0
+@onready var PLAYER_VP = 0
 @onready var NUM_PLAYERS = 4 # Server side variable
 @onready var GLOBAL_TURN_NUM = 1 # Server side variable, all clients will have the same value
 @onready var PLAYER_NUM = 1 # Client/server side variable, unique to this client
@@ -47,6 +51,10 @@ extends Node2D
 @onready var BOT_2_LAST_NODE_SELECTED = null
 @onready var BOT_3_LAST_VERTEX_SELECTED = null
 @onready var BOT_3_LAST_NODE_SELECTED = null
+@onready var BOT_1_VP = 0
+@onready var BOT_2_VP = 0
+@onready var BOT_3_VP = 0
+
 @onready var ELIGIBLE_SETTLEMENT_VERTICES = [] # Contains a list of eligible vertices for settlement placement. This is shared between all players
 @onready var ELIGIBLE_ROAD_VERTICES = [] # Contains a list of eligible vertices to connect a road from an original vertex. For example -- a settlement may be on a vertex and prevent settlement placement but a road could still be placed by another player that "touches" that settlement
 
@@ -55,13 +63,14 @@ signal selection_finished # Used for returning control back to a main function a
 signal end_turn # Used for signaling that a player or bots turn is over, usually used in the main game loop
 
 func _ready() -> void:
+	await initialize_ui_boxes()
 	randomize() # Initializes randomizer, only call this once
 	var tile_positions = generate_rand_standard_map() # Map data contains coordinates of all cells of the map
 	
 	global_vertices = generate_tile_vertices(tile_positions, standard_map)
 	ELIGIBLE_SETTLEMENT_VERTICES = global_vertices.duplicate() # At the beginning of the game, all vertices are eligible
 	ELIGIBLE_ROAD_VERTICES = global_vertices.duplicate()
-	_draw()
+	#_draw()
 	init_settlement_buttons(global_vertices)
 	
 	# Initialize chat box setting(s)
@@ -87,17 +96,33 @@ func _ready() -> void:
 		if GLOBAL_TURN_NUM < 1:
 			GLOBAL_TURN_NUM = 1
 			break
+		
+		generate_initial_resources(GLOBAL_TURN_NUM)
+		
 	chat_log.append_text("[font_size=%s]\nAll players done placing settlements and roads." % chat_log_font_size)
+	
+	PLAYER_VP = 2
+	BOT_1_VP = 2
+	BOT_2_VP = 2
+	BOT_3_VP = 2
+	
+	PLAYER_UI_BOX.get_node("VP").text = "[font_size=18][center]Victory Points: 2"
+	BOT_1_UI_BOX.get_node("VP").text = "[font_size=18][center]Victory Points: 2"
+	BOT_2_UI_BOX.get_node("VP").text = "[font_size=18][center]Victory Points: 2"
+	BOT_3_UI_BOX.get_node("VP").text = "[font_size=18][center]Victory Points: 2"
+	
+
+func initialize_ui_boxes() -> void:
+	PLAYER_UI_BOX.get_node("PlayerName").text = "[font_size=18][center][b]Player"
+	BOT_1_UI_BOX.get_node("PlayerName").text = "[font_size=18][center][b]Bot 1"
+	BOT_2_UI_BOX.get_node("PlayerName").text = "[font_size=18][center][b]Bot 2"
+	BOT_3_UI_BOX.get_node("PlayerName").text = "[font_size=18][center][b]Bot 3"
 
 # Debug func
-func _draw():
-	for x in ELIGIBLE_SETTLEMENT_VERTICES:
-		draw_circle(x, 5, Color(Color.RED), 5.0)
+#func _draw():
+	#for x in ELIGIBLE_SETTLEMENT_VERTICES:
+		#draw_circle(x, 5, Color(Color.RED), 5.0)
 
-func add_player_to_game():
-	# Determine if player is bot or real
-	# For now, bots (4 of them)
-	pass
 
 # A client will only roll once
 func roll_for_who_goes_first():
@@ -198,6 +223,12 @@ func custom_sort_for_first_roll(a, b):
 	
 	# All functions require a sync to the server!
 
+# Generate initial resources for the player, bot functionality added in for debug using global turn num
+func generate_initial_resources(GLOBAL_TURN_NUM):
+	if GLOBAL_TURN_NUM == PLAYER_TURN_NUM:
+		var second_settlement = PLAYER_SETTLEMENTS.back()
+		
+
 # A client will only do this once when it is their turn, bot functionality is added here for testing
 func place_initial_settlements_and_roads(GLOBAL_TURN_NUM):
 	
@@ -233,6 +264,7 @@ func place_initial_settlements_and_roads(GLOBAL_TURN_NUM):
 			if node.name == "Possible_Placement_Road%s" % i:
 				i+=1
 				node.queue_free()
+		
 		emit_signal("end_turn")
 		return
 		
@@ -470,9 +502,6 @@ func update_eligible_settlement_vertices(vertex, selected_node) -> void:
 			selected_node.queue_free()
 	
 	return
-
-func generate_resources():
-	pass
 
 # Triggers when a Player selects to build a settlement only
 func build_settlement():
@@ -773,8 +802,8 @@ func generate_rand_standard_map() -> Array[Vector2i]:
 	return possible_placements_read
 	
 func check_win():
-	if VP >= 10:
+	if PLAYER_VP >= 10 or BOT_1_VP >= 10 or BOT_2_VP >= 10 or BOT_3_VP >= 10:
 		end_game()
 
 func end_game():
-	pass
+	print("Game over!")

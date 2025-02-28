@@ -1,10 +1,10 @@
 ea4bc82a6ad023ab7ee23ee620429895
-::res://::1740285386
+::res://::1740714492
 icon.svg::CompressedTexture2D::6373733551754743652::1730948997::1730949056::1::::<><>::
 NetworkingClient.gd::GDScript::-1::1731047780::0::1::::<>Node<>::
-NetworkingClient.tscn::PackedScene::656575761024644187::1740206945::0::1::::<><>::res://NetworkingClient.gd<>uid://b81k73kbrjw18::::res://scenes/game_select.tscn
+NetworkingClient.tscn::PackedScene::656575761024644187::1740714492::0::1::::<><>::res://NetworkingClient.gd<>uid://b81k73kbrjw18::::res://scenes/game_select.tscn
 README.md::TextFile::-1::1731049421::0::1::::<><>::
-::res://images/::1737605340
+::res://images/::1740715108
 hexagonAll_sheet.png::CompressedTexture2D::7426068708351339155::1731129327::1731132147::1::::<><>::
 test.png::CompressedTexture2D::3727286656844444509::1731138639::1731138639::1::::<><>::
 tiles.png::CompressedTexture2D::2467195625254166832::1731139821::1731298152::1::::<><>::
@@ -343,6 +343,12 @@ mapTile_040.png::CompressedTexture2D::59105246280554996::1731129471::1736489985:
 mapTile_049.png::CompressedTexture2D::1067647323099234871::1731129471::1736489985::1::::<><>::
 sheep.png::CompressedTexture2D::7006207429715311951::1736743107::1736743158::1::::<><>::
 wheat.png::CompressedTexture2D::5034787456480822239::1736571721::1736571867::1::::<><>::
+::res://images/Resource_Cards/::1740715557
+brick.png::CompressedTexture2D::6422956331366197055::1740715429::1740715434::1::::<><>::
+sheep.png::CompressedTexture2D::362211602210688858::1740715134::1740715379::1::::<><>::
+stone.png::CompressedTexture2D::4754910221943095645::1740715534::1740715571::1::::<><>::
+tree.png::CompressedTexture2D::8947901867233144681::1740715491::1740715495::1::::<><>::
+wheat.png::CompressedTexture2D::7113744026000830121::1740715356::1740715379::1::::<><>::
 ::res://images/Resource_Numbers/::1732087988
 tile2_new.png::CompressedTexture2D::626221830188182512::1732087669::1732087671::1::::<><>::
 tile3.png::CompressedTexture2D::428426584893842216::1732087708::1732087712::1::::<><>::
@@ -394,12 +400,12 @@ stone_16.png::CompressedTexture2D::6438140811769738770::1731129327::1731138447::
 stone_17.png::CompressedTexture2D::1450681430102861909::1731129327::1731138447::1::::<><>::
 stone_18.png::CompressedTexture2D::3569502330696221612::1731129327::1731138447::1::::<><>::
 stone_19.png::CompressedTexture2D::3217299825431518187::1731129327::1731138447::1::::<><>::
-::res://scenes/::1740206972
+::res://scenes/::1740714492
 camera_2d.gd::GDScript::-1::1731382215::0::1::::<>Camera2D<>::
-canaan.gd::GDScript::-1::1740206899::0::1::::<>Node2D<>::
-canaan.tscn::PackedScene::649491649225409735::1740206945::0::1::::<><>::res://scenes/canaan.gd<>res://scenes/camera_2d.gd<>uid://djglnqvthqtah::::res://images/Dirt/dirt_14.png<>uid://bv63g4podrub6::::res://images/Grass/grass_05.png<>uid://b6n4bu03fr25o::::res://images/Mars/mars_07.png<>uid://bpyol5iri4dvd::::res://images/wheat.png<>uid://dg2dv2u158wo8::::res://images/Stone/stone_07.png<>uid://d3fmtt7g8agjt::::res://images/Sand/sand_12.png<>uid://i6l1uby721ou::::res://images/Resource_Numbers/tile2_new.png<>res://scenes/resource_num_scaling.gdshader<>uid://cmu7h11y77ykt::::res://images/Resource_Numbers/tile12.png<>uid://gdsegqt3j67e::::res://images/Resource_Numbers/tile3.png<>uid://cm38b034qap7q::::res://images/Resource_Numbers/tile4.png<>uid://bggbks5nhm88n::::res://images/Resource_Numbers/tile5.png<>uid://chjv2wh07vwnn::::res://images/Resource_Numbers/tile6.png<>uid://dsy07w1lk71t2::::res://images/Resource_Numbers/tile8.png<>uid://d4ltpj374puxy::::res://images/Resource_Numbers/tile9.png<>uid://cqn0vl10rhjl8::::res://images/Resource_Numbers/tile10.png<>uid://bsgxbs4n5jlci::::res://images/Resource_Numbers/tile11.png<>res://scenes/harbor_rotation.gdshader<>uid://ipi6t7tunf6e::::res://images/Harbors/generic_harbor.png<>uid://banatarpnxdpj::::res://images/Harbors/brick_harbor.png<>uid://c8rq22diap2nq::::res://images/Harbors/sheep_harbor.png<>uid://bk6m2j4v01x3f::::res://images/Harbors/stone_harbor.png<>uid://5plym3wvhuun::::res://images/Harbors/wheat_harbor.png<>uid://cxelann5cdetv::::res://images/Harbors/wood_harbor.png<>uid://cskq1akso1233::::res://images/UI_Place_Settlement_Indicator.png<>uid://cxftq3mpksgb8::::res://images/Pieces (Yellow)/pieceYellow_single07.png<>uid://knqxx5mol0j8::::res://images/Pieces (Yellow)/pieceYellow_border11.png
-game_select.tscn::PackedScene::4756992146856726629::1740206945::0::1::::<><>::
-harbor_rotation.gdshader::Shader::-1::1740206972::0::1::::<><>::
-resource_num_scaling.gdshader::Shader::-1::1740206972::0::1::::<><>::
+canaan.gd::GDScript::-1::1740631456::0::1::::<>Node2D<>::
+canaan.tscn::PackedScene::649491649225409735::1740714492::0::1::::<><>::res://scenes/canaan.gd<>res://scenes/camera_2d.gd<>uid://djglnqvthqtah::::res://images/Dirt/dirt_14.png<>uid://bv63g4podrub6::::res://images/Grass/grass_05.png<>uid://b6n4bu03fr25o::::res://images/Mars/mars_07.png<>uid://bpyol5iri4dvd::::res://images/wheat.png<>uid://dg2dv2u158wo8::::res://images/Stone/stone_07.png<>uid://d3fmtt7g8agjt::::res://images/Sand/sand_12.png<>uid://i6l1uby721ou::::res://images/Resource_Numbers/tile2_new.png<>res://scenes/resource_num_scaling.gdshader<>uid://cmu7h11y77ykt::::res://images/Resource_Numbers/tile12.png<>uid://gdsegqt3j67e::::res://images/Resource_Numbers/tile3.png<>uid://cm38b034qap7q::::res://images/Resource_Numbers/tile4.png<>uid://bggbks5nhm88n::::res://images/Resource_Numbers/tile5.png<>uid://chjv2wh07vwnn::::res://images/Resource_Numbers/tile6.png<>uid://dsy07w1lk71t2::::res://images/Resource_Numbers/tile8.png<>uid://d4ltpj374puxy::::res://images/Resource_Numbers/tile9.png<>uid://cqn0vl10rhjl8::::res://images/Resource_Numbers/tile10.png<>uid://bsgxbs4n5jlci::::res://images/Resource_Numbers/tile11.png<>res://scenes/harbor_rotation.gdshader<>uid://ipi6t7tunf6e::::res://images/Harbors/generic_harbor.png<>uid://banatarpnxdpj::::res://images/Harbors/brick_harbor.png<>uid://c8rq22diap2nq::::res://images/Harbors/sheep_harbor.png<>uid://bk6m2j4v01x3f::::res://images/Harbors/stone_harbor.png<>uid://5plym3wvhuun::::res://images/Harbors/wheat_harbor.png<>uid://cxelann5cdetv::::res://images/Harbors/wood_harbor.png<>uid://cskq1akso1233::::res://images/UI_Place_Settlement_Indicator.png<>uid://bbm1kg3uwpf0v::::res://images/Pieces (White)/pieceWhite_border08.png<>uid://bp8dh6srxprvm::::res://images/Pieces (White)/pieceWhite_border12.png<>uid://knqxx5mol0j8::::res://images/Pieces (Yellow)/pieceYellow_border11.png<>uid://or4ge4y23xg2::::res://images/Pieces (Red)/pieceRed_border08.png<>uid://ukynd5n8ewos::::res://images/Pieces (Red)/pieceRed_border12.png<>uid://ctkx6eiltpvxy::::res://images/Pieces (Blue)/pieceBlue_border09.png<>uid://dyrdhhvmrnv83::::res://images/Pieces (Blue)/pieceBlue_border13.png<>uid://bx2eqmglx0kkd::::res://images/Pieces (Yellow)/pieceYellow_border07.png
+game_select.tscn::PackedScene::4756992146856726629::1740714492::0::1::::<><>::
+harbor_rotation.gdshader::Shader::-1::1740714492::0::1::::<><>::
+resource_num_scaling.gdshader::Shader::-1::1740714492::0::1::::<><>::
 ::res://scripts/::1731559323
 Vertex.gd::GDScript::-1::1731559323::0::1::::Vertex<>RefCounted<>::
