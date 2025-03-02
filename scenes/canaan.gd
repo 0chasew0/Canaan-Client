@@ -31,6 +31,7 @@ extends Node2D
 
 # Debug vars
 @export var DEBUG_map_vertex_offset = Vector2(905, 671) # For the map vertices
+@onready var tile_positions_local = []
 
 # Server side simulated variables
 @onready var BOT_1_PLAYER_NUM = 2
@@ -66,11 +67,11 @@ func _ready() -> void:
 	await initialize_ui_boxes()
 	randomize() # Initializes randomizer, only call this once
 	var tile_positions = generate_rand_standard_map() # Map data contains coordinates of all cells of the map
+	tile_positions_local = tile_map_coords_to_local_coords(standard_map, tile_positions)
 	
 	global_vertices = generate_tile_vertices(tile_positions, standard_map)
 	ELIGIBLE_SETTLEMENT_VERTICES = global_vertices.duplicate() # At the beginning of the game, all vertices are eligible
 	ELIGIBLE_ROAD_VERTICES = global_vertices.duplicate()
-	#_draw()
 	init_settlement_buttons(global_vertices)
 	
 	# Initialize chat box setting(s)
@@ -83,7 +84,8 @@ func _ready() -> void:
 	# Place initial settlements and roads for all players
 	# First round
 	for i in range(PLAYER_COUNT):
-		await place_initial_settlements_and_roads(GLOBAL_TURN_NUM)
+		place_initial_settlements_and_roads(GLOBAL_TURN_NUM)
+		await end_turn
 		GLOBAL_TURN_NUM += 1
 		if GLOBAL_TURN_NUM > PLAYER_COUNT:
 			GLOBAL_TURN_NUM = PLAYER_COUNT
@@ -91,13 +93,15 @@ func _ready() -> void:
 	# Second round
 	for i in range(PLAYER_COUNT):
 
-		await place_initial_settlements_and_roads(GLOBAL_TURN_NUM)
+		place_initial_settlements_and_roads(GLOBAL_TURN_NUM)
+		await end_turn
 		GLOBAL_TURN_NUM -= 1
-		if GLOBAL_TURN_NUM < 1:
-			GLOBAL_TURN_NUM = 1
-			break
 		
-		generate_initial_resources(GLOBAL_TURN_NUM)
+	GLOBAL_TURN_NUM = 1
+	
+	for i in range(PLAYER_COUNT):
+		generate_initial_resources(GLOBAL_TURN_NUM, standard_map, tile_positions, tile_positions_local)
+		GLOBAL_TURN_NUM += 1
 		
 	chat_log.append_text("[font_size=%s]\nAll players done placing settlements and roads." % chat_log_font_size)
 	
@@ -119,9 +123,9 @@ func initialize_ui_boxes() -> void:
 	BOT_3_UI_BOX.get_node("PlayerName").text = "[font_size=18][center][b]Bot 3"
 
 # Debug func
-#func _draw():
-	#for x in ELIGIBLE_SETTLEMENT_VERTICES:
-		#draw_circle(x, 5, Color(Color.RED), 5.0)
+func _draw():
+	for x in tile_positions_local:
+		draw_circle(x, 5, Color(Color.RED), 5.0)
 
 
 # A client will only roll once
@@ -224,10 +228,22 @@ func custom_sort_for_first_roll(a, b):
 	# All functions require a sync to the server!
 
 # Generate initial resources for the player, bot functionality added in for debug using global turn num
-func generate_initial_resources(GLOBAL_TURN_NUM):
+func generate_initial_resources(GLOBAL_TURN_NUM, map_data, tile_positions, tile_positions_local):
 	if GLOBAL_TURN_NUM == PLAYER_TURN_NUM:
-		var second_settlement = PLAYER_SETTLEMENTS.back()
-		
+		var second_settlement_pos = PLAYER_SETTLEMENTS.back()
+		for i in range(len(tile_positions_local)):
+			# Should be the three closest tiles, where pos is the center of the tile
+			var distance = sqrt(((tile_positions_local[i].x - second_settlement_pos.x)**2) + ((tile_positions_local[i].y - second_settlement_pos.y)**2))
+			if distance < 75:
+				print(map_data.get_cell_source_id(tile_positions[i]))
+	emit_signal("end_turn")
+
+# Convert the tile map coords to a local coordinate space
+func tile_map_coords_to_local_coords(tile_map, tile_positions) -> Array:
+	var local_coords = []
+	for pos in tile_positions:
+		local_coords.append(tile_map.map_to_local(pos) + DEBUG_map_vertex_offset)
+	return local_coords
 
 # A client will only do this once when it is their turn, bot functionality is added here for testing
 func place_initial_settlements_and_roads(GLOBAL_TURN_NUM):
@@ -266,7 +282,6 @@ func place_initial_settlements_and_roads(GLOBAL_TURN_NUM):
 				node.queue_free()
 		
 		emit_signal("end_turn")
-		return
 		
 	# If the client is a bot
 	elif GLOBAL_TURN_NUM == BOT_1_TURN_NUM:
@@ -308,7 +323,6 @@ func init_possible_road_placements(settlement_pos) -> void:
 	
 	for vertex in ELIGIBLE_ROAD_VERTICES:
 		var distance = sqrt(((vertex.x - settlement_pos.x)**2) + ((vertex.y - settlement_pos.y)**2))
-		print(distance)
 		if distance > 45 and distance < 75:
 			# Find midpoint to place UI element
 			var midpoint = Vector2(((vertex.x + settlement_pos.x) / 2), ((vertex.y + settlement_pos.y) / 2))
@@ -398,7 +412,6 @@ func settlement_placement_pressed(id, global_turn_num, vertex_selection):
 	$MapLayer.add_child(ui_element_for_selected_settlement)
 	ui_element_for_selected_settlement.show()
 	ui_element_for_selected_settlement.position = selected_node_position + offset_position
-	print(selected_node_position)
 	
 	# Add settlement (position) to player, save selections, will need after placing road to remove
 	PLAYER_SETTLEMENTS.append(vertex_selection)
@@ -472,7 +485,7 @@ func bot_place_initial_settlement(GLOBAL_TURN_NUM, BOT_SETTLEMENT_ARRAY) -> void
 	bot_place_initial_road(selected_node_position, GLOBAL_TURN_NUM)
 	update_eligible_settlement_vertices(selected_node_position, selected_node)
 	
-	await get_tree().create_timer(2).timeout
+	await get_tree().create_timer(0.1).timeout
 	
 	emit_signal("selection_finished")
 
