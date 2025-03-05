@@ -1,7 +1,7 @@
 [gd_scene load_steps=72 format=4 uid="uid://jivbdwftiitr"]
 
-[ext_resource type="Script" path="res://scenes/canaan.gd" id="1_d354y"]
-[ext_resource type="Script" path="res://scenes/camera_2d.gd" id="2_sec5m"]
+[ext_resource type="Script" uid="uid://bw23uon3cp087" path="res://scenes/canaan.gd" id="1_d354y"]
+[ext_resource type="Script" uid="uid://14yc7lvh4r55" path="res://scenes/camera_2d.gd" id="2_sec5m"]
 [ext_resource type="Texture2D" uid="uid://djglnqvthqtah" path="res://images/Dirt/dirt_14.png" id="2_y5yh0"]
 [ext_resource type="Texture2D" uid="uid://bv63g4podrub6" path="res://images/Grass/grass_05.png" id="3_lk8ig"]
 [ext_resource type="Texture2D" uid="uid://b6n4bu03fr25o" path="res://images/Mars/mars_07.png" id="4_t3oo1"]
@@ -9,7 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://dg2dv2u158wo8" path="res://images/Stone/stone_07.png" id="6_ohhag"]
 [ext_resource type="Texture2D" uid="uid://d3fmtt7g8agjt" path="res://images/Sand/sand_12.png" id="7_ebvpi"]
 [ext_resource type="Texture2D" uid="uid://i6l1uby721ou" path="res://images/Resource_Numbers/tile2_new.png" id="9_lyjmo"]
-[ext_resource type="Shader" path="res://scenes/resource_num_scaling.gdshader" id="9_qvsvo"]
+[ext_resource type="Shader" uid="uid://bht0hwgucsd1y" path="res://scenes/resource_num_scaling.gdshader" id="9_qvsvo"]
 [ext_resource type="Texture2D" uid="uid://cmu7h11y77ykt" path="res://images/Resource_Numbers/tile12.png" id="10_4idp2"]
 [ext_resource type="Texture2D" uid="uid://gdsegqt3j67e" path="res://images/Resource_Numbers/tile3.png" id="11_486j8"]
 [ext_resource type="Texture2D" uid="uid://cm38b034qap7q" path="res://images/Resource_Numbers/tile4.png" id="12_lu03k"]
@@ -19,7 +19,7 @@
 [ext_resource type="Texture2D" uid="uid://d4ltpj374puxy" path="res://images/Resource_Numbers/tile9.png" id="16_o88h8"]
 [ext_resource type="Texture2D" uid="uid://cqn0vl10rhjl8" path="res://images/Resource_Numbers/tile10.png" id="17_sve7i"]
 [ext_resource type="Texture2D" uid="uid://bsgxbs4n5jlci" path="res://images/Resource_Numbers/tile11.png" id="18_5q3sy"]
-[ext_resource type="Shader" path="res://scenes/harbor_rotation.gdshader" id="20_bcwju"]
+[ext_resource type="Shader" uid="uid://wb3gs0xrqypk" path="res://scenes/harbor_rotation.gdshader" id="20_bcwju"]
 [ext_resource type="Texture2D" uid="uid://ipi6t7tunf6e" path="res://images/Harbors/generic_harbor.png" id="20_issr1"]
 [ext_resource type="Texture2D" uid="uid://banatarpnxdpj" path="res://images/Harbors/brick_harbor.png" id="22_2wc0e"]
 [ext_resource type="Texture2D" uid="uid://c8rq22diap2nq" path="res://images/Harbors/sheep_harbor.png" id="23_jgflf"]
@@ -45,27 +45,32 @@
 tile_data = PackedInt32Array(131072, 1, 0, 1, 1, 0, 65536, 1, 0, 131073, 1, 0, 196608, 1, 0, 262145, 1, 0, 2, 1, 0, 65537, 1, 0, 131074, 1, 0, 196609, 1, 0, 262146, 1, 0, 3, 1, 0, 65538, 1, 0, 131075, 1, 0, 196610, 1, 0, 262147, 1, 0, 65539, 1, 0, 131076, 1, 0, 196611, 1, 0)
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_tlbur"]
+resource_name = "Tree"
 texture = ExtResource("2_y5yh0")
 texture_region_size = Vector2i(120, 140)
 use_texture_padding = false
 0:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bl4lj"]
+resource_name = "Sheep"
 texture = ExtResource("3_lk8ig")
 texture_region_size = Vector2i(120, 140)
 0:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_igenq"]
+resource_name = "Brick"
 texture = ExtResource("4_t3oo1")
 texture_region_size = Vector2i(120, 140)
 0:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_kjc6j"]
+resource_name = "Wheat"
 texture = ExtResource("5_xcn6w")
 texture_region_size = Vector2i(120, 140)
 0:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_7igx8"]
+resource_name = "Stone"
 texture = ExtResource("6_ohhag")
 texture_region_size = Vector2i(120, 140)
 0:0/0 = 0
@@ -157,7 +162,7 @@ sources/10 = SubResource("TileSetAtlasSource_4jkhf")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_evleq"]
 shader = ExtResource("20_bcwju")
-shader_parameter/angle = 29.917
+shader_parameter/angle = 0.0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_budli"]
 texture = ExtResource("20_issr1")
@@ -220,7 +225,6 @@ sources/8 = SubResource("TileSetAtlasSource_5aaxl")
 
 [node name="Canaan" type="Node2D"]
 y_sort_enabled = true
-position = Vector2(1, 8)
 script = ExtResource("1_d354y")
 chat_log_font_size = 22
 DEBUG_map_vertex_offset = Vector2(908, 671)
@@ -261,7 +265,6 @@ tile_set = SubResource("TileSet_bq0il")
 [node name="Harbors" type="TileMapLayer" parent="MapLayer"]
 z_index = 2
 position = Vector2(908, 679)
-tile_map_data = PackedByteArray("AAD+//z/AQAAAAAAAAA=")
 tile_set = SubResource("TileSet_m4nik")
 
 [node name="Possible_Placement_Settlement" type="TextureButton" parent="MapLayer"]
@@ -457,7 +460,7 @@ bbcode_enabled = true
 text = "[font_size=18][center][b]Supply"
 scroll_active = false
 
-[node name="Brick_Supply" type="TextureRect" parent="UILayer/Supply"]
+[node name="Brick" type="TextureRect" parent="UILayer/Supply"]
 layout_mode = 0
 offset_left = 4.0
 offset_top = 27.0
@@ -466,7 +469,7 @@ offset_bottom = 217.0
 scale = Vector2(0.4, 0.44)
 texture = ExtResource("36_vhk21")
 
-[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Supply/Brick_Supply"]
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Supply/Brick"]
 layout_mode = 0
 offset_left = 85.0
 offset_top = 7.0
@@ -477,7 +480,7 @@ bbcode_enabled = true
 text = "[font_size=30][center][b]19"
 scroll_active = false
 
-[node name="Sheep_Supply" type="TextureRect" parent="UILayer/Supply"]
+[node name="Sheep" type="TextureRect" parent="UILayer/Supply"]
 layout_mode = 0
 offset_left = 61.0
 offset_top = 27.0
@@ -486,7 +489,7 @@ offset_bottom = 217.0
 scale = Vector2(0.4, 0.44)
 texture = ExtResource("37_doxtf")
 
-[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Supply/Sheep_Supply"]
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Supply/Sheep"]
 layout_mode = 0
 offset_left = 85.0
 offset_top = 6.81821
@@ -497,7 +500,7 @@ bbcode_enabled = true
 text = "[font_size=30][center][b]19"
 scroll_active = false
 
-[node name="Stone_Supply" type="TextureRect" parent="UILayer/Supply"]
+[node name="Stone" type="TextureRect" parent="UILayer/Supply"]
 layout_mode = 0
 offset_left = 119.0
 offset_top = 27.0
@@ -506,7 +509,7 @@ offset_bottom = 217.0
 scale = Vector2(0.4, 0.44)
 texture = ExtResource("38_ai2yn")
 
-[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Supply/Stone_Supply"]
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Supply/Stone"]
 layout_mode = 0
 offset_left = 85.0
 offset_top = 6.81821
@@ -517,7 +520,7 @@ bbcode_enabled = true
 text = "[font_size=30][center][b]19"
 scroll_active = false
 
-[node name="Tree_Supply" type="TextureRect" parent="UILayer/Supply"]
+[node name="Tree" type="TextureRect" parent="UILayer/Supply"]
 layout_mode = 0
 offset_left = 178.0
 offset_top = 27.0
@@ -526,7 +529,7 @@ offset_bottom = 217.0
 scale = Vector2(0.4, 0.44)
 texture = ExtResource("39_6qd3u")
 
-[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Supply/Tree_Supply"]
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Supply/Tree"]
 layout_mode = 0
 offset_left = 85.0
 offset_top = 6.81821
@@ -537,7 +540,7 @@ bbcode_enabled = true
 text = "[font_size=30][center][b]19"
 scroll_active = false
 
-[node name="Wheat_Supply" type="TextureRect" parent="UILayer/Supply"]
+[node name="Wheat" type="TextureRect" parent="UILayer/Supply"]
 layout_mode = 0
 offset_left = 237.0
 offset_top = 27.0
@@ -546,7 +549,7 @@ offset_bottom = 217.0
 scale = Vector2(0.4, 0.44)
 texture = ExtResource("40_65qm3")
 
-[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Supply/Wheat_Supply"]
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Supply/Wheat"]
 layout_mode = 0
 offset_left = 85.0
 offset_top = 6.81821
@@ -557,7 +560,7 @@ bbcode_enabled = true
 text = "[font_size=30][center][b]19"
 scroll_active = false
 
-[node name="Development_Card_Supply" type="TextureRect" parent="UILayer/Supply"]
+[node name="Development_Card" type="TextureRect" parent="UILayer/Supply"]
 visible = false
 layout_mode = 0
 offset_left = 296.0
@@ -566,7 +569,7 @@ offset_right = 436.0
 offset_bottom = 217.0
 scale = Vector2(0.4, 0.44)
 
-[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Supply/Development_Card_Supply"]
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Supply/Development_Card"]
 visible = false
 layout_mode = 0
 offset_left = 85.0

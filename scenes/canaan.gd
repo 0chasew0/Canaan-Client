@@ -28,6 +28,13 @@ extends Node2D
 @onready var PLAYER_COUNT = 4 # Will never be less than 2, and for now, more than 4
 @onready var PLAYER_LAST_VERTEX_SELECTED = null
 @onready var PLAYER_LAST_NODE_SELECTED = null
+@onready var PLAYER_RESOURCES = {
+	"Tree": 0,
+	"Sheep": 0,
+	"Brick": 0,
+	"Wheat": 0,
+	"Stone": 0
+}
 
 # Debug vars
 @export var DEBUG_map_vertex_offset = Vector2(905, 671) # For the map vertices
@@ -55,6 +62,27 @@ extends Node2D
 @onready var BOT_1_VP = 0
 @onready var BOT_2_VP = 0
 @onready var BOT_3_VP = 0
+@onready var BOT_1_RESOURCES = {
+	"Tree": 0,
+	"Sheep": 0,
+	"Brick": 0,
+	"Wheat": 0,
+	"Stone": 0
+}
+@onready var BOT_2_RESOURCES = {
+	"Tree": 0,
+	"Sheep": 0,
+	"Brick": 0,
+	"Wheat": 0,
+	"Stone": 0
+}
+@onready var BOT_3_RESOURCES = {
+	"Tree": 0,
+	"Sheep": 0,
+	"Brick": 0,
+	"Wheat": 0,
+	"Stone": 0
+}
 
 @onready var ELIGIBLE_SETTLEMENT_VERTICES = [] # Contains a list of eligible vertices for settlement placement. This is shared between all players
 @onready var ELIGIBLE_ROAD_VERTICES = [] # Contains a list of eligible vertices to connect a road from an original vertex. For example -- a settlement may be on a vertex and prevent settlement placement but a road could still be placed by another player that "touches" that settlement
@@ -229,13 +257,47 @@ func custom_sort_for_first_roll(a, b):
 
 # Generate initial resources for the player, bot functionality added in for debug using global turn num
 func generate_initial_resources(GLOBAL_TURN_NUM, map_data, tile_positions, tile_positions_local):
+	
+	var SOURCE_ID_TO_RESOURCE_MAPPING = {
+		1: "Tree",
+		2: "Sheep",
+		3: "Brick",
+		4: "Wheat",
+		5: "Stone"
+	}
+	
 	if GLOBAL_TURN_NUM == PLAYER_TURN_NUM:
+		var RESOURCES = []
 		var second_settlement_pos = PLAYER_SETTLEMENTS.back()
 		for i in range(len(tile_positions_local)):
 			# Should be the three closest tiles, where pos is the center of the tile
 			var distance = sqrt(((tile_positions_local[i].x - second_settlement_pos.x)**2) + ((tile_positions_local[i].y - second_settlement_pos.y)**2))
 			if distance < 75:
-				print(map_data.get_cell_source_id(tile_positions[i]))
+				RESOURCES.append(map_data.get_cell_source_id(tile_positions[i]))
+		
+		# Do a lookup to mapping dict and add to player's resource dict
+		var UI_offset = 0
+		for id in RESOURCES:
+			if id == 6: # Skip desert tile
+				continue
+			var resource = SOURCE_ID_TO_RESOURCE_MAPPING[id]
+			PLAYER_RESOURCES[resource] += 1
+			
+			# Add resources as UI elements
+			for node in get_node("UILayer/Supply").get_children():
+				if node.name == resource:
+					print(node.name)
+					var copied_ui_resource = node.duplicate()
+					$"UILayer/Resource Bar".add_child(copied_ui_resource, true)
+					copied_ui_resource.position = Vector2(6.5 + UI_offset, 9.3)
+					copied_ui_resource.z_index = 1
+					copied_ui_resource.remove_child(copied_ui_resource.get_children()[0])
+					
+					break
+			UI_offset += 60
+		
+		print(PLAYER_RESOURCES)
+		
 	emit_signal("end_turn")
 
 # Convert the tile map coords to a local coordinate space
@@ -786,8 +848,6 @@ func generate_rand_standard_map() -> Array[Vector2i]:
 			var rand_harbor_selection = randi_range(0, len(harbor_types)-1)
 			var harbor_type = harbor_types[rand_harbor_selection]
 			harbor_types.pop_at(rand_harbor_selection)
-		
-		
 			harbor_map_layer.set_cell(harbor_positions[i], harbor_type, Vector2i(0,0))
 		else:
 			harbor_map_layer.set_cell(harbor_positions[i], 0, Vector2i(0,0))
@@ -810,7 +870,10 @@ func generate_rand_standard_map() -> Array[Vector2i]:
 		else:
 			var tile_material = harbor_map_layer.get_cell_tile_data(harbor_positions[i]).get_material()
 			tile_material.set_shader_parameter("angle", angle)
-
+	
+	# Add to add this hack in after upgrade to 4.4
+	var tile_material = harbor_map_layer.get_cell_tile_data(harbor_positions[0]).get_material()
+	tile_material.set_shader_parameter("angle", 30.01)
 	
 	return possible_placements_read
 	
