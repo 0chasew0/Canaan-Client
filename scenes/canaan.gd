@@ -120,7 +120,6 @@ func _ready() -> void:
 			break
 	# Second round
 	for i in range(PLAYER_COUNT):
-
 		place_initial_settlements_and_roads(GLOBAL_TURN_NUM)
 		await end_turn
 		GLOBAL_TURN_NUM -= 1
@@ -130,6 +129,10 @@ func _ready() -> void:
 	for i in range(PLAYER_COUNT):
 		generate_initial_resources(GLOBAL_TURN_NUM, standard_map, tile_positions, tile_positions_local)
 		GLOBAL_TURN_NUM += 1
+		
+	print("bot 1 resources: ", BOT_1_RESOURCES)
+	print("bot 2 resources: ", BOT_2_RESOURCES)
+	print("bot 3 resources: ", BOT_3_RESOURCES)
 		
 	chat_log.append_text("[font_size=%s]\nAll players done placing settlements and roads." % chat_log_font_size)
 	
@@ -143,6 +146,43 @@ func _ready() -> void:
 	BOT_2_UI_BOX.get_node("VP").text = "[font_size=18][center]Victory Points: 2"
 	BOT_3_UI_BOX.get_node("VP").text = "[font_size=18][center]Victory Points: 2"
 	
+	# Initialize Robber
+	
+	main_game_loop()
+	
+func main_game_loop():
+	GLOBAL_TURN_NUM = 1
+	
+	# Bot functionality added for testing
+	for i in range(100): # Turn limit?
+		if GLOBAL_TURN_NUM == PLAYER_TURN_NUM:
+			# Represents a single turn
+			
+			# Can play one development card before rolling dice
+			# Check for win
+			
+			await roll_dice_btn.pressed # Wait for user to roll dice before continuing
+			DIE_ROLL_NUM = _on_roll_dice_pressed()
+			
+			
+			break
+		elif GLOBAL_TURN_NUM == BOT_1_TURN_NUM:
+			# Simulate dice roll
+			
+			# Increment turn and end turn
+			GLOBAL_TURN_NUM += 1
+			if GLOBAL_TURN_NUM > 4:
+				GLOBAL_TURN_NUM = 1
+			pass
+		elif GLOBAL_TURN_NUM == BOT_2_TURN_NUM:
+			if GLOBAL_TURN_NUM > 4:
+				GLOBAL_TURN_NUM = 1
+			pass
+		elif GLOBAL_TURN_NUM == BOT_3_TURN_NUM:
+			if GLOBAL_TURN_NUM > 4:
+				GLOBAL_TURN_NUM = 1
+			pass
+	
 
 func initialize_ui_boxes() -> void:
 	PLAYER_UI_BOX.get_node("PlayerName").text = "[font_size=18][center][b]Player"
@@ -154,6 +194,7 @@ func initialize_ui_boxes() -> void:
 func _draw():
 	for x in tile_positions_local:
 		draw_circle(x, 5, Color(Color.RED), 5.0)
+
 
 
 # A client will only roll once
@@ -286,18 +327,68 @@ func generate_initial_resources(GLOBAL_TURN_NUM, map_data, tile_positions, tile_
 			# Add resources as UI elements
 			for node in get_node("UILayer/Supply").get_children():
 				if node.name == resource:
-					print(node.name)
 					var copied_ui_resource = node.duplicate()
 					$"UILayer/Resource Bar".add_child(copied_ui_resource, true)
 					copied_ui_resource.position = Vector2(6.5 + UI_offset, 9.3)
 					copied_ui_resource.z_index = 1
-					copied_ui_resource.remove_child(copied_ui_resource.get_children()[0])
+					copied_ui_resource.remove_child(copied_ui_resource.get_children()[0]) # Removes the supply text from the top right of the card
 					
 					break
 			UI_offset += 60
 		
-		print(PLAYER_RESOURCES)
+	# If the client is a bot
+	elif GLOBAL_TURN_NUM == BOT_1_TURN_NUM:
+		var RESOURCES = []
+		var second_settlement_pos = BOT_1_SETTLEMENTS.back()
+		for i in range(len(tile_positions_local)):
+			# Should be the three closest tiles, where pos is the center of the tile
+			var distance = sqrt(((tile_positions_local[i].x - second_settlement_pos.x)**2) + ((tile_positions_local[i].y - second_settlement_pos.y)**2))
+			if distance < 75:
+				RESOURCES.append(map_data.get_cell_source_id(tile_positions[i]))
 		
+		# Do a lookup to mapping dict and add to player's resource dict
+		var UI_offset = 0
+		for id in RESOURCES:
+			if id == 6: # Skip desert tile
+				continue
+			var resource = SOURCE_ID_TO_RESOURCE_MAPPING[id]
+			BOT_1_RESOURCES[resource] += 1
+	
+	elif GLOBAL_TURN_NUM == BOT_2_TURN_NUM:
+		var RESOURCES = []
+		var second_settlement_pos = BOT_2_SETTLEMENTS.back()
+		for i in range(len(tile_positions_local)):
+			# Should be the three closest tiles, where pos is the center of the tile
+			var distance = sqrt(((tile_positions_local[i].x - second_settlement_pos.x)**2) + ((tile_positions_local[i].y - second_settlement_pos.y)**2))
+			if distance < 75:
+				RESOURCES.append(map_data.get_cell_source_id(tile_positions[i]))
+		
+		# Do a lookup to mapping dict and add to player's resource dict
+		var UI_offset = 0
+		for id in RESOURCES:
+			if id == 6: # Skip desert tile
+				continue
+			var resource = SOURCE_ID_TO_RESOURCE_MAPPING[id]
+			BOT_2_RESOURCES[resource] += 1
+			
+	elif GLOBAL_TURN_NUM == BOT_3_TURN_NUM:
+		var RESOURCES = []
+		var second_settlement_pos = BOT_3_SETTLEMENTS.back()
+		for i in range(len(tile_positions_local)):
+			# Should be the three closest tiles, where pos is the center of the tile
+			var distance = sqrt(((tile_positions_local[i].x - second_settlement_pos.x)**2) + ((tile_positions_local[i].y - second_settlement_pos.y)**2))
+			if distance < 75:
+				RESOURCES.append(map_data.get_cell_source_id(tile_positions[i]))
+		
+		# Do a lookup to mapping dict and add to player's resource dict
+		var UI_offset = 0
+		for id in RESOURCES:
+			if id == 6: # Skip desert tile
+				continue
+			var resource = SOURCE_ID_TO_RESOURCE_MAPPING[id]
+			BOT_3_RESOURCES[resource] += 1
+	
+	
 	emit_signal("end_turn")
 
 # Convert the tile map coords to a local coordinate space
@@ -577,24 +668,6 @@ func update_eligible_settlement_vertices(vertex, selected_node) -> void:
 			selected_node.queue_free()
 	
 	return
-
-# Triggers when a Player selects to build a settlement only
-func build_settlement():
-	# Add checks for:
-		# Vertex is not currently occupied by another settlement?
-		# Player has required resources?
-		# Settlement placement follows distance rule?
-		# Settlement is connected to road owned by correct player?
-		# This isn't turn 0 or 1? (Setup phase)
-		
-	# If successfully built, increment VP and add settlement (visually and to player) and check for win
-	pass
-	
-func build_city():
-	pass
-	
-func build_road():
-	pass
 
 # Debug func
 #func _draw():
