@@ -11,6 +11,7 @@ extends Node2D
 @onready var BOT_1_UI_BOX = $UILayer/Player2Background
 @onready var BOT_2_UI_BOX = $UILayer/Player3Background
 @onready var BOT_3_UI_BOX = $UILayer/Player4Background
+@onready var global_ui_resource_offset = 0
 
 # Game state variables
 @onready var global_vertices = null
@@ -35,6 +36,7 @@ extends Node2D
 	"Wheat": 0,
 	"Stone": 0
 }
+@onready var ROBBER_POSITION = null
 
 # Debug vars
 @export var DEBUG_map_vertex_offset = Vector2(905, 671) # For the map vertices
@@ -102,6 +104,9 @@ func _ready() -> void:
 	ELIGIBLE_ROAD_VERTICES = global_vertices.duplicate()
 	init_settlement_buttons(global_vertices)
 	
+	# Initialize Robber
+	await initialize_robber(standard_map, tile_positions)
+	
 	# Initialize chat box setting(s)
 	chat_log.append_text("[font_size=%s]Welcome to Canaan!" % chat_log_font_size)
 	
@@ -146,43 +151,52 @@ func _ready() -> void:
 	BOT_2_UI_BOX.get_node("VP").text = "[font_size=18][center]Victory Points: 2"
 	BOT_3_UI_BOX.get_node("VP").text = "[font_size=18][center]Victory Points: 2"
 	
-	# Initialize Robber
 	
-	main_game_loop()
+	main_game_loop(tile_positions, standard_map)
 	
-func main_game_loop():
+func main_game_loop(tile_positions, standard_map):
 	GLOBAL_TURN_NUM = 1
 	
 	# Bot functionality added for testing
-	for i in range(100): # Turn limit?
+	for i in range(400): # Turn limit?
 		if GLOBAL_TURN_NUM == PLAYER_TURN_NUM:
-			# Represents a single turn
+			# Turn Initializers
+			print("player turn")
+			roll_dice_btn.disabled = false
 			
 			# Can play one development card before rolling dice
+			
 			# Check for win
 			
 			await roll_dice_btn.pressed # Wait for user to roll dice before continuing
 			DIE_ROLL_NUM = _on_roll_dice_pressed()
+			roll_dice_btn.disabled = true
+			
+			# Generate resources for EACH player based on dice result, unless a 7 is rolled
+			# For friendly robber, check that no player has VP > 2, else do robber as normal
+			if DIE_ROLL_NUM == 7 and PLAYER_VP < 3 and BOT_1_VP < 3 and BOT_2_VP < 3 and BOT_3_VP < 3:
+				activate_robber()
+			await generate_resources_for_all_players(DIE_ROLL_NUM, tile_positions_local, tile_positions, standard_map)
 			
 			
-			break
 		elif GLOBAL_TURN_NUM == BOT_1_TURN_NUM:
+			print("bot 1 turn")
 			# Simulate dice roll
 			
 			# Increment turn and end turn
 			GLOBAL_TURN_NUM += 1
 			if GLOBAL_TURN_NUM > 4:
 				GLOBAL_TURN_NUM = 1
-			pass
 		elif GLOBAL_TURN_NUM == BOT_2_TURN_NUM:
+			print("bot 2 turn")
+			GLOBAL_TURN_NUM += 1
 			if GLOBAL_TURN_NUM > 4:
 				GLOBAL_TURN_NUM = 1
-			pass
 		elif GLOBAL_TURN_NUM == BOT_3_TURN_NUM:
+			print("bot 3 turn")
+			GLOBAL_TURN_NUM += 1
 			if GLOBAL_TURN_NUM > 4:
 				GLOBAL_TURN_NUM = 1
-			pass
-	
 
 func initialize_ui_boxes() -> void:
 	PLAYER_UI_BOX.get_node("PlayerName").text = "[font_size=18][center][b]Player"
@@ -191,12 +205,21 @@ func initialize_ui_boxes() -> void:
 	BOT_3_UI_BOX.get_node("PlayerName").text = "[font_size=18][center][b]Bot 3"
 
 # Debug func
-func _draw():
-	for x in tile_positions_local:
-		draw_circle(x, 5, Color(Color.RED), 5.0)
+#func _draw():
+	#for x in tile_positions_local:
+		#draw_circle(x, 5, Color(Color.RED), 5.0)
 
-
-
+func initialize_robber(map_data, tile_positions):
+	# Find desert tile and place robber there
+	for i in range(len(tile_positions)):
+		var id = map_data.get_cell_source_id(tile_positions[i])
+		if id == 6: # 6 = desert
+			var local_coords_for_center_of_tile = tile_positions_local[i]
+			$MapLayer/Robber.position = local_coords_for_center_of_tile + Vector2(-32, -32)
+			ROBBER_POSITION = local_coords_for_center_of_tile
+			break
+	return
+			
 # A client will only roll once
 func roll_for_who_goes_first():
 	# Determine who goes first by rolling for it
@@ -296,6 +319,67 @@ func custom_sort_for_first_roll(a, b):
 	
 	# All functions require a sync to the server!
 
+# TODO
+func activate_robber():
+	pass
+
+func generate_resources_for_all_players(dice_result, tile_positions_local, tile_positions, map_data):
+	
+	# Maps the visual resource num to it's Atlas ID in the TileSet
+	var RESOURCE_NUM_MAPPING = {
+		1: 2,
+		2: 3,
+		3: 4,
+		4: 5,
+		5: 6,
+		6: 8,
+		7: 9,
+		8: 10,
+		9: 11,
+		10: 12
+	}
+	
+	var SOURCE_ID_TO_RESOURCE_MAPPING = {
+		1: "Tree",
+		2: "Sheep",
+		3: "Brick",
+		4: "Wheat",
+		5: "Stone"
+	}
+	
+	# Check each settlements adjacent tiles to see if they match the dice result
+	var resources = []
+	for i in range(len(PLAYER_SETTLEMENTS)):
+		for j in range(len(tile_positions_local)):
+			# Should be the three closest tiles, where pos is the center of the tile
+			var distance = sqrt(((tile_positions_local[j].x - PLAYER_SETTLEMENTS[i].x)**2) + ((tile_positions_local[j].y - PLAYER_SETTLEMENTS[i].y)**2))
+			if distance < 75:
+				# Get the tiles atlas id and use the mapping
+				var resource_num_source_id = resource_num_map_layer.get_cell_source_id(tile_positions[j])
+				if RESOURCE_NUM_MAPPING[resource_num_source_id] == dice_result:
+					resources.append(map_data.get_cell_source_id(tile_positions[j]))
+					
+	# Do a lookup to mapping dict and add to player's resource dict
+	var UI_offset = global_ui_resource_offset
+	for id in resources:
+		if id == 6: # Skip desert tile
+			continue
+		var resource = SOURCE_ID_TO_RESOURCE_MAPPING[id]
+		PLAYER_RESOURCES[resource] += 1
+		
+		# Add resources as UI elements
+		for node in get_node("UILayer/Supply").get_children():
+			if node.name == resource:
+				var copied_ui_resource = node.duplicate()
+				$"UILayer/Resource Bar".add_child(copied_ui_resource, true)
+				copied_ui_resource.position = Vector2(6.5 + UI_offset, 9.3)
+				copied_ui_resource.z_index = 1
+				copied_ui_resource.remove_child(copied_ui_resource.get_children()[0]) # Removes the supply text from the top right of the card
+				
+				break
+		UI_offset += 60
+	global_ui_resource_offset = UI_offset
+	
 # Generate initial resources for the player, bot functionality added in for debug using global turn num
 func generate_initial_resources(GLOBAL_TURN_NUM, map_data, tile_positions, tile_positions_local):
 	
@@ -335,6 +419,7 @@ func generate_initial_resources(GLOBAL_TURN_NUM, map_data, tile_positions, tile_
 					
 					break
 			UI_offset += 60
+		global_ui_resource_offset = UI_offset
 		
 	# If the client is a bot
 	elif GLOBAL_TURN_NUM == BOT_1_TURN_NUM:
@@ -391,7 +476,7 @@ func generate_initial_resources(GLOBAL_TURN_NUM, map_data, tile_positions, tile_
 	
 	emit_signal("end_turn")
 
-# Convert the tile map coords to a local coordinate space
+# Convert the tile map coords to a local coordinate space -- gets the center of the tile
 func tile_map_coords_to_local_coords(tile_map, tile_positions) -> Array:
 	var local_coords = []
 	for pos in tile_positions:
@@ -944,7 +1029,7 @@ func generate_rand_standard_map() -> Array[Vector2i]:
 			var tile_material = harbor_map_layer.get_cell_tile_data(harbor_positions[i]).get_material()
 			tile_material.set_shader_parameter("angle", angle)
 	
-	# Add to add this hack in after upgrade to 4.4
+	# Had to add this hack in after upgrade to 4.4
 	var tile_material = harbor_map_layer.get_cell_tile_data(harbor_positions[0]).get_material()
 	tile_material.set_shader_parameter("angle", 30.01)
 	
