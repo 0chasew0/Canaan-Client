@@ -1,4 +1,4 @@
-[gd_scene load_steps=73 format=4 uid="uid://jivbdwftiitr"]
+[gd_scene load_steps=78 format=4 uid="uid://jivbdwftiitr"]
 
 [ext_resource type="Script" uid="uid://bw23uon3cp087" path="res://scenes/canaan.gd" id="1_d354y"]
 [ext_resource type="Script" uid="uid://14yc7lvh4r55" path="res://scenes/camera_2d.gd" id="2_sec5m"]
@@ -41,6 +41,11 @@
 [ext_resource type="Texture2D" uid="uid://b80kxahhsfvqb" path="res://images/Resource_Cards/stone.png" id="38_ai2yn"]
 [ext_resource type="Texture2D" uid="uid://d0qovvy8by45j" path="res://images/Resource_Cards/tree.png" id="39_6qd3u"]
 [ext_resource type="Texture2D" uid="uid://c8l7lbpbq5huv" path="res://images/Resource_Cards/wheat.png" id="40_65qm3"]
+[ext_resource type="Texture2D" uid="uid://b3nqnchiq288i" path="res://images/bank_trade_icon.png" id="42_luowv"]
+[ext_resource type="Texture2D" uid="uid://bp52owf8bkx6j" path="res://images/player_trade_icon.png" id="43_c1tvx"]
+[ext_resource type="Texture2D" uid="uid://76ftlu6htlhi" path="res://images/development_card_NEEDS_ART.png" id="44_kovk3"]
+[ext_resource type="Texture2D" uid="uid://bnkbrkh0re7tt" path="res://images/Pieces (Yellow)/pieceYellow_border09.png" id="44_ppdgm"]
+[ext_resource type="Texture2D" uid="uid://d2xema0qmnjg5" path="res://images/end_turn_icon.png" id="45_kovk3"]
 
 [sub_resource type="TileMapPattern" id="TileMapPattern_or3yt"]
 tile_data = PackedInt32Array(131072, 1, 0, 1, 1, 0, 65536, 1, 0, 131073, 1, 0, 196608, 1, 0, 262145, 1, 0, 2, 1, 0, 65537, 1, 0, 131074, 1, 0, 196609, 1, 0, 262146, 1, 0, 3, 1, 0, 65538, 1, 0, 131075, 1, 0, 196610, 1, 0, 262147, 1, 0, 65539, 1, 0, 131076, 1, 0, 196611, 1, 0)
@@ -239,10 +244,10 @@ z_index = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -40870.0
-offset_top = -19764.0
-offset_right = 39869.0
-offset_bottom = 17383.0
+offset_left = -40878.0
+offset_top = -19765.0
+offset_right = 39861.0
+offset_bottom = 17382.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -438,10 +443,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = 769.0
-offset_top = 422.0
-offset_right = 944.0
-offset_bottom = 517.0
+offset_left = 740.0
+offset_top = 441.0
+offset_right = 915.0
+offset_bottom = 536.0
 grow_horizontal = 2
 grow_vertical = 2
 text = "Roll Dice"
@@ -909,5 +914,122 @@ offset_right = 908.0
 offset_bottom = 1080.0
 color = Color(0.999998, 0.996531, 0.729055, 1)
 
+[node name="Bank_Trade_Btn_Background" type="ColorRect" parent="UILayer"]
+offset_left = 914.0
+offset_top = 987.0
+offset_right = 1010.0
+offset_bottom = 1073.0
+color = Color(0.701593, 0.804474, 0.664316, 1)
+
+[node name="Trade_Button" type="TextureButton" parent="UILayer/Bank_Trade_Btn_Background"]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 11.0
+offset_right = 78.0
+offset_bottom = 75.0
+texture_normal = ExtResource("42_luowv")
+
+[node name="Player_Trade_Btn_Background" type="ColorRect" parent="UILayer"]
+offset_left = 1016.0
+offset_top = 987.0
+offset_right = 1112.0
+offset_bottom = 1073.0
+color = Color(0.701593, 0.804474, 0.664316, 1)
+
+[node name="Trade_Button" type="TextureButton" parent="UILayer/Player_Trade_Btn_Background"]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 11.0
+offset_right = 78.0
+offset_bottom = 75.0
+texture_normal = ExtResource("43_c1tvx")
+
+[node name="Buy_Development_Card_Background" type="ColorRect" parent="UILayer"]
+offset_left = 1120.0
+offset_top = 987.0
+offset_right = 1216.0
+offset_bottom = 1073.0
+color = Color(0.701593, 0.804474, 0.664316, 1)
+
+[node name="Buy_Development_Card_Button" type="TextureButton" parent="UILayer/Buy_Development_Card_Background"]
+layout_mode = 0
+offset_left = 28.0
+offset_top = 11.0
+offset_right = 69.0
+offset_bottom = 75.0
+texture_normal = ExtResource("44_kovk3")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Build_Road_Btn_Background" type="ColorRect" parent="UILayer"]
+offset_left = 1225.0
+offset_top = 987.0
+offset_right = 1321.0
+offset_bottom = 1073.0
+color = Color(0.701593, 0.804474, 0.664316, 1)
+
+[node name="Build_Road_Button" type="TextureButton" parent="UILayer/Build_Road_Btn_Background"]
+layout_mode = 0
+offset_left = 41.0
+offset_top = 81.0
+offset_right = 119.0
+offset_bottom = 92.0
+rotation = -1.57079
+texture_normal = ExtResource("29_qc4eu")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Build_Settlement_Btn_Background" type="ColorRect" parent="UILayer"]
+offset_left = 1329.0
+offset_top = 987.0
+offset_right = 1425.0
+offset_bottom = 1073.0
+color = Color(0.701593, 0.804474, 0.664316, 1)
+
+[node name="Build_Settlement_Button" type="TextureButton" parent="UILayer/Build_Settlement_Btn_Background"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 17.0
+offset_right = 72.0
+offset_bottom = 65.0
+texture_normal = ExtResource("34_lxjc8")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Build_City_Btn_Background" type="ColorRect" parent="UILayer"]
+offset_left = 1434.0
+offset_top = 987.0
+offset_right = 1530.0
+offset_bottom = 1073.0
+color = Color(0.701593, 0.804474, 0.664316, 1)
+
+[node name="Build_City_Button" type="TextureButton" parent="UILayer/Build_City_Btn_Background"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 17.0
+offset_right = 76.0
+offset_bottom = 70.0
+texture_normal = ExtResource("44_ppdgm")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="End_Turn_Btn_Background" type="ColorRect" parent="UILayer"]
+offset_left = 1540.0
+offset_top = 987.0
+offset_right = 1636.0
+offset_bottom = 1073.0
+color = Color(0.701593, 0.804474, 0.664316, 1)
+
+[node name="End_Turn_Button" type="TextureButton" parent="UILayer/End_Turn_Btn_Background"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 17.0
+offset_right = 76.0
+offset_bottom = 70.0
+texture_normal = ExtResource("45_kovk3")
+ignore_texture_size = true
+stretch_mode = 0
+
 [connection signal="timeout" from="MapLayer/Player1_Settlement_Timer" to="." method="_on_player_1_settlement_timer_timeout"]
 [connection signal="pressed" from="UILayer/Roll_Dice" to="." method="_on_roll_dice_pressed"]
+[connection signal="pressed" from="UILayer/Build_Settlement_Btn_Background/Build_Settlement_Button" to="." method="_on_build_settlement_button_pressed"]

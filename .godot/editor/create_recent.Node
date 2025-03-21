@@ -1,8 +1,8 @@
-TextureRect
+TextureButton
 RichTextLabel
 ColorRect
+TextureRect
 Timer
-TextureButton
 TileMapLayer
 Button
 Node2D

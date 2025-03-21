@@ -107,6 +107,9 @@ func _ready() -> void:
 	# Initialize Robber
 	await initialize_robber(standard_map, tile_positions)
 	
+	# Initialize UI button states
+	activate_or_deactivate_ui_buttons()
+	
 	# Initialize chat box setting(s)
 	chat_log.append_text("[font_size=%s]Welcome to Canaan!" % chat_log_font_size)
 	
@@ -177,7 +180,10 @@ func main_game_loop(tile_positions, standard_map):
 			if DIE_ROLL_NUM == 7 and PLAYER_VP < 3 and BOT_1_VP < 3 and BOT_2_VP < 3 and BOT_3_VP < 3:
 				activate_robber()
 			await generate_resources_for_all_players(DIE_ROLL_NUM, tile_positions_local, tile_positions, standard_map)
+			activate_or_deactivate_ui_buttons()
 			
+			# When player is done with turn
+			#await $UILayer/End_Turn_Btn_Background/End_Turn_Button.pressed
 			
 		elif GLOBAL_TURN_NUM == BOT_1_TURN_NUM:
 			print("bot 1 turn")
@@ -322,6 +328,44 @@ func custom_sort_for_first_roll(a, b):
 # TODO
 func activate_robber():
 	pass
+
+# Sets certain UI buttons/elements as "active"/"not disabled" if the player meets the resource requirement for them,
+# indicating that they can afford the respective thing (settlement, city, road, development card, etc.)
+# Call this anytime after a player modifies their resources in any way (dice roll, dev card, trading, etc.)
+func activate_or_deactivate_ui_buttons():
+	# Road
+	var build_road_button_state = $UILayer/Build_Road_Btn_Background/Build_Road_Button.disabled
+	build_road_button_state = false if PLAYER_RESOURCES["Brick"] >= 1 and PLAYER_RESOURCES["Tree"] >= 1 else true
+	$UILayer/Build_Road_Btn_Background/Build_Road_Button.disabled = build_road_button_state
+	
+	# Settlement
+	var build_settlement_button_state = $UILayer/Build_Settlement_Btn_Background/Build_Settlement_Button.disabled
+	build_settlement_button_state = false if PLAYER_RESOURCES["Brick"] >= 1 and PLAYER_RESOURCES["Tree"] >= 1 and PLAYER_RESOURCES["Wheat"] >= 1 and PLAYER_RESOURCES["Sheep"] >= 1 else true
+	$UILayer/Build_Settlement_Btn_Background/Build_Settlement_Button.disabled = build_settlement_button_state
+	
+	# City
+	var build_city_button_state = $UILayer/Build_City_Btn_Background/Build_City_Button.disabled
+	build_city_button_state = false if PLAYER_RESOURCES["Wheat"] >= 2 and PLAYER_RESOURCES["Stone"] >= 3 else true
+	$UILayer/Build_City_Btn_Background/Build_City_Button.disabled = build_city_button_state
+	
+	# Development Card
+	var buy_dev_card_button_state = $UILayer/Buy_Development_Card_Background/Buy_Development_Card_Button.disabled
+	buy_dev_card_button_state = false if PLAYER_RESOURCES["Wheat"] >= 1 and PLAYER_RESOURCES["Stone"] >= 1 and PLAYER_RESOURCES["Sheep"] >= 1 else true
+	$UILayer/Buy_Development_Card_Background/Buy_Development_Card_Button.disabled = buy_dev_card_button_state
+	
+	# Bank Trade
+	var bank_trade_button_state = $UILayer/Bank_Trade_Btn_Background/Trade_Button.disabled
+	bank_trade_button_state = false if PLAYER_RESOURCES["Brick"] >= 4 or PLAYER_RESOURCES["Tree"] >= 4 or PLAYER_RESOURCES["Sheep"] >= 4 or PLAYER_RESOURCES["Wheat"] >= 4 or PLAYER_RESOURCES["Stone"] >= 4 else true
+	$UILayer/Bank_Trade_Btn_Background/Trade_Button.disabled = bank_trade_button_state
+	
+	# Players can offer up trades where they don't offer anything, so that button will always be active/enabled
+
+# Should only be allowed to be pressed if correct resources have been met, see activate_or_deactive_ui_buttons()
+func _on_build_settlement_button_pressed() -> void:
+	# Only show possible placements that follow distance rule and are connected by THIS player's roads
+	print("build settlement button pressed")
+	
+	
 
 func generate_resources_for_all_players(dice_result, tile_positions_local, tile_positions, map_data):
 	
