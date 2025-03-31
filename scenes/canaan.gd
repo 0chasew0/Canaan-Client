@@ -24,8 +24,7 @@ extends Node2D
 @onready var is_roll_for_turn = true
 @onready var is_initial_settlements = true
 @onready var PLAYER_SETTLEMENTS = [] # Holds the positions of all settlements this player owns
-@onready var PLAYER_ROAD_GRAPHS = [] # Holds the positions of all connected points branching out from a settlement/city
-									  # example: [[(0,0), (0,1), (0,2)], [()], []] 
+@onready var PLAYER_ROADS = [] # Holds the midpoint positions of all player-owned roads
 @onready var PLAYER_COUNT = 4 # Will never be less than 2, and for now, more than 4
 @onready var PLAYER_LAST_VERTEX_SELECTED = null
 @onready var PLAYER_LAST_NODE_SELECTED = null
@@ -41,6 +40,7 @@ extends Node2D
 # Debug vars
 @export var DEBUG_map_vertex_offset = Vector2(905, 671) # For the map vertices
 @onready var tile_positions_local = []
+@onready var ALL_ROAD_MIDPOINTS = [] # Stores all road midpoints
 
 # Server side simulated variables
 @onready var BOT_1_PLAYER_NUM = 2
@@ -87,7 +87,7 @@ extends Node2D
 }
 
 @onready var ELIGIBLE_SETTLEMENT_VERTICES = [] # Contains a list of eligible vertices for settlement placement. This is shared between all players
-@onready var ELIGIBLE_ROAD_VERTICES = [] # Contains a list of eligible vertices to connect a road from an original vertex. For example -- a settlement may be on a vertex and prevent settlement placement but a road could still be placed by another player that "touches" that settlement
+@onready var ELIGIBLE_ROAD_VERTICES_SETUP = []
 
 # Signals
 signal selection_finished # Used for returning control back to a main function after a user selects an action or they timeout from that action
@@ -101,7 +101,7 @@ func _ready() -> void:
 	
 	global_vertices = generate_tile_vertices(tile_positions, standard_map)
 	ELIGIBLE_SETTLEMENT_VERTICES = global_vertices.duplicate() # At the beginning of the game, all vertices are eligible
-	ELIGIBLE_ROAD_VERTICES = global_vertices.duplicate()
+	ELIGIBLE_ROAD_VERTICES_SETUP = global_vertices.duplicate()
 	init_settlement_buttons(global_vertices)
 	
 	# Initialize Robber
@@ -361,6 +361,47 @@ func activate_or_deactivate_ui_buttons():
 	
 	# Players can offer up trades where they don't offer anything, so that button will always be active/enabled
 
+# Generate all road midpoints based off all possible settlement positions
+func initialize_all_road_midpoints():
+	
+	var road_ui_btn_offset = Vector2(-10, -3.5)
+	
+	#for vertex in global_vertices:
+		#var distance = sqrt(((vertex.x - settlement_pos.x)**2) + ((vertex.y - settlement_pos.y)**2))
+		#if distance > 45 and distance < 75:
+			## Find midpoint to place UI element
+			#var midpoint = Vector2(((vertex.x + settlement_pos.x) / 2), ((vertex.y + settlement_pos.y) / 2))
+			#var curr_UI_element = $MapLayer/Possible_Placement_Road.duplicate()
+			#$MapLayer.add_child(curr_UI_element, true)
+			#curr_UI_element.show()
+			#curr_UI_element.position = midpoint + road_ui_btn_offset
+			## Passed vertex here is the vertex that connects the settlement vertex to the next vertex
+			#curr_UI_element.pressed.connect(road_placement_pressed.bind(curr_UI_element, GLOBAL_TURN_NUM, vertex, settlement_pos))
+
+# Should only be allowed to be pressed if correct resources have been met, see activate_or_deactive_ui_buttons()
+func _on_build_road_button_pressed() -> void:
+	print("Build road button pressed.")
+	var read_ALL_ROAD_MIDPOINTS = ALL_ROAD_MIDPOINTS.duplicate(true)
+	
+	print(len(read_ALL_ROAD_MIDPOINTS), read_ALL_ROAD_MIDPOINTS)
+	
+	# Can only build roads that connect to other player-owned roads
+	# All possible positions for a player to place a road will be 
+	var all_possible_road_placements = []
+	for i in range(len(PLAYER_ROADS)):
+		var curr_road_pos = PLAYER_ROADS[i]
+		# Check curr road position against all possible positions
+		for j in range(len(read_ALL_ROAD_MIDPOINTS)): # Find all road midpoints that could connect to the current road using dist formula
+			#var distance = sqrt(((vertex.x - settlement_pos.x)**2) + ((vertex.y - settlement_pos.y)**2))
+			#if distance > 45 and distance < 75:
+			pass
+	
+			
+	# Check that the possible placement vertices aren't owned by another player
+	for i in range(PLAYER_COUNT):
+		pass
+	
+
 # Should only be allowed to be pressed if correct resources have been met, see activate_or_deactive_ui_buttons()
 func _on_build_settlement_button_pressed() -> void:
 	# Only show possible placements that follow distance rule and are connected by THIS player's roads
@@ -370,6 +411,8 @@ func _on_build_settlement_button_pressed() -> void:
 	# Narrow down by all player settlements - remove from all vertices
 	# Narrow down again by distance rule from every settlement in the game
 	# Narrow down by vertices connected by THIS player's road
+	
+	
 
 func generate_resources_for_all_players(dice_result, tile_positions_local, tile_positions, map_data):
 	
@@ -558,7 +601,7 @@ func place_initial_settlements_and_roads(GLOBAL_TURN_NUM):
 		# Roads in this init function will never branch from an existing road -- they will only extend from a settlement
 		# Player settlements array should hold latest settlement position -- always use last one
 		var settlement_pos = PLAYER_SETTLEMENTS.back()
-		init_possible_road_placements(settlement_pos)
+		possible_road_placements_setup_phase(settlement_pos)
 		await selection_finished
 
 		var i = 2
@@ -601,13 +644,12 @@ func place_initial_settlements_and_roads(GLOBAL_TURN_NUM):
 		print("bot 3 turn done")
 		emit_signal("end_turn")
 
-# Only used for the initial settlement placements, hence "init"
-func init_possible_road_placements(settlement_pos) -> void:
+func possible_road_placements_setup_phase(settlement_pos) -> void:
 	# Given a single point -- find all possible road placements branching from it using distance formula
 	
 	var road_ui_btn_offset = Vector2(-10, -3.5)
 	
-	for vertex in ELIGIBLE_ROAD_VERTICES:
+	for vertex in ELIGIBLE_ROAD_VERTICES_SETUP:
 		var distance = sqrt(((vertex.x - settlement_pos.x)**2) + ((vertex.y - settlement_pos.y)**2))
 		if distance > 45 and distance < 75:
 			# Find midpoint to place UI element
@@ -629,6 +671,8 @@ func road_placement_pressed(midpoint_btn_node, GLOBAL_TURN_NUM, connected_vertex
 	ui_element_for_road.pivot_offset = Vector2(ui_element_for_road.size.x / 2, ui_element_for_road.size.y / 2)
 	ui_element_for_road.position = midpoint_btn_node.position + road_ui_offset # Place road at midpoint then rotate
 	
+	PLAYER_ROADS.append(ui_element_for_road.position)
+	
 	# Use slope and arctan between two points to calculate how to rotate the UI element
 	var slope = ((connected_vertex.y - settlement_vertex.y) / (connected_vertex.x - settlement_vertex.x))
 	var degrees = rad_to_deg(atan(slope))
@@ -649,7 +693,7 @@ func bot_place_initial_road(settlement_pos, GLOBAL_TURN_NUM) -> void:
 		ui_element_for_road = $MapLayer/Bot3_Road.duplicate()
 	
 	var eligible_road_placements = []
-	for vertex in ELIGIBLE_ROAD_VERTICES:
+	for vertex in ELIGIBLE_ROAD_VERTICES_SETUP:
 		var distance = sqrt(((vertex.x - settlement_pos.x)**2) + ((vertex.y - settlement_pos.y)**2))
 		if distance > 50 and distance < 75: # May need to slightly adjust this range
 			# Find midpoint to place UI element
@@ -680,7 +724,6 @@ func init_settlement_buttons(global_vertices):
 		curr_UI_element.add_to_group("UI_settlement_buttons")
 		UI_elements.append(curr_UI_element)
 		$MapLayer.add_child(curr_UI_element)
-		curr_UI_element.tooltip_text = str(vertex + settlement_placement_offset) # DEBUG!
 		curr_UI_element.hide()
 		curr_UI_element.position = vertex + settlement_placement_offset
 		curr_UI_element.pressed.connect(settlement_placement_pressed.bind(curr_UI_element.name, GLOBAL_TURN_NUM, vertex))
@@ -829,6 +872,8 @@ func generate_tile_vertices(tile_positions: Array[Vector2i], map_data: TileMapLa
 		
 		for vertex in local_vertices:
 			global_vertices.append(world_pos + vertex + DEBUG_map_vertex_offset)
+			
+		# Generate road midpoints here using local_vertices then deduplicate ?!
 	
 	global_vertices.sort()
 	
@@ -840,7 +885,7 @@ func generate_tile_vertices(tile_positions: Array[Vector2i], map_data: TileMapLa
 			if distance < 10:
 				elements_to_remove.append(global_vertices[j])
 	
-	#remove the elements...
+	# remove the elements...
 	for i in range(len(elements_to_remove)):
 		if elements_to_remove[i] in global_vertices:
 			global_vertices.remove_at(global_vertices.find(elements_to_remove[i]))
