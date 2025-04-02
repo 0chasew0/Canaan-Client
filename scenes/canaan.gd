@@ -99,7 +99,7 @@ func _ready() -> void:
 	var tile_positions = generate_rand_standard_map() # Map data contains coordinates of all cells of the map
 	tile_positions_local = tile_map_coords_to_local_coords(standard_map, tile_positions)
 	
-	global_vertices = generate_tile_vertices(tile_positions, standard_map)
+	global_vertices = await generate_tile_vertices(tile_positions, standard_map)
 	ELIGIBLE_SETTLEMENT_VERTICES = global_vertices.duplicate() # At the beginning of the game, all vertices are eligible
 	ELIGIBLE_ROAD_VERTICES_SETUP = global_vertices.duplicate()
 	init_settlement_buttons(global_vertices)
@@ -361,29 +361,10 @@ func activate_or_deactivate_ui_buttons():
 	
 	# Players can offer up trades where they don't offer anything, so that button will always be active/enabled
 
-# Generate all road midpoints based off all possible settlement positions
-func initialize_all_road_midpoints():
-	
-	var road_ui_btn_offset = Vector2(-10, -3.5)
-	
-	#for vertex in global_vertices:
-		#var distance = sqrt(((vertex.x - settlement_pos.x)**2) + ((vertex.y - settlement_pos.y)**2))
-		#if distance > 45 and distance < 75:
-			## Find midpoint to place UI element
-			#var midpoint = Vector2(((vertex.x + settlement_pos.x) / 2), ((vertex.y + settlement_pos.y) / 2))
-			#var curr_UI_element = $MapLayer/Possible_Placement_Road.duplicate()
-			#$MapLayer.add_child(curr_UI_element, true)
-			#curr_UI_element.show()
-			#curr_UI_element.position = midpoint + road_ui_btn_offset
-			## Passed vertex here is the vertex that connects the settlement vertex to the next vertex
-			#curr_UI_element.pressed.connect(road_placement_pressed.bind(curr_UI_element, GLOBAL_TURN_NUM, vertex, settlement_pos))
-
 # Should only be allowed to be pressed if correct resources have been met, see activate_or_deactive_ui_buttons()
 func _on_build_road_button_pressed() -> void:
 	print("Build road button pressed.")
 	var read_ALL_ROAD_MIDPOINTS = ALL_ROAD_MIDPOINTS.duplicate(true)
-	
-	print(len(read_ALL_ROAD_MIDPOINTS), read_ALL_ROAD_MIDPOINTS)
 	
 	# Can only build roads that connect to other player-owned roads
 	# All possible positions for a player to place a road will be 
@@ -392,15 +373,64 @@ func _on_build_road_button_pressed() -> void:
 		var curr_road_pos = PLAYER_ROADS[i]
 		# Check curr road position against all possible positions
 		for j in range(len(read_ALL_ROAD_MIDPOINTS)): # Find all road midpoints that could connect to the current road using dist formula
-			#var distance = sqrt(((vertex.x - settlement_pos.x)**2) + ((vertex.y - settlement_pos.y)**2))
-			#if distance > 45 and distance < 75:
-			pass
+			var distance = sqrt(((curr_road_pos.x - read_ALL_ROAD_MIDPOINTS[j].x)**2) + ((curr_road_pos.y - read_ALL_ROAD_MIDPOINTS[j].y)**2))
+			if distance > 45 and distance < 75:
+				all_possible_road_placements.append(read_ALL_ROAD_MIDPOINTS[j])
+				
 	
-			
+	
 	# Check that the possible placement vertices aren't owned by another player
 	for i in range(PLAYER_COUNT):
 		pass
 	
+	# Display the UI elements
+	for vertex in all_possible_road_placements:
+		var road_ui_btn_offset = Vector2(-10, -3.5)
+		
+		var curr_UI_element = $MapLayer/Possible_Placement_Road.duplicate()
+		$MapLayer.add_child(curr_UI_element, true)
+		curr_UI_element.show()
+		curr_UI_element.position = vertex + road_ui_btn_offset
+
+		curr_UI_element.pressed.connect(road_placement_pressed.bind(curr_UI_element, vertex))
+	
+	await selection_finished
+	
+	# Remove UI elements
+	var i = 2
+	for node in get_node("MapLayer").get_children():
+		if node.name == "Possible_Placement_Road%s" % i:
+			i+=1
+			node.queue_free()
+	
+func road_placement_pressed(midpoint_btn_node, road_midpoint):
+	# When the midpoint button is pressed -- show a road between the two points and add that point as a road to this player
+	var road_ui_offset = Vector2(-25, 7.5)
+	
+	var ui_element_for_road = $MapLayer/Player1_Road.duplicate()
+	$MapLayer.add_child(ui_element_for_road)
+	ui_element_for_road.show()
+	ui_element_for_road.pivot_offset = Vector2(ui_element_for_road.size.x / 2, ui_element_for_road.size.y / 2)
+	ui_element_for_road.position = midpoint_btn_node.position + road_ui_offset # Place road at midpoint then rotate
+	
+	PLAYER_ROADS.append(ui_element_for_road.position)
+	
+	# Use slope and arctan between two points to calculate how to rotate the UI element
+	# To find the second point, find the closest settlement vertex to this road's midpoint
+	var settlement_vertex = null
+	var smallest_distance = 999999
+	var closest_point = null
+	for pos in global_vertices:
+		var distance = sqrt(((pos.x - road_midpoint.x)**2) + ((pos.y - road_midpoint.y)**2))
+		if distance < smallest_distance:
+			smallest_distance = distance
+			closest_point = pos
+			
+	var slope = ((road_midpoint.y - closest_point.y) / (road_midpoint.x - closest_point.x))
+	var degrees = rad_to_deg(atan(slope))
+	ui_element_for_road.rotation_degrees = degrees
+	
+	emit_signal("selection_finished")
 
 # Should only be allowed to be pressed if correct resources have been met, see activate_or_deactive_ui_buttons()
 func _on_build_settlement_button_pressed() -> void:
@@ -447,6 +477,8 @@ func generate_resources_for_all_players(dice_result, tile_positions_local, tile_
 			if distance < 75:
 				# Get the tiles atlas id and use the mapping
 				var resource_num_source_id = resource_num_map_layer.get_cell_source_id(tile_positions[j])
+				if resource_num_source_id == -1:
+					continue
 				if RESOURCE_NUM_MAPPING[resource_num_source_id] == dice_result:
 					resources.append(map_data.get_cell_source_id(tile_positions[j]))
 					
@@ -659,11 +691,11 @@ func possible_road_placements_setup_phase(settlement_pos) -> void:
 			curr_UI_element.show()
 			curr_UI_element.position = midpoint + road_ui_btn_offset
 			# Passed vertex here is the vertex that connects the settlement vertex to the next vertex
-			curr_UI_element.pressed.connect(road_placement_pressed.bind(curr_UI_element, GLOBAL_TURN_NUM, vertex, settlement_pos))
+			curr_UI_element.pressed.connect(road_placement_pressed_setup_phase.bind(curr_UI_element, GLOBAL_TURN_NUM, vertex, settlement_pos))
 
-func road_placement_pressed(midpoint_btn_node, GLOBAL_TURN_NUM, connected_vertex, settlement_vertex):
+func road_placement_pressed_setup_phase(midpoint_btn_node, GLOBAL_TURN_NUM, connected_vertex, settlement_vertex):
 	
-	# When the midpoint button is pressed -- show a road between the two points and add those two points as a road to this player
+	# When the midpoint button is pressed -- show a road between the two points and add that point as a road to this player
 	var road_ui_offset = Vector2(-25, 7.5)
 	var ui_element_for_road = $MapLayer/Player1_Road.duplicate()
 	$MapLayer.add_child(ui_element_for_road)
@@ -671,7 +703,7 @@ func road_placement_pressed(midpoint_btn_node, GLOBAL_TURN_NUM, connected_vertex
 	ui_element_for_road.pivot_offset = Vector2(ui_element_for_road.size.x / 2, ui_element_for_road.size.y / 2)
 	ui_element_for_road.position = midpoint_btn_node.position + road_ui_offset # Place road at midpoint then rotate
 	
-	PLAYER_ROADS.append(ui_element_for_road.position)
+	PLAYER_ROADS.append(midpoint_btn_node.position)
 	
 	# Use slope and arctan between two points to calculate how to rotate the UI element
 	var slope = ((connected_vertex.y - settlement_vertex.y) / (connected_vertex.x - settlement_vertex.x))
@@ -858,6 +890,7 @@ func generate_tile_vertices(tile_positions: Array[Vector2i], map_data: TileMapLa
 	var radius = tile_size.y / 2
 	
 	var global_vertices = []
+	var all_road_midpoints = []
 	for i in range(len(tile_positions)):
 		# Get the tile data
 		var tile_data = map_data.get_cell_tile_data(tile_positions[i])
@@ -871,24 +904,52 @@ func generate_tile_vertices(tile_positions: Array[Vector2i], map_data: TileMapLa
 		var world_pos = map_data.map_to_local(tile_positions[i])
 		
 		for vertex in local_vertices:
+			var trans_vertex = world_pos + vertex + DEBUG_map_vertex_offset
 			global_vertices.append(world_pos + vertex + DEBUG_map_vertex_offset)
 			
 		# Generate road midpoints here using local_vertices then deduplicate ?!
+		var local_road_midpoints = []
+		for j in range(len(local_vertices)):
+			var midpoint = 0.0
+			if j == 5:
+				var trans_vertex_1 = world_pos + local_vertices[j] + DEBUG_map_vertex_offset
+				var trans_vertex_2 = world_pos + local_vertices[0] + DEBUG_map_vertex_offset
+				midpoint = Vector2(((trans_vertex_1.x + trans_vertex_2.x) / 2), ((trans_vertex_2.y + trans_vertex_1.y) / 2))
+			else:
+				var trans_vertex_1 = world_pos + local_vertices[j] + DEBUG_map_vertex_offset
+				var trans_vertex_2 = world_pos + local_vertices[j+1] + DEBUG_map_vertex_offset
+				midpoint = Vector2(((trans_vertex_1.x + trans_vertex_2.x) / 2), ((trans_vertex_2.y + trans_vertex_1.y) / 2))
+			all_road_midpoints.append(midpoint)
 	
 	global_vertices.sort()
+	all_road_midpoints.sort()
 	
-	## Deduplicate array
+	# Deduplicate global_vertices array
 	var elements_to_remove = []
 	for i in range(len(global_vertices)):
 		for j in range(i+1, len(global_vertices)):
 			var distance = get_distance(global_vertices[i], global_vertices[j])
 			if distance < 10:
 				elements_to_remove.append(global_vertices[j])
-	
 	# remove the elements...
 	for i in range(len(elements_to_remove)):
 		if elements_to_remove[i] in global_vertices:
 			global_vertices.remove_at(global_vertices.find(elements_to_remove[i]))
+	
+	# Deduplicate all_road_midpoints array
+	elements_to_remove = []
+	for i in range(len(all_road_midpoints)):
+		for j in range(i+1, len(all_road_midpoints)):
+			var distance = get_distance(all_road_midpoints[i], all_road_midpoints[j])
+			if distance < 10:
+				elements_to_remove.append(all_road_midpoints[j])
+	# remove the elements...
+	for i in range(len(elements_to_remove)):
+		if elements_to_remove[i] in all_road_midpoints:
+			all_road_midpoints.remove_at(all_road_midpoints.find(elements_to_remove[i]))
+	
+	ALL_ROAD_MIDPOINTS = all_road_midpoints # Set the global var
+	
 	return global_vertices
 
 func get_distance(point1: Vector2, point2: Vector2) -> float:
