@@ -12,6 +12,7 @@ extends Node2D
 @onready var BOT_2_UI_BOX = $UILayer/Player3Background
 @onready var BOT_3_UI_BOX = $UILayer/Player4Background
 @onready var global_ui_resource_offset = 0
+@onready var PLAYER_RESOURCE_BAR_POSITIONS = [null, null, null, null, null]
 
 # Game state variables
 @onready var global_vertices = null
@@ -36,6 +37,7 @@ extends Node2D
 	"Stone": 0
 }
 @onready var ROBBER_POSITION = null
+@onready var ALL_OWNED_ROADS = []
 
 # Debug vars
 @export var DEBUG_map_vertex_offset = Vector2(905, 671) # For the map vertices
@@ -85,6 +87,9 @@ extends Node2D
 	"Wheat": 0,
 	"Stone": 0
 }
+@onready var BOT_1_ROADS = []
+@onready var BOT_2_ROADS = []
+@onready var BOT_3_ROADS = []
 
 @onready var ELIGIBLE_SETTLEMENT_VERTICES = [] # Contains a list of eligible vertices for settlement placement. This is shared between all players
 @onready var ELIGIBLE_ROAD_VERTICES_SETUP = []
@@ -112,6 +117,11 @@ func _ready() -> void:
 	
 	# Initialize chat box setting(s)
 	chat_log.append_text("[font_size=%s]Welcome to Canaan!" % chat_log_font_size)
+	
+	# Initialize road array
+	for i in range(PLAYER_COUNT):
+		ALL_OWNED_ROADS.append([])
+	print(ALL_OWNED_ROADS)
 	
 	## Main game loop for a client
 	#while true:
@@ -364,6 +374,10 @@ func activate_or_deactivate_ui_buttons():
 # Should only be allowed to be pressed if correct resources have been met, see activate_or_deactive_ui_buttons()
 func _on_build_road_button_pressed() -> void:
 	print("Build road button pressed.")
+	print("player roads: ", PLAYER_ROADS)
+	
+	# TODO: Call function to disable all other buttons
+	
 	var read_ALL_ROAD_MIDPOINTS = ALL_ROAD_MIDPOINTS.duplicate(true)
 	
 	# Can only build roads that connect to other player-owned roads
@@ -376,12 +390,17 @@ func _on_build_road_button_pressed() -> void:
 			var distance = sqrt(((curr_road_pos.x - read_ALL_ROAD_MIDPOINTS[j].x)**2) + ((curr_road_pos.y - read_ALL_ROAD_MIDPOINTS[j].y)**2))
 			if distance > 45 and distance < 75:
 				all_possible_road_placements.append(read_ALL_ROAD_MIDPOINTS[j])
-				
 	
-	
-	# Check that the possible placement vertices aren't owned by another player
-	for i in range(PLAYER_COUNT):
-		pass
+	# Check that the possible placement vertices aren't owned by any player, if so, remove them
+	var elements_to_remove = []
+	for i in range(len(ALL_OWNED_ROADS)):
+		for j in range(len(all_possible_road_placements)):
+			var placement_account_for_offset = (all_possible_road_placements[j] + Vector2(-10, -3.5))
+			if placement_account_for_offset in ALL_OWNED_ROADS[i]:
+				elements_to_remove.append(all_possible_road_placements[j])
+	for i in range(len(elements_to_remove)):
+		if elements_to_remove[i] in all_possible_road_placements:
+			all_possible_road_placements.remove_at(all_possible_road_placements.find(elements_to_remove[i]))
 	
 	# Display the UI elements
 	for vertex in all_possible_road_placements:
@@ -402,6 +421,11 @@ func _on_build_road_button_pressed() -> void:
 		if node.name == "Possible_Placement_Road%s" % i:
 			i+=1
 			node.queue_free()
+			
+	# Remove resources from player
+	
+	
+	activate_or_deactivate_ui_buttons()
 	
 func road_placement_pressed(midpoint_btn_node, road_midpoint):
 	# When the midpoint button is pressed -- show a road between the two points and add that point as a road to this player
@@ -413,7 +437,8 @@ func road_placement_pressed(midpoint_btn_node, road_midpoint):
 	ui_element_for_road.pivot_offset = Vector2(ui_element_for_road.size.x / 2, ui_element_for_road.size.y / 2)
 	ui_element_for_road.position = midpoint_btn_node.position + road_ui_offset # Place road at midpoint then rotate
 	
-	PLAYER_ROADS.append(ui_element_for_road.position)
+	PLAYER_ROADS.append(midpoint_btn_node.position)
+	ALL_OWNED_ROADS[0] = PLAYER_ROADS
 	
 	# Use slope and arctan between two points to calculate how to rotate the UI element
 	# To find the second point, find the closest settlement vertex to this road's midpoint
@@ -531,6 +556,30 @@ func generate_initial_resources(GLOBAL_TURN_NUM, map_data, tile_positions, tile_
 			var resource = SOURCE_ID_TO_RESOURCE_MAPPING[id]
 			PLAYER_RESOURCES[resource] += 1
 			
+			# TODO: make this match code a function, will be used a lot. (add_to_resource_bar, subtract_from_resource_bar)
+			
+			# Add UI elements depending on what resource it is
+			match resource:
+				"Tree":
+					var UI_element = $UILayer/Supply/Tree
+					# Check where to place this element depending on other elements in the resource bar and if this resource is already in the resource bar
+					# Check to see if this resource is already on the resource bar first
+					for i in range(len(PLAYER_RESOURCE_BAR_POSITIONS)):
+						if PLAYER_RESOURCE_BAR_POSITIONS[i] == 1: # Just append num to amount of trees (+= 1)
+							pass
+					# If not, we need to add it to the bar
+					for i in range(len(PLAYER_RESOURCE_BAR_POSITIONS)):
+						if PLAYER_RESOURCE_BAR_POSITIONS[i] == null and PLAYER_RESOURCE_BAR_POSITIONS != 1: # Tree should be added to the resource bar
+							PLAYER_RESOURCE_BAR_POSITIONS[i] = 1 # This says "Tree" is in this position on the resource bar
+				"Sheep":
+					pass
+				"Brick":
+					pass
+				"Wheat":
+					pass
+				"Stone":
+					pass
+			
 			# Add resources as UI elements
 			for node in get_node("UILayer/Supply").get_children():
 				if node.name == resource:
@@ -538,8 +587,7 @@ func generate_initial_resources(GLOBAL_TURN_NUM, map_data, tile_positions, tile_
 					$"UILayer/Resource Bar".add_child(copied_ui_resource, true)
 					copied_ui_resource.position = Vector2(6.5 + UI_offset, 9.3)
 					copied_ui_resource.z_index = 1
-					copied_ui_resource.remove_child(copied_ui_resource.get_children()[0]) # Removes the supply text from the top right of the card
-					
+					copied_ui_resource.get_children()[0].text = "[font_size=30][center][b]%s" % PLAYER_RESOURCES[resource]
 					break
 			UI_offset += 60
 		global_ui_resource_offset = UI_offset
@@ -681,15 +729,13 @@ func possible_road_placements_setup_phase(settlement_pos) -> void:
 	
 	var road_ui_btn_offset = Vector2(-10, -3.5)
 	
-	for vertex in ELIGIBLE_ROAD_VERTICES_SETUP:
+	for vertex in ALL_ROAD_MIDPOINTS:
 		var distance = sqrt(((vertex.x - settlement_pos.x)**2) + ((vertex.y - settlement_pos.y)**2))
-		if distance > 45 and distance < 75:
-			# Find midpoint to place UI element
-			var midpoint = Vector2(((vertex.x + settlement_pos.x) / 2), ((vertex.y + settlement_pos.y) / 2))
+		if distance > 30 and distance < 40:
 			var curr_UI_element = $MapLayer/Possible_Placement_Road.duplicate()
 			$MapLayer.add_child(curr_UI_element, true)
 			curr_UI_element.show()
-			curr_UI_element.position = midpoint + road_ui_btn_offset
+			curr_UI_element.position = vertex + road_ui_btn_offset
 			# Passed vertex here is the vertex that connects the settlement vertex to the next vertex
 			curr_UI_element.pressed.connect(road_placement_pressed_setup_phase.bind(curr_UI_element, GLOBAL_TURN_NUM, vertex, settlement_pos))
 
@@ -704,6 +750,7 @@ func road_placement_pressed_setup_phase(midpoint_btn_node, GLOBAL_TURN_NUM, conn
 	ui_element_for_road.position = midpoint_btn_node.position + road_ui_offset # Place road at midpoint then rotate
 	
 	PLAYER_ROADS.append(midpoint_btn_node.position)
+	ALL_OWNED_ROADS[0] = PLAYER_ROADS
 	
 	# Use slope and arctan between two points to calculate how to rotate the UI element
 	var slope = ((connected_vertex.y - settlement_vertex.y) / (connected_vertex.x - settlement_vertex.x))
@@ -725,20 +772,26 @@ func bot_place_initial_road(settlement_pos, GLOBAL_TURN_NUM) -> void:
 		ui_element_for_road = $MapLayer/Bot3_Road.duplicate()
 	
 	var eligible_road_placements = []
-	for vertex in ELIGIBLE_ROAD_VERTICES_SETUP:
+	for vertex in ALL_ROAD_MIDPOINTS:
 		var distance = sqrt(((vertex.x - settlement_pos.x)**2) + ((vertex.y - settlement_pos.y)**2))
-		if distance > 50 and distance < 75: # May need to slightly adjust this range
+		if distance > 30 and distance < 40: # May need to slightly adjust this range
 			# Find midpoint to place UI element
 			eligible_road_placements.append(vertex)
 	var rand_num = randi_range(0, len(eligible_road_placements)-1)
 	var chosen_road = eligible_road_placements[rand_num]
-	var midpoint = Vector2(((chosen_road.x + settlement_pos.x) / 2), ((chosen_road.y + settlement_pos.y) / 2))
+	
+	if GLOBAL_TURN_NUM == BOT_1_TURN_NUM:
+		ALL_OWNED_ROADS[1].append(chosen_road + Vector2(-10, -3.5))
+	if GLOBAL_TURN_NUM == BOT_2_TURN_NUM:
+		ALL_OWNED_ROADS[2].append(chosen_road + Vector2(-10, -3.5))
+	if GLOBAL_TURN_NUM == BOT_3_TURN_NUM:
+		ALL_OWNED_ROADS[3].append(chosen_road + Vector2(-10, -3.5))
 	
 	var road_ui_offset = Vector2(-25, 7.5) + Vector2(-10, -3.5)
 	$MapLayer.add_child(ui_element_for_road)
 	ui_element_for_road.show()
 	ui_element_for_road.pivot_offset = Vector2(ui_element_for_road.size.x / 2, ui_element_for_road.size.y / 2)
-	ui_element_for_road.position = midpoint + road_ui_offset # Place road at midpoint then rotate
+	ui_element_for_road.position = chosen_road + road_ui_offset # Place road at midpoint then rotate
 	
 	# Use slope and arctan between two points to calculate how to rotate the UI element
 	var slope = ((chosen_road.y - settlement_pos.y) / (chosen_road.x - settlement_pos.x))
