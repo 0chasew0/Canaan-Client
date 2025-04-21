@@ -374,7 +374,6 @@ func activate_or_deactivate_ui_buttons():
 # Should only be allowed to be pressed if correct resources have been met, see activate_or_deactive_ui_buttons()
 func _on_build_road_button_pressed() -> void:
 	print("Build road button pressed.")
-	print("player roads: ", PLAYER_ROADS)
 	
 	# TODO: Call function to disable all other buttons
 	
@@ -423,7 +422,11 @@ func _on_build_road_button_pressed() -> void:
 			node.queue_free()
 			
 	# Remove resources from player
+	PLAYER_RESOURCES["Tree"] -= 1
+	PLAYER_RESOURCES["Brick"] -= 1
 	
+	ui_remove_from_resource_bar("Tree")
+	ui_remove_from_resource_bar("Brick")
 	
 	activate_or_deactivate_ui_buttons()
 	
@@ -515,18 +518,7 @@ func generate_resources_for_all_players(dice_result, tile_positions_local, tile_
 		var resource = SOURCE_ID_TO_RESOURCE_MAPPING[id]
 		PLAYER_RESOURCES[resource] += 1
 		
-		# Add resources as UI elements
-		for node in get_node("UILayer/Supply").get_children():
-			if node.name == resource:
-				var copied_ui_resource = node.duplicate()
-				$"UILayer/Resource Bar".add_child(copied_ui_resource, true)
-				copied_ui_resource.position = Vector2(6.5 + UI_offset, 9.3)
-				copied_ui_resource.z_index = 1
-				copied_ui_resource.remove_child(copied_ui_resource.get_children()[0]) # Removes the supply text from the top right of the card
-				
-				break
-		UI_offset += 60
-	global_ui_resource_offset = UI_offset
+		ui_add_to_resource_bar(resource)
 	
 # Generate initial resources for the player, bot functionality added in for debug using global turn num
 func generate_initial_resources(GLOBAL_TURN_NUM, map_data, tile_positions, tile_positions_local):
@@ -556,41 +548,7 @@ func generate_initial_resources(GLOBAL_TURN_NUM, map_data, tile_positions, tile_
 			var resource = SOURCE_ID_TO_RESOURCE_MAPPING[id]
 			PLAYER_RESOURCES[resource] += 1
 			
-			# TODO: make this match code a function, will be used a lot. (add_to_resource_bar, subtract_from_resource_bar)
-			
-			# Add UI elements depending on what resource it is
-			match resource:
-				"Tree":
-					var UI_element = $UILayer/Supply/Tree
-					# Check where to place this element depending on other elements in the resource bar and if this resource is already in the resource bar
-					# Check to see if this resource is already on the resource bar first
-					for i in range(len(PLAYER_RESOURCE_BAR_POSITIONS)):
-						if PLAYER_RESOURCE_BAR_POSITIONS[i] == 1: # Just append num to amount of trees (+= 1)
-							pass
-					# If not, we need to add it to the bar
-					for i in range(len(PLAYER_RESOURCE_BAR_POSITIONS)):
-						if PLAYER_RESOURCE_BAR_POSITIONS[i] == null and PLAYER_RESOURCE_BAR_POSITIONS != 1: # Tree should be added to the resource bar
-							PLAYER_RESOURCE_BAR_POSITIONS[i] = 1 # This says "Tree" is in this position on the resource bar
-				"Sheep":
-					pass
-				"Brick":
-					pass
-				"Wheat":
-					pass
-				"Stone":
-					pass
-			
-			# Add resources as UI elements
-			for node in get_node("UILayer/Supply").get_children():
-				if node.name == resource:
-					var copied_ui_resource = node.duplicate()
-					$"UILayer/Resource Bar".add_child(copied_ui_resource, true)
-					copied_ui_resource.position = Vector2(6.5 + UI_offset, 9.3)
-					copied_ui_resource.z_index = 1
-					copied_ui_resource.get_children()[0].text = "[font_size=30][center][b]%s" % PLAYER_RESOURCES[resource]
-					break
-			UI_offset += 60
-		global_ui_resource_offset = UI_offset
+			ui_add_to_resource_bar(resource)
 		
 	# If the client is a bot
 	elif GLOBAL_TURN_NUM == BOT_1_TURN_NUM:
@@ -646,6 +604,104 @@ func generate_initial_resources(GLOBAL_TURN_NUM, map_data, tile_positions, tile_
 	
 	
 	emit_signal("end_turn")
+	
+func ui_add_to_resource_bar(resource):
+	# Add UI elements depending on what resource it is, and if it already exists in the resource bar
+	
+	# Pos in PLAYER_RESOURCE_BAR_POSITIONS to UI offset amount
+	var UI_OFFSET_MAPPING = {
+		1: 0,
+		2: 60,
+		3: 120,
+		4: 180,
+		5: 240
+	}
+	
+	var RESOURCE_TO_ID_MAPPING = {
+		"Tree": 1,
+		"Sheep": 2,
+		"Brick": 3,
+		"Wheat": 4,
+		"Stone": 5
+	}
+	
+	var resource_id = RESOURCE_TO_ID_MAPPING[resource]
+	var UI_element = get_node("UILayer/Supply/%s" % resource)
+	# Check where to place this element depending on other elements in the resource bar and if this resource is already in the resource bar
+	
+	# Check to see if this resource is already on the resource bar first
+	for i in range(len(PLAYER_RESOURCE_BAR_POSITIONS)):
+		if PLAYER_RESOURCE_BAR_POSITIONS[i] == resource_id:
+			get_node("UILayer/Resource Bar/%s/Num_Remaining" % resource).text = "[font_size=30][center][b]%s" % PLAYER_RESOURCES[resource]
+			return
+			
+	# If not, we need to add it to the bar
+	for i in range(len(PLAYER_RESOURCE_BAR_POSITIONS)):
+		if PLAYER_RESOURCE_BAR_POSITIONS[i] == null:
+			PLAYER_RESOURCE_BAR_POSITIONS[i] = resource_id # This says "Tree" is in this position on the resource bar
+			var copied_ui_resource = UI_element.duplicate()
+			$"UILayer/Resource Bar".add_child(copied_ui_resource, true)
+			var UI_offset = UI_OFFSET_MAPPING[i+1]
+			copied_ui_resource.position = Vector2(6.5 + UI_offset, 9.3)
+			copied_ui_resource.z_index = 1
+			copied_ui_resource.get_children()[0].text = "[font_size=30][center][b]%s" % PLAYER_RESOURCES[resource]
+			return
+
+func ui_remove_from_resource_bar(resource):
+	var RESOURCE_TO_ID_MAPPING = {
+		"Tree": 1,
+		"Sheep": 2,
+		"Brick": 3,
+		"Wheat": 4,
+		"Stone": 5
+	}
+	
+	var UI_OFFSET_MAPPING = {
+		1: 0,
+		2: 60,
+		3: 120,
+		4: 180,
+		5: 240
+	}
+	
+	var ID_TO_RESOURCE_MAPPING = {
+		1: "Tree",
+		2: "Sheep",
+		3: "Brick",
+		4: "Wheat",
+		5: "Stone"
+	}
+	
+	var num_of_resource = PLAYER_RESOURCES[resource]
+	var resource_id = RESOURCE_TO_ID_MAPPING[resource]
+	if num_of_resource == 0: # Remove resource from bar completely
+		var resource_offset = null
+		var index_of_element_to_remove = null
+		get_node("UILayer/Resource Bar/%s/" % resource).queue_free()
+		# Shift over all other elements if necessary
+		for i in range(len(PLAYER_RESOURCE_BAR_POSITIONS)):
+			if PLAYER_RESOURCE_BAR_POSITIONS[i] == resource_id:
+				resource_offset = UI_OFFSET_MAPPING[PLAYER_RESOURCE_BAR_POSITIONS[i]]
+				index_of_element_to_remove = i
+		# Reconstruct bar positions array, recalculate positions
+		PLAYER_RESOURCE_BAR_POSITIONS = PLAYER_RESOURCE_BAR_POSITIONS.slice(0, index_of_element_to_remove) + PLAYER_RESOURCE_BAR_POSITIONS.slice(index_of_element_to_remove + 1, len(PLAYER_RESOURCE_BAR_POSITIONS)+1)
+		PLAYER_RESOURCE_BAR_POSITIONS.append(null)
+		
+		print(PLAYER_RESOURCE_BAR_POSITIONS)
+		
+		for i in range(len(PLAYER_RESOURCE_BAR_POSITIONS)):
+			if PLAYER_RESOURCE_BAR_POSITIONS[i] == null:
+				continue
+			var curr_resource = ID_TO_RESOURCE_MAPPING[PLAYER_RESOURCE_BAR_POSITIONS[i]]
+			var curr_resource_node = get_node("UILayer/Resource Bar/%s/" % curr_resource)
+			var UI_offset = UI_OFFSET_MAPPING[i+1]
+			curr_resource_node.position = Vector2(6.5 + UI_offset, 9.3)
+			
+	else: # Reduce number of resource in bar
+		for i in range(len(PLAYER_RESOURCE_BAR_POSITIONS)):
+			if PLAYER_RESOURCE_BAR_POSITIONS[i] == resource_id:
+				get_node("UILayer/Resource Bar/%s/Num_Remaining" % resource).text = "[font_size=30][center][b]%s" % PLAYER_RESOURCES[resource]
+				return
 
 # Convert the tile map coords to a local coordinate space -- gets the center of the tile
 func tile_map_coords_to_local_coords(tile_map, tile_positions) -> Array:
