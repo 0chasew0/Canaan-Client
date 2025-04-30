@@ -375,8 +375,6 @@ func activate_or_deactivate_ui_buttons():
 func _on_build_road_button_pressed() -> void:
 	print("Build road button pressed.")
 	
-	# TODO: Call function to disable all other buttons
-	
 	var read_ALL_ROAD_MIDPOINTS = ALL_ROAD_MIDPOINTS.duplicate(true)
 	
 	# Can only build roads that connect to other player-owned roads
@@ -421,7 +419,7 @@ func _on_build_road_button_pressed() -> void:
 			i+=1
 			node.queue_free()
 			
-	# Remove resources from player
+	# Remove resources from player and from resource bar
 	PLAYER_RESOURCES["Tree"] -= 1
 	PLAYER_RESOURCES["Brick"] -= 1
 	
@@ -462,15 +460,76 @@ func road_placement_pressed(midpoint_btn_node, road_midpoint):
 
 # Should only be allowed to be pressed if correct resources have been met, see activate_or_deactive_ui_buttons()
 func _on_build_settlement_button_pressed() -> void:
-	# Only show possible placements that follow distance rule and are connected by THIS player's roads
 	print("build settlement button pressed")
 	
-	# Start with all vertices
-	# Narrow down by all player settlements - remove from all vertices
-	# Narrow down again by distance rule from every settlement in the game
-	# Narrow down by vertices connected by THIS player's road
+	var possible_settlement_placements = []
+	for i in range(len(ELIGIBLE_SETTLEMENT_VERTICES)):
+		var curr_pos = ELIGIBLE_SETTLEMENT_VERTICES[i]
+		for j in range(len(PLAYER_ROADS)):
+			var distance = get_distance(curr_pos, PLAYER_ROADS[j])
+			if distance > 20 and distance < 50:
+				possible_settlement_placements.append(ELIGIBLE_SETTLEMENT_VERTICES[i])
 	
+	# Display the UI elements
+	for vertex in possible_settlement_placements:
+		var settlement_placement_offset = Vector2(-12, -9)
+		
+		var curr_UI_element = $MapLayer/Possible_Placement_Settlement.duplicate()
+		$MapLayer.add_child(curr_UI_element, true)
+		curr_UI_element.show()
+		curr_UI_element.position = vertex + settlement_placement_offset
+
+		curr_UI_element.pressed.connect(settlement_button_pressed.bind(curr_UI_element, vertex))
 	
+	await selection_finished
+	
+	# Remove resources from player and from resource bar
+	PLAYER_RESOURCES["Tree"] -= 1
+	PLAYER_RESOURCES["Brick"] -= 1
+	PLAYER_RESOURCES["Wheat"] -= 1
+	PLAYER_RESOURCES["Sheep"] -= 1
+	
+	ui_remove_from_resource_bar("Tree")
+	ui_remove_from_resource_bar("Brick")
+	ui_remove_from_resource_bar("Wheat")
+	ui_remove_from_resource_bar("Sheep")
+	
+	activate_or_deactivate_ui_buttons()
+
+func settlement_button_pressed(node, vertex):
+	# Add settlement as UI element
+	var offset_position = Vector2(-15, -15)
+	#var selected_node = get_node("MapLayer/%s" % id)
+	var selected_node_position = node.position
+	var ui_element_for_selected_settlement = $MapLayer/Player1_Settlement.duplicate()
+	$MapLayer.add_child(ui_element_for_selected_settlement)
+	ui_element_for_selected_settlement.show()
+	ui_element_for_selected_settlement.position = selected_node_position + offset_position
+	
+	# Add settlement (position) to player, save selections, will need after placing road to remove
+	PLAYER_SETTLEMENTS.append(vertex)
+	PLAYER_LAST_VERTEX_SELECTED = vertex
+	PLAYER_LAST_NODE_SELECTED = node
+	
+	# Removes vertex itself and surrounding vertices due to distance rule
+	var vertices_to_remove = []
+	vertices_to_remove.append(vertex)
+	for i in range(len(ELIGIBLE_SETTLEMENT_VERTICES)-1):
+		var distance = sqrt(((vertex.x - ELIGIBLE_SETTLEMENT_VERTICES[i].x)**2) + ((vertex.y - ELIGIBLE_SETTLEMENT_VERTICES[i].y)**2))
+		if distance < 90: # These are the closest vertices
+				vertices_to_remove.append(ELIGIBLE_SETTLEMENT_VERTICES[i])
+	for i in range(len(vertices_to_remove)):
+		if vertices_to_remove[i] in ELIGIBLE_SETTLEMENT_VERTICES:
+			ELIGIBLE_SETTLEMENT_VERTICES.remove_at(ELIGIBLE_SETTLEMENT_VERTICES.find(vertices_to_remove[i]))
+	
+	# Remove UI elements
+	var i = 2
+	for n in get_node("MapLayer").get_children():
+		if n.name == "Possible_Placement_Settlement%s" % i:
+			i+=1
+			n.queue_free()
+	
+	emit_signal("selection_finished")
 
 func generate_resources_for_all_players(dice_result, tile_positions_local, tile_positions, map_data):
 	
@@ -867,10 +926,10 @@ func init_settlement_buttons(global_vertices):
 		$MapLayer.add_child(curr_UI_element)
 		curr_UI_element.hide()
 		curr_UI_element.position = vertex + settlement_placement_offset
-		curr_UI_element.pressed.connect(settlement_placement_pressed.bind(curr_UI_element.name, GLOBAL_TURN_NUM, vertex))
+		curr_UI_element.pressed.connect(settlement_placement_pressed_setup_phase.bind(curr_UI_element.name, GLOBAL_TURN_NUM, vertex))
 
 # Should only fire if logic from place_initial_settlements() is correct
-func settlement_placement_pressed(id, global_turn_num, vertex_selection):
+func settlement_placement_pressed_setup_phase(id, global_turn_num, vertex_selection):
 	# increment VP
 	# check for win
 	

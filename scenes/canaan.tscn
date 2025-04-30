@@ -993,6 +993,11 @@ texture_normal = ExtResource("29_qc4eu")
 ignore_texture_size = true
 stretch_mode = 0
 
+[node name="Button_DEBUG" type="Button" parent="UILayer/Build_Road_Btn_Background"]
+layout_mode = 0
+offset_right = 96.0
+offset_bottom = 86.0
+
 [node name="Disabled_Mask" type="ColorRect" parent="UILayer/Build_Road_Btn_Background"]
 visible = false
 layout_mode = 0
@@ -1075,4 +1080,5 @@ color = Color(0.14902, 0.14902, 0.14902, 0.678431)
 [connection signal="timeout" from="MapLayer/Player1_Settlement_Timer" to="." method="_on_player_1_settlement_timer_timeout"]
 [connection signal="pressed" from="UILayer/Roll_Dice" to="." method="_on_roll_dice_pressed"]
 [connection signal="pressed" from="UILayer/Build_Road_Btn_Background/Build_Road_Button" to="." method="_on_build_road_button_pressed"]
+[connection signal="pressed" from="UILayer/Build_Road_Btn_Background/Button_DEBUG" to="." method="_on_build_road_button_pressed"]
 [connection signal="pressed" from="UILayer/Build_Settlement_Btn_Background/Build_Settlement_Button" to="." method="_on_build_settlement_button_pressed"]
