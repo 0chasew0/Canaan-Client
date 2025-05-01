@@ -406,6 +406,23 @@ grow_vertical = 2
 texture = ExtResource("34_lxjc8")
 expand_mode = 1
 
+[node name="Player1_City" type="TextureRect" parent="MapLayer"]
+visible = false
+z_index = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -24.0
+offset_top = -24.0
+offset_right = 24.0
+offset_bottom = 24.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("44_ppdgm")
+expand_mode = 1
+
 [node name="Player1_Road" type="TextureRect" parent="MapLayer"]
 visible = false
 z_index = 3
@@ -1082,3 +1099,4 @@ color = Color(0.14902, 0.14902, 0.14902, 0.678431)
 [connection signal="pressed" from="UILayer/Build_Road_Btn_Background/Build_Road_Button" to="." method="_on_build_road_button_pressed"]
 [connection signal="pressed" from="UILayer/Build_Road_Btn_Background/Button_DEBUG" to="." method="_on_build_road_button_pressed"]
 [connection signal="pressed" from="UILayer/Build_Settlement_Btn_Background/Build_Settlement_Button" to="." method="_on_build_settlement_button_pressed"]
+[connection signal="pressed" from="UILayer/Build_City_Btn_Background/Build_City_Button" to="." method="_on_build_city_button_pressed"]

@@ -25,6 +25,7 @@ extends Node2D
 @onready var is_roll_for_turn = true
 @onready var is_initial_settlements = true
 @onready var PLAYER_SETTLEMENTS = [] # Holds the positions of all settlements this player owns
+@onready var PLAYER_CITIES = []
 @onready var PLAYER_ROADS = [] # Holds the midpoint positions of all player-owned roads
 @onready var PLAYER_COUNT = 4 # Will never be less than 2, and for now, more than 4
 @onready var PLAYER_LAST_VERTEX_SELECTED = null
@@ -531,6 +532,62 @@ func settlement_button_pressed(node, vertex):
 	
 	emit_signal("selection_finished")
 
+func _on_build_city_button_pressed() -> void:
+	# Show the possible places a player could build a city
+	var settlement_placement_offset = Vector2(-12, -9)
+	for i in range(len(PLAYER_SETTLEMENTS)):
+		var curr_UI_element = $MapLayer/Possible_Placement_Settlement.duplicate()
+		$MapLayer.add_child(curr_UI_element, true)
+		curr_UI_element.show()
+		curr_UI_element.position = PLAYER_SETTLEMENTS[i] + settlement_placement_offset
+		curr_UI_element.pressed.connect(city_button_pressed.bind(curr_UI_element, PLAYER_SETTLEMENTS[i]))
+	
+	await selection_finished
+	
+	# Remove resources from player and from resource bar
+	PLAYER_RESOURCES["Stone"] -= 1
+	ui_remove_from_resource_bar("Stone")
+	PLAYER_RESOURCES["Stone"] -= 1
+	ui_remove_from_resource_bar("Stone")
+	PLAYER_RESOURCES["Stone"] -= 1
+	ui_remove_from_resource_bar("Stone")
+	PLAYER_RESOURCES["Wheat"] -= 1
+	ui_remove_from_resource_bar("Wheat")
+	PLAYER_RESOURCES["Wheat"] -= 1
+	ui_remove_from_resource_bar("Wheat")
+	
+	activate_or_deactivate_ui_buttons()
+
+func city_button_pressed(node, vertex):
+	# Remove the settlement that is here, both in the UI and from the player's data
+	print(len(PLAYER_SETTLEMENTS))
+	PLAYER_SETTLEMENTS.remove_at(PLAYER_SETTLEMENTS.find(vertex))
+	print(len(PLAYER_SETTLEMENTS))
+	var i = 2
+	for n in get_node("MapLayer").get_children():
+		if n.get_class() == "TextureRect":
+			if n.position == (vertex + Vector2(-15, -15) + Vector2(-12, -9)):
+				n.queue_free()
+	
+	PLAYER_CITIES.append(vertex)
+	
+	# Place the City UI element
+	var offset_position = Vector2(-15, -15)
+	var selected_node_position = node.position
+	var ui_element_for_selected_settlement = $MapLayer/Player1_City.duplicate()
+	$MapLayer.add_child(ui_element_for_selected_settlement)
+	ui_element_for_selected_settlement.show()
+	ui_element_for_selected_settlement.position = selected_node_position + offset_position
+	
+	# Remove other possible location's UI elements
+	i = 2
+	for n in get_node("MapLayer").get_children():
+		if n.name == "Possible_Placement_Settlement%s" % i:
+			i+=1
+			n.queue_free()
+	
+	emit_signal("selection_finished")
+	
 func generate_resources_for_all_players(dice_result, tile_positions_local, tile_positions, map_data):
 	
 	# Maps the visual resource num to it's Atlas ID in the TileSet
