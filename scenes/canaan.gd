@@ -12,85 +12,29 @@ extends Node2D
 @onready var BOT_2_UI_BOX = $UILayer/Player3Background
 @onready var BOT_3_UI_BOX = $UILayer/Player4Background
 @onready var global_ui_resource_offset = 0
-@onready var PLAYER_RESOURCE_BAR_POSITIONS = [null, null, null, null, null]
+@onready var NUM_SUPPLY_TREE = 19
+@onready var NUM_SUPPLY_SHEEP = 19
+@onready var NUM_SUPPLY_BRICK = 19
+@onready var NUM_SUPPLY_WHEAT = 19
+@onready var NUM_SUPPLY_STONE = 19
 
 # Game state variables
+@onready var ALL_PLAYERS = []
 @onready var global_vertices = null
-@onready var PLAYER_VP = 0
 @onready var NUM_PLAYERS = 4 # Server side variable
 @onready var GLOBAL_TURN_NUM = 1 # Server side variable, all clients will have the same value
-@onready var PLAYER_NUM = 1 # Client/server side variable, unique to this client
-@onready var PLAYER_TURN_NUM = 1 # What turn does this player go on
 @onready var DIE_ROLL_NUM = 0 # Client variable, gets sent to server
 @onready var is_roll_for_turn = true
 @onready var is_initial_settlements = true
-@onready var PLAYER_SETTLEMENTS = [] # Holds the positions of all settlements this player owns
-@onready var PLAYER_CITIES = []
-@onready var PLAYER_ROADS = [] # Holds the midpoint positions of all player-owned roads
 @onready var PLAYER_COUNT = 4 # Will never be less than 2, and for now, more than 4
-@onready var PLAYER_LAST_VERTEX_SELECTED = null
-@onready var PLAYER_LAST_NODE_SELECTED = null
-@onready var PLAYER_RESOURCES = {
-	"Tree": 0,
-	"Sheep": 0,
-	"Brick": 0,
-	"Wheat": 0,
-	"Stone": 0
-}
 @onready var ROBBER_POSITION = null
 @onready var ALL_OWNED_ROADS = []
+@onready var ALL_PLAYERS_TURN_NUMS = {}
 
 # Debug vars
 @export var DEBUG_map_vertex_offset = Vector2(905, 671) # For the map vertices
 @onready var tile_positions_local = []
 @onready var ALL_ROAD_MIDPOINTS = [] # Stores all road midpoints
-
-# Server side simulated variables
-@onready var BOT_1_PLAYER_NUM = 2
-@onready var BOT_2_PLAYER_NUM = 3
-@onready var BOT_3_PLAYER_NUM = 4
-@onready var BOT_1_DIE_ROLL_NUM = 0
-@onready var BOT_2_DIE_ROLL_NUM = 0
-@onready var BOT_3_DIE_ROLL_NUM = 0
-@onready var BOT_1_TURN_NUM = 2
-@onready var BOT_2_TURN_NUM = 3
-@onready var BOT_3_TURN_NUM = 4
-@onready var BOT_1_SETTLEMENTS = []
-@onready var BOT_2_SETTLEMENTS = []
-@onready var BOT_3_SETTLEMENTS = []
-@onready var BOT_1_LAST_VERTEX_SELECTED = null
-@onready var BOT_1_LAST_NODE_SELECTED = null
-@onready var BOT_2_LAST_VERTEX_SELECTED = null
-@onready var BOT_2_LAST_NODE_SELECTED = null
-@onready var BOT_3_LAST_VERTEX_SELECTED = null
-@onready var BOT_3_LAST_NODE_SELECTED = null
-@onready var BOT_1_VP = 0
-@onready var BOT_2_VP = 0
-@onready var BOT_3_VP = 0
-@onready var BOT_1_RESOURCES = {
-	"Tree": 0,
-	"Sheep": 0,
-	"Brick": 0,
-	"Wheat": 0,
-	"Stone": 0
-}
-@onready var BOT_2_RESOURCES = {
-	"Tree": 0,
-	"Sheep": 0,
-	"Brick": 0,
-	"Wheat": 0,
-	"Stone": 0
-}
-@onready var BOT_3_RESOURCES = {
-	"Tree": 0,
-	"Sheep": 0,
-	"Brick": 0,
-	"Wheat": 0,
-	"Stone": 0
-}
-@onready var BOT_1_ROADS = []
-@onready var BOT_2_ROADS = []
-@onready var BOT_3_ROADS = []
 
 @onready var ELIGIBLE_SETTLEMENT_VERTICES = [] # Contains a list of eligible vertices for settlement placement. This is shared between all players
 @onready var ELIGIBLE_ROAD_VERTICES_SETUP = []
@@ -100,6 +44,22 @@ signal selection_finished # Used for returning control back to a main function a
 signal end_turn # Used for signaling that a player or bots turn is over, usually used in the main game loop
 
 func _ready() -> void:
+	
+	var PLAYER = load("res://player.gd")
+	for i in range(PLAYER_COUNT):
+		if i == 0: # In multiplayer, this should check for whether this is a bot or player
+			var PLAYER_OBJ = PLAYER.new()
+			PLAYER_OBJ._name = "Player 1"
+			PLAYER_OBJ.type = "Player"
+			PLAYER_OBJ.id = 1
+			ALL_PLAYERS.append(PLAYER_OBJ)
+		else:
+			var BOT = PLAYER.new()
+			BOT.name = ("Bot %s" % str(i+1))
+			BOT.type = "Bot"
+			BOT.id = i+1
+			ALL_PLAYERS.append(BOT)
+	
 	await initialize_ui_boxes()
 	randomize() # Initializes randomizer, only call this once
 	var tile_positions = generate_rand_standard_map() # Map data contains coordinates of all cells of the map
@@ -114,7 +74,7 @@ func _ready() -> void:
 	await initialize_robber(standard_map, tile_positions)
 	
 	# Initialize UI button states
-	await activate_or_deactivate_ui_buttons()
+	#await activate_or_deactivate_ui_buttons(p)
 	
 	# Initialize chat box setting(s)
 	chat_log.append_text("[font_size=%s]Welcome to Canaan!" % chat_log_font_size)
@@ -122,11 +82,8 @@ func _ready() -> void:
 	# Initialize road array
 	for i in range(PLAYER_COUNT):
 		ALL_OWNED_ROADS.append([])
-	print(ALL_OWNED_ROADS)
 	
-	## Main game loop for a client
-	#while true:
-		#pass
+	# Main game loop for a client
 	await roll_for_who_goes_first()
 	# Place initial settlements and roads for all players
 	# First round
@@ -149,22 +106,16 @@ func _ready() -> void:
 		generate_initial_resources(GLOBAL_TURN_NUM, standard_map, tile_positions, tile_positions_local)
 		GLOBAL_TURN_NUM += 1
 		
-	print("bot 1 resources: ", BOT_1_RESOURCES)
-	print("bot 2 resources: ", BOT_2_RESOURCES)
-	print("bot 3 resources: ", BOT_3_RESOURCES)
-		
 	chat_log.append_text("[font_size=%s]\nAll players done placing settlements and roads." % chat_log_font_size)
 	
-	PLAYER_VP = 2
-	BOT_1_VP = 2
-	BOT_2_VP = 2
-	BOT_3_VP = 2
+	for player in ALL_PLAYERS:
+		player.vp = 2
 	
+	# Make this more dynamic
 	PLAYER_UI_BOX.get_node("VP").text = "[font_size=18][center]Victory Points: 2"
 	BOT_1_UI_BOX.get_node("VP").text = "[font_size=18][center]Victory Points: 2"
 	BOT_2_UI_BOX.get_node("VP").text = "[font_size=18][center]Victory Points: 2"
 	BOT_3_UI_BOX.get_node("VP").text = "[font_size=18][center]Victory Points: 2"
-	
 	
 	main_game_loop(tile_positions, standard_map)
 	
@@ -172,49 +123,60 @@ func main_game_loop(tile_positions, standard_map):
 	GLOBAL_TURN_NUM = 1
 	
 	# Bot functionality added for testing
-	for i in range(400): # Turn limit?
-		if GLOBAL_TURN_NUM == PLAYER_TURN_NUM:
-			# Turn Initializers
-			await activate_or_deactivate_ui_buttons()
-			print("player turn")
-			roll_dice_btn.disabled = false
-			
-			# Can play one development card before rolling dice
-			
-			# Check for win
-			
-			await roll_dice_btn.pressed # Wait for user to roll dice before continuing
-			DIE_ROLL_NUM = _on_roll_dice_pressed()
-			roll_dice_btn.disabled = true
-			
-			# Generate resources for EACH player based on dice result, unless a 7 is rolled
-			# For friendly robber, check that no player has VP > 2, else do robber as normal
-			if DIE_ROLL_NUM == 7 and PLAYER_VP < 3 and BOT_1_VP < 3 and BOT_2_VP < 3 and BOT_3_VP < 3:
-				activate_robber()
-			await generate_resources_for_all_players(DIE_ROLL_NUM, tile_positions_local, tile_positions, standard_map)
-			await activate_or_deactivate_ui_buttons()
-			
-			# When player is done with turn
-			#await $UILayer/End_Turn_Btn_Background/End_Turn_Button.pressed
-			
-		elif GLOBAL_TURN_NUM == BOT_1_TURN_NUM:
-			print("bot 1 turn")
-			# Simulate dice roll
-			
-			# Increment turn and end turn
-			GLOBAL_TURN_NUM += 1
-			if GLOBAL_TURN_NUM > 4:
-				GLOBAL_TURN_NUM = 1
-		elif GLOBAL_TURN_NUM == BOT_2_TURN_NUM:
-			print("bot 2 turn")
-			GLOBAL_TURN_NUM += 1
-			if GLOBAL_TURN_NUM > 4:
-				GLOBAL_TURN_NUM = 1
-		elif GLOBAL_TURN_NUM == BOT_3_TURN_NUM:
-			print("bot 3 turn")
-			GLOBAL_TURN_NUM += 1
-			if GLOBAL_TURN_NUM > 4:
-				GLOBAL_TURN_NUM = 1
+	for i in range(100): # Turn limit?
+		for p in ALL_PLAYERS:
+			if p.type == "Player":
+				# Turn Initializers
+				await activate_or_deactivate_ui_buttons(p)
+				print("player turn")
+				roll_dice_btn.disabled = false
+				
+				# Can play one development card before rolling dice
+				
+				# Check for win
+				
+				await roll_dice_btn.pressed # Wait for user to roll dice before continuing
+				p.dice_roll_result = _on_roll_dice_pressed()
+				roll_dice_btn.disabled = true
+				
+				# Generate resources for EACH player based on dice result, unless a 7 is rolled
+				# For friendly robber, check that no player has VP > 2, else do robber as normal
+				if p.dice_roll_result == 7:
+					for player in ALL_PLAYERS:
+						if player.vp < 3:
+							continue
+						else:
+							activate_robber()
+							
+				await generate_resources_for_all_players(p.dice_roll_result, tile_positions_local, tile_positions, standard_map)
+				await activate_or_deactivate_ui_buttons(p)
+				
+				# When player is done with turn
+				await $UILayer/End_Turn_Btn_Background/End_Turn_Button.pressed
+				GLOBAL_TURN_NUM += 1
+				if GLOBAL_TURN_NUM > 4:
+					GLOBAL_TURN_NUM = 1
+				continue
+			else:
+				print("bot turn")
+				# Disable all buttons when it's not the client's turn
+				# Simulate dice roll
+				p.dice_roll_result = _on_roll_dice_pressed()
+				print("bot 1 rolled: ", DIE_ROLL_NUM)
+				if p.dice_roll_result == 7:
+					for player in ALL_PLAYERS:
+						if player.vp < 3:
+							continue
+						else:
+							activate_robber()
+				await generate_resources_for_all_players(p.dice_roll_result, tile_positions_local, tile_positions, standard_map)
+				
+				bot_decision_loop(p)
+				
+				# Increment turn and end turn
+				GLOBAL_TURN_NUM += 1
+				if GLOBAL_TURN_NUM > 4:
+					GLOBAL_TURN_NUM = 1
 
 func initialize_ui_boxes() -> void:
 	PLAYER_UI_BOX.get_node("PlayerName").text = "[font_size=18][center][b]Player"
@@ -245,66 +207,80 @@ func roll_for_who_goes_first():
 	chat_log.append_text("[font_size=%s]\nRoll for turn order!" % chat_log_font_size)
 	
 	var turn_order: Array[Vector2i] = []
-	for i in range(1, NUM_PLAYERS + 1): # This will end up as server code
-		# Server: hide all dice button presses for all other players who aren't rolling
-		# Bots will automatically roll dice
-		
-		# If it is this client's turn
-		if PLAYER_NUM == GLOBAL_TURN_NUM:
+	for player in ALL_PLAYERS:
+		if player.type == "Player":
 			await roll_dice_btn.pressed # Wait for user to roll dice before continuing
-			DIE_ROLL_NUM = _on_roll_dice_pressed()
-			turn_order.append(Vector2i(DIE_ROLL_NUM, PLAYER_NUM))
+			player.dice_roll_result = _on_roll_dice_pressed()
+			turn_order.append(Vector2i(player.dice_roll_result, player))
 			
 			# Update the chat log
 			var fmt_str = "[font_size=%s]\nPlayer %s rolled a %s"
-			var act_str = fmt_str % [chat_log_font_size, PLAYER_NUM, DIE_ROLL_NUM]
+			var act_str = fmt_str % [chat_log_font_size, player.id, player.dice_roll_result]
 			chat_log.append_text(act_str)
-		elif BOT_1_PLAYER_NUM == GLOBAL_TURN_NUM: # Server: either a bot will roll or a player. For now, only bots, so simulate their rolls
-			BOT_1_DIE_ROLL_NUM = _on_roll_dice_pressed()
-			turn_order.append(Vector2i(BOT_1_DIE_ROLL_NUM, BOT_1_PLAYER_NUM))
+		else:
+			player.dice_roll_result = _on_roll_dice_pressed()
+			turn_order.append(Vector2i(player.dice_roll_result, player))
 			var fmt_str = "[font_size=%s]\nPlayer %s rolled a %s"
-			var act_str = fmt_str % [chat_log_font_size, BOT_1_PLAYER_NUM, BOT_1_DIE_ROLL_NUM]
-			chat_log.append_text(act_str)
-		elif BOT_2_PLAYER_NUM == GLOBAL_TURN_NUM:
-			BOT_2_DIE_ROLL_NUM = _on_roll_dice_pressed()
-			turn_order.append(Vector2i(BOT_2_DIE_ROLL_NUM, BOT_2_PLAYER_NUM))
-			var fmt_str = "[font_size=%s]\nPlayer %s rolled a %s"
-			var act_str = fmt_str % [chat_log_font_size, BOT_2_PLAYER_NUM, BOT_2_DIE_ROLL_NUM]
-			chat_log.append_text(act_str)
-		elif BOT_3_PLAYER_NUM == GLOBAL_TURN_NUM: 
-			BOT_3_DIE_ROLL_NUM = _on_roll_dice_pressed()
-			turn_order.append(Vector2i(BOT_3_DIE_ROLL_NUM, BOT_3_PLAYER_NUM))
-			var fmt_str = "[font_size=%s]\nPlayer %s rolled a %s"
-			var act_str = fmt_str % [chat_log_font_size, BOT_3_PLAYER_NUM, BOT_3_DIE_ROLL_NUM]
+			var act_str = fmt_str % [chat_log_font_size, player.id, player.dice_roll_result]
 			chat_log.append_text(act_str)
 		GLOBAL_TURN_NUM += 1
+		
+	#for i in range(1, NUM_PLAYERS + 1): # This will end up as server code
+		## Server: hide all dice button presses for all other players who aren't rolling
+		## Bots will automatically roll dice
+		#
+		## If it is this client's turn
+		#if PLAYER_NUM == GLOBAL_TURN_NUM:
+			#await roll_dice_btn.pressed # Wait for user to roll dice before continuing
+			#DIE_ROLL_NUM = _on_roll_dice_pressed()
+			#turn_order.append(Vector2i(DIE_ROLL_NUM, PLAYER_NUM))
+			#
+			## Update the chat log
+			#var fmt_str = "[font_size=%s]\nPlayer %s rolled a %s"
+			#var act_str = fmt_str % [chat_log_font_size, PLAYER_NUM, DIE_ROLL_NUM]
+			#chat_log.append_text(act_str)
+		#elif BOT_1_PLAYER_NUM == GLOBAL_TURN_NUM: # Server: either a bot will roll or a player. For now, only bots, so simulate their rolls
+			#BOT_1_DIE_ROLL_NUM = _on_roll_dice_pressed()
+			#turn_order.append(Vector2i(BOT_1_DIE_ROLL_NUM, BOT_1_PLAYER_NUM))
+			#var fmt_str = "[font_size=%s]\nPlayer %s rolled a %s"
+			#var act_str = fmt_str % [chat_log_font_size, BOT_1_PLAYER_NUM, BOT_1_DIE_ROLL_NUM]
+			#chat_log.append_text(act_str)
+		#elif BOT_2_PLAYER_NUM == GLOBAL_TURN_NUM:
+			#BOT_2_DIE_ROLL_NUM = _on_roll_dice_pressed()
+			#turn_order.append(Vector2i(BOT_2_DIE_ROLL_NUM, BOT_2_PLAYER_NUM))
+			#var fmt_str = "[font_size=%s]\nPlayer %s rolled a %s"
+			#var act_str = fmt_str % [chat_log_font_size, BOT_2_PLAYER_NUM, BOT_2_DIE_ROLL_NUM]
+			#chat_log.append_text(act_str)
+		#elif BOT_3_PLAYER_NUM == GLOBAL_TURN_NUM: 
+			#BOT_3_DIE_ROLL_NUM = _on_roll_dice_pressed()
+			#turn_order.append(Vector2i(BOT_3_DIE_ROLL_NUM, BOT_3_PLAYER_NUM))
+			#var fmt_str = "[font_size=%s]\nPlayer %s rolled a %s"
+			#var act_str = fmt_str % [chat_log_font_size, BOT_3_PLAYER_NUM, BOT_3_DIE_ROLL_NUM]
+			#chat_log.append_text(act_str)
+		#GLOBAL_TURN_NUM += 1
 		
 	turn_order.sort_custom(custom_sort_for_first_roll)
 	
 	# turn_order[i].y will be a players_id, so assign player turn nums from that
-	for i in range(len(turn_order)):
-		if turn_order[i].y == PLAYER_NUM:
-			PLAYER_TURN_NUM = i+1
-		elif turn_order[i].y == BOT_1_TURN_NUM:
-			BOT_1_TURN_NUM = i+1
-		elif turn_order[i].y == BOT_2_TURN_NUM:
-			BOT_2_TURN_NUM = i+1
-		elif turn_order[i].y == BOT_3_TURN_NUM:
-			BOT_3_TURN_NUM = i+1
+	#for i in range(len(turn_order)):
+		#if turn_order[i].y == PLAYER_NUM:
+			#PLAYER_TURN_NUM = i+1
+		#elif turn_order[i].y == BOT_1_TURN_NUM:
+			#BOT_1_TURN_NUM = i+1
+		#elif turn_order[i].y == BOT_2_TURN_NUM:
+			#BOT_2_TURN_NUM = i+1
+		#elif turn_order[i].y == BOT_3_TURN_NUM:
+			#BOT_3_TURN_NUM = i+1
+	
+	print(ALL_PLAYERS)
+	for i in ALL_PLAYERS.size()-1:
+		ALL_PLAYERS[i] = turn_order[i].y
+	print(ALL_PLAYERS)
 	
 	chat_log.append_text("\n")
-	for i in range(len(turn_order)):
-		var placement_str = ""
-		if i == 0:
-			placement_str = "first"
-		elif i == 1:
-			placement_str = "second"
-		elif i == 2:
-			placement_str = "third"
-		elif i == 3:
-			placement_str = "fourth"
-		var fmt_str = "[font_size=%s]\nPlayer %s goes %s!"
-		var act_str = fmt_str % [chat_log_font_size, turn_order[i].y, placement_str]
+	for i in ALL_PLAYERS.size()-1:
+		var fmt_str = "[font_size=%s]\n%s %s goes %s!"
+		var act_str = fmt_str % [chat_log_font_size, ALL_PLAYERS[i].type, ALL_PLAYERS[i].id, i+1]
 		chat_log.append_text(act_str)
 		
 	is_roll_for_turn = false
@@ -344,34 +320,169 @@ func activate_robber():
 # Sets certain UI buttons/elements as "active"/"not disabled" if the player meets the resource requirement for them,
 # indicating that they can afford the respective thing (settlement, city, road, development card, etc.)
 # Call this anytime after a player modifies their resources in any way (dice roll, dev card, trading, etc.)
-func activate_or_deactivate_ui_buttons():
+func activate_or_deactivate_ui_buttons(p):
 	# Road
-	var build_road_button_state = false if PLAYER_RESOURCES["Brick"] >= 1 and PLAYER_RESOURCES["Tree"] >= 1 else true
+	var build_road_button_state = false if p.resources["Brick"] >= 1 and p.resources["Tree"] >= 1 else true
 	$UILayer/Build_Road_Btn_Background/Build_Road_Button.disabled = build_road_button_state
 	$UILayer/Build_Road_Btn_Background/Disabled_Mask.visible = build_road_button_state
 	
 	# Settlement
-	var build_settlement_button_state = false if PLAYER_RESOURCES["Brick"] >= 1 and PLAYER_RESOURCES["Tree"] >= 1 and PLAYER_RESOURCES["Wheat"] >= 1 and PLAYER_RESOURCES["Sheep"] >= 1 else true
+	var build_settlement_button_state = false if p.resources["Brick"] >= 1 and p.resources["Tree"] >= 1 and p.resources["Wheat"] >= 1 and p.resources["Sheep"] >= 1 else true
 	$UILayer/Build_Settlement_Btn_Background/Build_Settlement_Button.disabled = build_settlement_button_state
 	$UILayer/Build_Settlement_Btn_Background/Disabled_Mask.visible = build_settlement_button_state
 	
 	# City
-	var build_city_button_state = false if PLAYER_RESOURCES["Wheat"] >= 2 and PLAYER_RESOURCES["Stone"] >= 3 else true
+	var build_city_button_state = false if p.resources["Wheat"] >= 2 and p.resources["Stone"] >= 3 else true
 	$UILayer/Build_City_Btn_Background/Build_City_Button.disabled = build_city_button_state
 	$UILayer/Build_City_Btn_Background/Disabled_Mask.visible = build_city_button_state
 	
 	# Development Card
-	var buy_dev_card_button_state = false if PLAYER_RESOURCES["Wheat"] >= 1 and PLAYER_RESOURCES["Stone"] >= 1 and PLAYER_RESOURCES["Sheep"] >= 1 else true
+	var buy_dev_card_button_state = false if p.resources["Wheat"] >= 1 and p.resources["Stone"] >= 1 and p.resources["Sheep"] >= 1 else true
 	$UILayer/Buy_Development_Card_Background/Buy_Development_Card_Button.disabled = buy_dev_card_button_state
 	$UILayer/Buy_Development_Card_Background/Disabled_Mask.visible = buy_dev_card_button_state
 	
 	# Bank Trade
-	var bank_trade_button_state = false if PLAYER_RESOURCES["Brick"] >= 4 or PLAYER_RESOURCES["Tree"] >= 4 or PLAYER_RESOURCES["Sheep"] >= 4 or PLAYER_RESOURCES["Wheat"] >= 4 or PLAYER_RESOURCES["Stone"] >= 4 else true
+	var bank_trade_button_state = false if p.resources["Brick"] >= 4 or p.resources["Tree"] >= 4 or p.resources["Sheep"] >= 4 or p.resources["Wheat"] >= 4 or p.resources["Stone"] >= 4 else true
 	$UILayer/Bank_Trade_Btn_Background/Trade_Button.disabled = bank_trade_button_state
 	$UILayer/Bank_Trade_Btn_Background/Disabled_Mask.visible = bank_trade_button_state
 	
 	# Players can offer up trades where they don't offer anything, so that button will always be active/enabled
 
+func ui_add_resource_to_supply(resource):
+	var RESOURCE_TO_ID_MAPPING = {
+		"Tree": 1,
+		"Sheep": 2,
+		"Brick": 3,
+		"Wheat": 4,
+		"Stone": 5
+	}
+	
+	if resource in RESOURCE_TO_ID_MAPPING:
+		if resource == "Tree":
+			if NUM_SUPPLY_TREE > 19:
+				print("error adding resource to supply (greater than 19 in supply): ", resource)
+				return false
+			NUM_SUPPLY_TREE += 1
+			get_node("UILayer/Supply/%s/Num_Remaining" % resource).text = "[font_size=30][center][b]%s" % NUM_SUPPLY_TREE
+		elif resource == "Sheep":
+			if NUM_SUPPLY_SHEEP > 19:
+				print("error adding resource to supply (greater than 19 in supply): ", resource)
+				return false
+			NUM_SUPPLY_SHEEP += 1
+			get_node("UILayer/Supply/%s/Num_Remaining" % resource).text = "[font_size=30][center][b]%s" % NUM_SUPPLY_SHEEP
+		elif resource == "Brick":
+			if NUM_SUPPLY_BRICK > 19:
+				print("error adding resource to supply (greater than 19 in supply): ", resource)
+				return false
+			NUM_SUPPLY_BRICK += 1
+			get_node("UILayer/Supply/%s/Num_Remaining" % resource).text = "[font_size=30][center][b]%s" % NUM_SUPPLY_BRICK
+		elif resource == "Wheat":
+			if NUM_SUPPLY_WHEAT > 19:
+				print("error adding resource to supply (greater than 19 in supply): ", resource)
+				return false
+			NUM_SUPPLY_WHEAT += 1
+			get_node("UILayer/Supply/%s/Num_Remaining" % resource).text = "[font_size=30][center][b]%s" % NUM_SUPPLY_WHEAT
+		elif resource == "Stone":
+			if NUM_SUPPLY_STONE > 19:
+				print("error adding resource to supply (greater than 19 in supply): ", resource)
+				return false
+			NUM_SUPPLY_STONE += 1
+			get_node("UILayer/Supply/%s/Num_Remaining" % resource).text = "[font_size=30][center][b]%s" % NUM_SUPPLY_STONE
+	else:
+		print("error adding resource to supply: ", resource)
+
+func ui_remove_resource_from_supply(resource):
+	var RESOURCE_TO_ID_MAPPING = {
+		"Tree": 1,
+		"Sheep": 2,
+		"Brick": 3,
+		"Wheat": 4,
+		"Stone": 5
+	}
+	
+	var resource_id = RESOURCE_TO_ID_MAPPING[resource]
+
+	if resource in RESOURCE_TO_ID_MAPPING:
+		if resource == "Tree":
+			if NUM_SUPPLY_TREE == 0:
+				print("No more Trees left!")
+				return false
+			NUM_SUPPLY_TREE -= 1
+			get_node("UILayer/Supply/%s/Num_Remaining" % resource).text = "[font_size=30][center][b]%s" % NUM_SUPPLY_TREE
+		elif resource == "Sheep":
+			if NUM_SUPPLY_SHEEP == 0:
+				print("No more Sheeps left!")
+				return false
+			NUM_SUPPLY_SHEEP -= 1
+			get_node("UILayer/Supply/%s/Num_Remaining" % resource).text = "[font_size=30][center][b]%s" % NUM_SUPPLY_SHEEP
+		elif resource == "Brick":
+			if NUM_SUPPLY_BRICK == 0:
+				print("No more Bricks left!")
+				return false
+			NUM_SUPPLY_BRICK -= 1
+			get_node("UILayer/Supply/%s/Num_Remaining" % resource).text = "[font_size=30][center][b]%s" % NUM_SUPPLY_BRICK
+		elif resource == "Wheat":
+			if NUM_SUPPLY_WHEAT == 0:
+				print("No more Wheats left!")
+				return false
+			NUM_SUPPLY_WHEAT -= 1
+			get_node("UILayer/Supply/%s/Num_Remaining" % resource).text = "[font_size=30][center][b]%s" % NUM_SUPPLY_WHEAT
+		elif resource == "Stone":
+			if NUM_SUPPLY_STONE == 0:
+				print("No more Stones left!")
+				return false
+			NUM_SUPPLY_STONE -= 1
+			get_node("UILayer/Supply/%s/Num_Remaining" % resource).text = "[font_size=30][center][b]%s" % NUM_SUPPLY_STONE
+		return true # If succesfully able to get this resource from the supply (it isn't empty)
+	else:
+		print("error removing resource from supply: ", resource)
+
+func bot_decision_loop(global_turn_num):
+	# Figure out which bot this is, based on global_turn_num
+	#var bot_num = ALL_PLAYERS_TURN_NUMS.find_key(global_turn_num)
+	
+	if global_turn_num == BOT_1_TURN_NUM:
+		
+		# If resource met and no viable settlement/city placements, then build road
+		bot_build_road(BOT_1_TURN_NUM)
+		
+		# else, prioritize building a city then settlement
+		
+		# use development cards if needed
+		# go for longest road if close
+	
+	elif global_turn_num == BOT_2_TURN_NUM:
+		pass
+	elif global_turn_num == BOT_3_TURN_NUM:
+		pass
+
+func bot_build_road(bot_num):
+	var read_ALL_ROAD_MIDPOINTS = ALL_ROAD_MIDPOINTS.duplicate(true)
+	
+	# Can only build roads that connect to other player-owned roads
+	# All possible positions for a player to place a road will be 
+	
+	var all_possible_road_placements = []
+	for i in range(len("BOT_%s_ROADS")):
+		var curr_road_pos = PLAYER_ROADS[i]
+		# Check curr road position against all possible positions
+		for j in range(len(read_ALL_ROAD_MIDPOINTS)): # Find all road midpoints that could connect to the current road using dist formula
+			var distance = sqrt(((curr_road_pos.x - read_ALL_ROAD_MIDPOINTS[j].x)**2) + ((curr_road_pos.y - read_ALL_ROAD_MIDPOINTS[j].y)**2))
+			if distance > 45 and distance < 75:
+				all_possible_road_placements.append(read_ALL_ROAD_MIDPOINTS[j])
+	
+	# Check that the possible placement vertices aren't owned by any player, if so, remove them
+	var elements_to_remove = []
+	for i in range(len(ALL_OWNED_ROADS)):
+		for j in range(len(all_possible_road_placements)):
+			var placement_account_for_offset = (all_possible_road_placements[j] + Vector2(-10, -3.5))
+			if placement_account_for_offset in ALL_OWNED_ROADS[i]:
+				elements_to_remove.append(all_possible_road_placements[j])
+	for i in range(len(elements_to_remove)):
+		if elements_to_remove[i] in all_possible_road_placements:
+			all_possible_road_placements.remove_at(all_possible_road_placements.find(elements_to_remove[i]))
+		
+		
 # Should only be allowed to be pressed if correct resources have been met, see activate_or_deactive_ui_buttons()
 func _on_build_road_button_pressed() -> void:
 	print("Build road button pressed.")
@@ -426,6 +537,9 @@ func _on_build_road_button_pressed() -> void:
 	
 	ui_remove_from_resource_bar("Tree")
 	ui_remove_from_resource_bar("Brick")
+	
+	ui_add_resource_to_supply("Tree")
+	ui_add_resource_to_supply("Brick")
 	
 	activate_or_deactivate_ui_buttons()
 	
@@ -495,6 +609,11 @@ func _on_build_settlement_button_pressed() -> void:
 	ui_remove_from_resource_bar("Wheat")
 	ui_remove_from_resource_bar("Sheep")
 	
+	ui_add_resource_to_supply("Tree")
+	ui_add_resource_to_supply("Brick")
+	ui_add_resource_to_supply("Wheat")
+	ui_add_resource_to_supply("Sheep")
+	
 	activate_or_deactivate_ui_buttons()
 
 func settlement_button_pressed(node, vertex):
@@ -547,14 +666,19 @@ func _on_build_city_button_pressed() -> void:
 	# Remove resources from player and from resource bar
 	PLAYER_RESOURCES["Stone"] -= 1
 	ui_remove_from_resource_bar("Stone")
+	ui_add_resource_to_supply("Stone")
 	PLAYER_RESOURCES["Stone"] -= 1
 	ui_remove_from_resource_bar("Stone")
+	ui_add_resource_to_supply("Stone")
 	PLAYER_RESOURCES["Stone"] -= 1
 	ui_remove_from_resource_bar("Stone")
+	ui_add_resource_to_supply("Stone")
 	PLAYER_RESOURCES["Wheat"] -= 1
 	ui_remove_from_resource_bar("Wheat")
+	ui_add_resource_to_supply("Wheat")
 	PLAYER_RESOURCES["Wheat"] -= 1
 	ui_remove_from_resource_bar("Wheat")
+	ui_add_resource_to_supply("Wheat")
 	
 	activate_or_deactivate_ui_buttons()
 
@@ -612,30 +736,103 @@ func generate_resources_for_all_players(dice_result, tile_positions_local, tile_
 		5: "Stone"
 	}
 	
-	# Check each settlements adjacent tiles to see if they match the dice result
-	var resources = []
-	for i in range(len(PLAYER_SETTLEMENTS)):
-		for j in range(len(tile_positions_local)):
-			# Should be the three closest tiles, where pos is the center of the tile
-			var distance = sqrt(((tile_positions_local[j].x - PLAYER_SETTLEMENTS[i].x)**2) + ((tile_positions_local[j].y - PLAYER_SETTLEMENTS[i].y)**2))
-			if distance < 75:
-				# Get the tiles atlas id and use the mapping
-				var resource_num_source_id = resource_num_map_layer.get_cell_source_id(tile_positions[j])
-				if resource_num_source_id == -1:
+	for p in range(PLAYER_COUNT):
+		# Check each settlements adjacent tiles to see if they match the dice result
+		# If real player
+		if p+1 == PLAYER_TURN_NUM:
+			print("generate resource for player")
+			var resources = []
+			for i in range(len(PLAYER_SETTLEMENTS)):
+				for j in range(len(tile_positions_local)):
+					# Should be the three closest tiles, where pos is the center of the tile
+					var distance = sqrt(((tile_positions_local[j].x - PLAYER_SETTLEMENTS[i].x)**2) + ((tile_positions_local[j].y - PLAYER_SETTLEMENTS[i].y)**2))
+					if distance < 75:
+						# Get the tiles atlas id and use the mapping
+						var resource_num_source_id = resource_num_map_layer.get_cell_source_id(tile_positions[j])
+						if resource_num_source_id == -1:
+							continue
+						if RESOURCE_NUM_MAPPING[resource_num_source_id] == dice_result:
+							resources.append(map_data.get_cell_source_id(tile_positions[j]))
+							
+			# Do a lookup to mapping dict and add to player's resource dict
+			var UI_offset = global_ui_resource_offset
+			for id in resources:
+				if id == 6: # Skip desert tile
 					continue
-				if RESOURCE_NUM_MAPPING[resource_num_source_id] == dice_result:
-					resources.append(map_data.get_cell_source_id(tile_positions[j]))
+				var resource = SOURCE_ID_TO_RESOURCE_MAPPING[id]
+				if ui_remove_resource_from_supply(resource) == true:
+					PLAYER_RESOURCES[resource] += 1
+					ui_add_to_resource_bar(resource)
 					
-	# Do a lookup to mapping dict and add to player's resource dict
-	var UI_offset = global_ui_resource_offset
-	for id in resources:
-		if id == 6: # Skip desert tile
-			continue
-		var resource = SOURCE_ID_TO_RESOURCE_MAPPING[id]
-		PLAYER_RESOURCES[resource] += 1
-		
-		ui_add_to_resource_bar(resource)
-	
+		if p+1 == BOT_1_TURN_NUM:
+			print("generate resource for bot 1")
+			var resources = []
+			for i in range(len(BOT_1_SETTLEMENTS)):
+				for j in range(len(tile_positions_local)):
+					# Should be the three closest tiles, where pos is the center of the tile
+					var distance = sqrt(((tile_positions_local[j].x - BOT_1_SETTLEMENTS[i].x)**2) + ((tile_positions_local[j].y - BOT_1_SETTLEMENTS[i].y)**2))
+					if distance < 75:
+						# Get the tiles atlas id and use the mapping
+						var resource_num_source_id = resource_num_map_layer.get_cell_source_id(tile_positions[j])
+						if resource_num_source_id == -1:
+							continue
+						if RESOURCE_NUM_MAPPING[resource_num_source_id] == dice_result:
+							resources.append(map_data.get_cell_source_id(tile_positions[j]))
+							
+			# Do a lookup to mapping dict and add to player's resource dict
+			for id in resources:
+				if id == 6: # Skip desert tile
+					continue
+				var resource = SOURCE_ID_TO_RESOURCE_MAPPING[id]
+				if ui_remove_resource_from_supply(resource) == true:
+					BOT_1_RESOURCES[resource] += 1
+			print(BOT_1_RESOURCES)
+		if p+1 == BOT_2_TURN_NUM:
+			print("generate resource for bot 2")
+			var resources = []
+			for i in range(len(BOT_2_SETTLEMENTS)):
+				for j in range(len(tile_positions_local)):
+					# Should be the three closest tiles, where pos is the center of the tile
+					var distance = sqrt(((tile_positions_local[j].x - BOT_2_SETTLEMENTS[i].x)**2) + ((tile_positions_local[j].y - BOT_2_SETTLEMENTS[i].y)**2))
+					if distance < 75:
+						# Get the tiles atlas id and use the mapping
+						var resource_num_source_id = resource_num_map_layer.get_cell_source_id(tile_positions[j])
+						if resource_num_source_id == -1:
+							continue
+						if RESOURCE_NUM_MAPPING[resource_num_source_id] == dice_result:
+							resources.append(map_data.get_cell_source_id(tile_positions[j]))
+							
+			# Do a lookup to mapping dict and add to player's resource dict
+			for id in resources:
+				if id == 6: # Skip desert tile
+					continue
+				var resource = SOURCE_ID_TO_RESOURCE_MAPPING[id]
+				if ui_remove_resource_from_supply(resource) == true:
+					BOT_2_RESOURCES[resource] += 1
+			print(BOT_2_RESOURCES)
+		if p+1 == BOT_3_TURN_NUM:
+			print("generate resource for bot 3")
+			var resources = []
+			for i in range(len(BOT_3_SETTLEMENTS)):
+				for j in range(len(tile_positions_local)):
+					# Should be the three closest tiles, where pos is the center of the tile
+					var distance = sqrt(((tile_positions_local[j].x - BOT_3_SETTLEMENTS[i].x)**2) + ((tile_positions_local[j].y - BOT_3_SETTLEMENTS[i].y)**2))
+					if distance < 75:
+						# Get the tiles atlas id and use the mapping
+						var resource_num_source_id = resource_num_map_layer.get_cell_source_id(tile_positions[j])
+						if resource_num_source_id == -1:
+							continue
+						if RESOURCE_NUM_MAPPING[resource_num_source_id] == dice_result:
+							resources.append(map_data.get_cell_source_id(tile_positions[j]))
+							
+			# Do a lookup to mapping dict and add to player's resource dict
+			for id in resources:
+				if id == 6: # Skip desert tile
+					continue
+				var resource = SOURCE_ID_TO_RESOURCE_MAPPING[id]
+				if ui_remove_resource_from_supply(resource) == true:
+					BOT_3_RESOURCES[resource] += 1
+			
 # Generate initial resources for the player, bot functionality added in for debug using global turn num
 func generate_initial_resources(GLOBAL_TURN_NUM, map_data, tile_positions, tile_positions_local):
 	
@@ -662,9 +859,9 @@ func generate_initial_resources(GLOBAL_TURN_NUM, map_data, tile_positions, tile_
 			if id == 6: # Skip desert tile
 				continue
 			var resource = SOURCE_ID_TO_RESOURCE_MAPPING[id]
-			PLAYER_RESOURCES[resource] += 1
-			
-			ui_add_to_resource_bar(resource)
+			if ui_remove_resource_from_supply(resource) == true:
+				PLAYER_RESOURCES[resource] += 1
+				ui_add_to_resource_bar(resource)
 		
 	# If the client is a bot
 	elif GLOBAL_TURN_NUM == BOT_1_TURN_NUM:
@@ -682,7 +879,8 @@ func generate_initial_resources(GLOBAL_TURN_NUM, map_data, tile_positions, tile_
 			if id == 6: # Skip desert tile
 				continue
 			var resource = SOURCE_ID_TO_RESOURCE_MAPPING[id]
-			BOT_1_RESOURCES[resource] += 1
+			if ui_remove_resource_from_supply(resource) == true:
+				BOT_1_RESOURCES[resource] += 1
 	
 	elif GLOBAL_TURN_NUM == BOT_2_TURN_NUM:
 		var RESOURCES = []
@@ -699,7 +897,8 @@ func generate_initial_resources(GLOBAL_TURN_NUM, map_data, tile_positions, tile_
 			if id == 6: # Skip desert tile
 				continue
 			var resource = SOURCE_ID_TO_RESOURCE_MAPPING[id]
-			BOT_2_RESOURCES[resource] += 1
+			if ui_remove_resource_from_supply(resource) == true:
+				BOT_2_RESOURCES[resource] += 1
 			
 	elif GLOBAL_TURN_NUM == BOT_3_TURN_NUM:
 		var RESOURCES = []
@@ -716,7 +915,8 @@ func generate_initial_resources(GLOBAL_TURN_NUM, map_data, tile_positions, tile_
 			if id == 6: # Skip desert tile
 				continue
 			var resource = SOURCE_ID_TO_RESOURCE_MAPPING[id]
-			BOT_3_RESOURCES[resource] += 1
+			if ui_remove_resource_from_supply(resource) == true:
+				BOT_3_RESOURCES[resource] += 1
 	
 	
 	emit_signal("end_turn")
@@ -834,7 +1034,6 @@ func place_initial_settlements_and_roads(GLOBAL_TURN_NUM):
 		var fmt_str = "[font_size=%s]\nPlayer %s place a settlement and road."
 		var act_str = fmt_str % [chat_log_font_size, PLAYER_NUM]
 		chat_log.append_text(act_str)
-		print("player turn")
 		
 		for node in get_tree().get_nodes_in_group("UI_settlement_buttons"):
 			node.show()
@@ -869,31 +1068,25 @@ func place_initial_settlements_and_roads(GLOBAL_TURN_NUM):
 		var fmt_str = "[font_size=%s]\nBot %s place a settlement and road."
 		var act_str = fmt_str % [chat_log_font_size, BOT_1_PLAYER_NUM]
 		chat_log.append_text(act_str)
-		print("Bot 1 turn")
-		
+
 		await bot_place_initial_settlement(GLOBAL_TURN_NUM, BOT_1_SETTLEMENTS)
 		
-		print("bot 1 turn done")
 		emit_signal("end_turn")
 	elif GLOBAL_TURN_NUM == BOT_2_TURN_NUM:
 		var fmt_str = "[font_size=%s]\nBot %s place a settlement and road."
 		var act_str = fmt_str % [chat_log_font_size, BOT_2_PLAYER_NUM]
 		chat_log.append_text(act_str)
-		print("Bot 2 turn")
 		
 		await bot_place_initial_settlement(GLOBAL_TURN_NUM, BOT_2_SETTLEMENTS)
 		
-		print("bot 2 turn done")
 		emit_signal("end_turn")
 	elif GLOBAL_TURN_NUM == BOT_3_TURN_NUM:
 		var fmt_str = "[font_size=%s]\nBot %s place a settlement and road."
 		var act_str = fmt_str % [chat_log_font_size, BOT_3_PLAYER_NUM]
 		chat_log.append_text(act_str)
-		print("Bot 3 turn")
 
 		await bot_place_initial_settlement(GLOBAL_TURN_NUM, BOT_3_SETTLEMENTS)
 		
-		print("bot 3 turn done")
 		emit_signal("end_turn")
 
 func possible_road_placements_setup_phase(settlement_pos) -> void:
