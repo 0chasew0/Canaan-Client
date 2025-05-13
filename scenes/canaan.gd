@@ -7,10 +7,10 @@ extends Node2D
 @onready var roll_dice_btn = $UILayer/Roll_Dice
 @onready var chat_log = $UILayer/Chat/Chat_Log
 @export var chat_log_font_size = 30
-@onready var PLAYER_UI_BOX = $UILayer/Player1Background
-@onready var BOT_1_UI_BOX = $UILayer/Player2Background
-@onready var BOT_2_UI_BOX = $UILayer/Player3Background
-@onready var BOT_3_UI_BOX = $UILayer/Player4Background
+@onready var UI_BOX_1 = $UILayer/Player1Background
+@onready var UI_BOX_2 = $UILayer/Player2Background
+@onready var UI_BOX_3 = $UILayer/Player3Background
+@onready var UI_BOX_4 = $UILayer/Player4Background
 @onready var global_ui_resource_offset = 0
 @onready var NUM_SUPPLY_TREE = 19
 @onready var NUM_SUPPLY_SHEEP = 19
@@ -107,11 +107,8 @@ func _ready() -> void:
 		
 	CLIENT.vp = 2
 	
-	# Make this more dynamic
-	PLAYER_UI_BOX.get_node("VP").text = "[font_size=18][center]Victory Points: 2"
-	BOT_1_UI_BOX.get_node("VP").text = "[font_size=18][center]Victory Points: 2"
-	BOT_2_UI_BOX.get_node("VP").text = "[font_size=18][center]Victory Points: 2"
-	BOT_3_UI_BOX.get_node("VP").text = "[font_size=18][center]Victory Points: 2"
+	for player in ALL_PLAYERS:
+		ui_update_vp(player)
 	
 	main_game_loop(tile_positions, standard_map)
 	
@@ -125,7 +122,7 @@ func main_game_loop(tile_positions, standard_map):
 				# Turn Initializers
 				await activate_or_deactivate_ui_buttons()
 				print("player turn")
-				roll_dice_btn.disabled = false
+				#roll_dice_btn.disabled = false
 				
 				# Can play one development card before rolling dice
 				
@@ -134,7 +131,7 @@ func main_game_loop(tile_positions, standard_map):
 				await roll_dice_btn.pressed # Wait for user to roll dice before continuing
 				p.dice_roll_result = _on_roll_dice_pressed()
 				chat_log.append_text("[font_size=%s]\n%s rolled a %s." % [chat_log_font_size, p._name, p.dice_roll_result])
-				roll_dice_btn.disabled = true
+				#roll_dice_btn.disabled = true
 				
 				# Generate resources for EACH player based on dice result, unless a 7 is rolled
 				# For friendly robber, check that no player has VP > 2, else do robber as normal
@@ -149,10 +146,10 @@ func main_game_loop(tile_positions, standard_map):
 				await activate_or_deactivate_ui_buttons()
 				
 				# When player is done with turn
-				await $UILayer/End_Turn_Btn_Background/End_Turn_Button.pressed
+				await roll_dice_btn.pressed
+				#await $UILayer/End_Turn_Btn_Background/End_Turn_Button.pressed
 
 			else:
-				print("bot turn")
 				# Disable all buttons when it's not the client's turn
 				# Simulate dice roll
 				p.dice_roll_result = _on_roll_dice_pressed()
@@ -170,10 +167,11 @@ func main_game_loop(tile_positions, standard_map):
 
 
 func initialize_ui_boxes() -> void:
-	PLAYER_UI_BOX.get_node("PlayerName").text = "[font_size=18][center][b]Player"
-	BOT_1_UI_BOX.get_node("PlayerName").text = "[font_size=18][center][b]Bot 1"
-	BOT_2_UI_BOX.get_node("PlayerName").text = "[font_size=18][center][b]Bot 2"
-	BOT_3_UI_BOX.get_node("PlayerName").text = "[font_size=18][center][b]Bot 3"
+	#PLAYER_UI_BOX.get_node("PlayerName").text = "[font_size=18][center][b]Player"
+	#BOT_1_UI_BOX.get_node("PlayerName").text = "[font_size=18][center][b]Bot 1"
+	#BOT_2_UI_BOX.get_node("PlayerName").text = "[font_size=18][center][b]Bot 2"
+	#BOT_3_UI_BOX.get_node("PlayerName").text = "[font_size=18][center][b]Bot 3"
+	pass
 
 # Debug func
 #func _draw():
@@ -387,19 +385,116 @@ func ui_remove_resource_from_supply(resource):
 	else:
 		print("error removing resource from supply: ", resource)
 
+func ui_update_vp(player):
+	get_node("UILayer/Player%sBackground/VP" % player.id).text = "[font_size=18][center]Victory Points: %s" % player.vp
+
 func bot_decision_loop(player):
 	# Figure out which bot this is, based on global_turn_num
 
 	# If resource met and no viable settlement/city placements, then build road
-	bot_build_road(player)
+	while true:
+		# Settlement
+		if player.resources["Brick"] >= 1 and player.resources["Tree"] >= 1 and player.resources["Wheat"] >= 1 and player.resources["Sheep"] >= 1:
+			bot_build_settlement(player)
+			
+		# Road
+		if player.resources["Tree"] >= 1 and player.resources["Brick"] >= 1:
+			bot_build_road(player)
+			
+		# City
+		if player.resources["Wheat"] >= 2 and player.resources["Stone"] >= 3:
+			break
+			
+		# Development Card
+		if player.resources["Wheat"] >= 1 and player.resources["Stone"] >= 1 and player.resources["Sheep"] >= 1:
+			break
+			
+		# Bank Trade
+		if player.resources["Brick"] >= 4 or player.resources["Tree"] >= 4 or player.resources["Sheep"] >= 4 or player.resources["Wheat"] >= 4 or player.resources["Stone"] >= 4:
+			break
+			
+		else:
+			break
+
 		
 	# else, prioritize building a city then settlement
 		
 	# use development cards if needed
 	# go for longest road if close
 
+func bot_build_settlement(player):
+	print(player._name, "attempting to build settlement.")
+	var ui_element_for_selected_settlement = null
+	if player._name == "Bot 1":
+		ui_element_for_selected_settlement = $MapLayer/Bot1_Settlement.duplicate()
+	if player._name == "Bot 2":
+		ui_element_for_selected_settlement = $MapLayer/Bot2_Settlement.duplicate()
+	if player._name == "Bot 3":
+		ui_element_for_selected_settlement = $MapLayer/Bot3_Settlement.duplicate()
+		
+	var possible_settlement_placements = []
+	for i in range(len(ELIGIBLE_SETTLEMENT_VERTICES)):
+		var curr_pos = ELIGIBLE_SETTLEMENT_VERTICES[i]
+		for j in range(len(player.roads)):
+			var distance = get_distance(curr_pos, player.roads[j])
+			if distance > 20 and distance < 50:
+				possible_settlement_placements.append(ELIGIBLE_SETTLEMENT_VERTICES[i])
+	
+	if len(possible_settlement_placements) == 0:
+		return
+	
+	var rand_settlement_pos = possible_settlement_placements.pick_random()
+	
+	var offset_position = Vector2(-15, -15) + Vector2(-12, -9)
+	$MapLayer.add_child(ui_element_for_selected_settlement)
+	ui_element_for_selected_settlement.show()
+	ui_element_for_selected_settlement.position = rand_settlement_pos + offset_position
+	
+	# Add settlement to bot
+	player.settlements.append(rand_settlement_pos)
+	
+	# Add settlement (position) to player, save selections, will need after placing road to remove
+	player.last_vertex_selected = rand_settlement_pos
+	player.last_node_selected = ui_element_for_selected_settlement
+	player.vp += 1
+	ui_update_vp(player)
+	
+	# Removes vertex itself and surrounding vertices due to distance rule
+	var vertices_to_remove = []
+	vertices_to_remove.append(rand_settlement_pos)
+	for i in range(len(ELIGIBLE_SETTLEMENT_VERTICES)-1):
+		var distance = sqrt(((rand_settlement_pos.x - ELIGIBLE_SETTLEMENT_VERTICES[i].x)**2) + ((rand_settlement_pos.y - ELIGIBLE_SETTLEMENT_VERTICES[i].y)**2))
+		if distance < 90: # These are the closest vertices
+				vertices_to_remove.append(ELIGIBLE_SETTLEMENT_VERTICES[i])
+	for i in range(len(vertices_to_remove)):
+		if vertices_to_remove[i] in ELIGIBLE_SETTLEMENT_VERTICES:
+			ELIGIBLE_SETTLEMENT_VERTICES.remove_at(ELIGIBLE_SETTLEMENT_VERTICES.find(vertices_to_remove[i]))
+	
+	player.resources["Tree"] -= 1
+	player.resources["Brick"] -= 1
+	player.resources["Wheat"] -= 1
+	player.resources["Sheep"] -= 1
+	
+	ui_add_resource_to_supply("Tree")
+	ui_add_resource_to_supply("Brick")
+	ui_add_resource_to_supply("Wheat")
+	ui_add_resource_to_supply("Sheep")
+	
+	print(player._name, "built settlement.")
+	
+	emit_signal("selection_finished")
+	
 func bot_build_road(player):
+	print(player._name, " built road.")
 	var read_ALL_ROAD_MIDPOINTS = ALL_ROAD_MIDPOINTS.duplicate(true)
+	
+	var ui_element_for_road = null
+	if player._name == "Bot 1":
+		ui_element_for_road = $MapLayer/Bot1_Road.duplicate()
+	if player._name == "Bot 2":
+		ui_element_for_road = $MapLayer/Bot2_Road.duplicate()
+	if player._name == "Bot 3":
+		ui_element_for_road = $MapLayer/Bot3_Road.duplicate()
 	
 	# Can only build roads that connect to other player-owned roads
 	# All possible positions for a player to place a road will be 
@@ -423,8 +518,47 @@ func bot_build_road(player):
 	for i in range(len(elements_to_remove)):
 		if elements_to_remove[i] in all_possible_road_placements:
 			all_possible_road_placements.remove_at(all_possible_road_placements.find(elements_to_remove[i]))
-		
-		
+	
+	# For now, bots choose a random road to build
+	
+	var rand_road = all_possible_road_placements.pick_random()
+	
+	var road_ui_offset = Vector2(-25, 7.5)
+	var rand_road_node_pos = rand_road + Vector2(-10, -3.5)
+	
+	$MapLayer.add_child(ui_element_for_road)
+	ui_element_for_road.show()
+	ui_element_for_road.pivot_offset = Vector2(ui_element_for_road.size.x / 2, ui_element_for_road.size.y / 2)
+	ui_element_for_road.position = rand_road_node_pos + road_ui_offset # Place road at midpoint then rotate
+	
+	player.roads.append(rand_road_node_pos)
+	ALL_OWNED_ROADS[ALL_PLAYERS.find(player)] = player.roads
+	
+	check_for_longest_road()
+	
+	# Use slope and arctan between two points to calculate how to rotate the UI element
+	# To find the second point, find the closest settlement vertex to this road's midpoint
+	var settlement_vertex = null
+	var smallest_distance = 999999
+	var closest_point = null
+	for pos in global_vertices:
+		var distance = sqrt(((pos.x - rand_road.x)**2) + ((pos.y - rand_road.y)**2))
+		if distance < smallest_distance:
+			smallest_distance = distance
+			closest_point = pos
+			
+	var slope = ((rand_road.y - closest_point.y) / (rand_road.x - closest_point.x))
+	var degrees = rad_to_deg(atan(slope))
+	ui_element_for_road.rotation_degrees = degrees
+	
+	player.resources["Tree"] -= 1
+	player.resources["Brick"] -= 1
+	
+	ui_add_resource_to_supply("Tree")
+	ui_add_resource_to_supply("Brick")
+	
+	emit_signal("selection_finished")
+	
 # Should only be allowed to be pressed if correct resources have been met, see activate_or_deactive_ui_buttons()
 func _on_build_road_button_pressed() -> void:
 	print("Build road button pressed.")
@@ -517,6 +651,10 @@ func road_placement_pressed(midpoint_btn_node, road_midpoint):
 	
 	emit_signal("selection_finished")
 
+func check_for_longest_road():
+	pass
+	
+
 # Should only be allowed to be pressed if correct resources have been met, see activate_or_deactive_ui_buttons()
 func _on_build_settlement_button_pressed() -> void:
 	print("build settlement button pressed")
@@ -575,7 +713,7 @@ func settlement_button_pressed(node, vertex):
 	CLIENT.last_vertex_selected = vertex
 	CLIENT.last_node_selected = node
 	CLIENT.vp += 1
-	ui_update_vp()
+	ui_update_vp(CLIENT)
 	
 	# Removes vertex itself and surrounding vertices due to distance rule
 	var vertices_to_remove = []
@@ -641,7 +779,7 @@ func city_button_pressed(node, vertex):
 	
 	CLIENT.cities.append(vertex)
 	CLIENT.vp += 1
-	ui_update_vp()
+	ui_update_vp(CLIENT)
 	
 	# Place the City UI element
 	var offset_position = Vector2(-15, -15)
@@ -688,7 +826,6 @@ func generate_resources_for_all_players(dice_result, tile_positions_local, tile_
 		# Check each settlements adjacent tiles to see if they match the dice result
 		# If real player
 		if p.type == "Player":
-			print("generate resource for player")
 			var resources = []
 			for i in range(len(p.settlements)):
 				for j in range(len(tile_positions_local)):
@@ -713,7 +850,6 @@ func generate_resources_for_all_players(dice_result, tile_positions_local, tile_
 					ui_add_to_resource_bar(resource)
 					
 		elif p.type == "Bot":
-			print("generate resource for bot: ", p._name)
 			var resources = []
 			for i in range(len(p.settlements)):
 				for j in range(len(tile_positions_local)):
@@ -734,7 +870,7 @@ func generate_resources_for_all_players(dice_result, tile_positions_local, tile_
 				var resource = SOURCE_ID_TO_RESOURCE_MAPPING[id]
 				if ui_remove_resource_from_supply(resource) == true:
 					p.resources[resource] += 1
-			print(p.resources)
+			print(p._name, " resources: ", p.resources)
 			
 # Generate initial resources for the player, bot functionality added in for debug using global turn num
 func generate_initial_resources(map_data, tile_positions, tile_positions_local):
@@ -997,6 +1133,7 @@ func bot_place_initial_road(settlement_pos, player) -> void:
 	var rand_num = randi_range(0, len(eligible_road_placements)-1)
 	var chosen_road = eligible_road_placements[rand_num]
 	
+	player.roads.append(chosen_road + Vector2(-10, -3.5))
 	ALL_OWNED_ROADS[ALL_PLAYERS.find(player)].append(chosen_road + Vector2(-10, -3.5))
 	
 	var road_ui_offset = Vector2(-25, 7.5) + Vector2(-10, -3.5)
