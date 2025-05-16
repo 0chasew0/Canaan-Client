@@ -140,7 +140,7 @@ func main_game_loop(tile_positions, standard_map):
 						if player.vp < 3:
 							continue
 						else:
-							activate_robber()
+							activate_robber(p)
 							
 				await generate_resources_for_all_players(p.dice_roll_result, tile_positions_local, tile_positions, standard_map)
 				await activate_or_deactivate_ui_buttons()
@@ -159,7 +159,7 @@ func main_game_loop(tile_positions, standard_map):
 						if player.vp < 3:
 							continue
 						else:
-							activate_robber()
+							activate_robber(p)
 				await generate_resources_for_all_players(p.dice_roll_result, tile_positions_local, tile_positions, standard_map)
 				
 				bot_decision_loop(p)
@@ -173,10 +173,6 @@ func initialize_ui_boxes() -> void:
 	#BOT_3_UI_BOX.get_node("PlayerName").text = "[font_size=18][center][b]Bot 3"
 	pass
 
-# Debug func
-#func _draw():
-	#for x in tile_positions_local:
-		#draw_circle(x, 5, Color(Color.RED), 5.0)
 
 func initialize_robber(map_data, tile_positions):
 	# Find desert tile and place robber there
@@ -241,28 +237,48 @@ func custom_sort_for_first_roll(a: Array, b: Array):
 		return false
 	return false
 
-# A normal turn
-	# Roll dice, roll_dice() -> send result to server
-		# If server returns robber, robber()
-		# Else if server returns non-7 roll, generate_resources() -> check if tile is robbed
-	# Trade/Build/Play Development Card
-		# Trade with bank, trade_bank()
-		# Trade with other players, trade_players() -> send trade to server
-		# Build road, build_road() -> check for longest road (and win)
-		# Build settlement, build_settlement() -> check for win
-		# Build city, build_city() -> check for win
-		# Buy development card, build_development()
-			# If VP card, check for win
-		# Play development card
-			# Knight, play_knight() -> check for largest army (and win)
-			# Road, play_road() -> check for longest road (and win)
-			# Year of Plenty, play_year_of_plenty()
-			# Monopoly, play_monopoly()
+func activate_robber(player):
+	for p in ALL_PLAYERS:
+		if p.total_resources > 7:
+			var num_of_resources_to_discard = floor(p.total_resources / 2)
+			print(p._name, " discarding ", num_of_resources_to_discard, " resources.")
+			if p.type == "Bot":
+				for i in range(num_of_resources_to_discard):
+					if p.resources["Tree"] > 0:
+						p.resources["Tree"] -= 1
+						ui_add_resource_to_supply("Tree")
+					if p.resources["Brick"] > 0:
+						p.resources["Brick"] -= 1
+						ui_add_resource_to_supply("Brick")
+					if p.resources["Stone"] > 0:
+						p.resources["Stone"] -= 1
+						ui_add_resource_to_supply("Stone")
+					if p.resources["Wheat"] > 0:
+						p.resources["Wheat"] -= 1
+						ui_add_resource_to_supply("Wheat")
+					if p.resources["Sheep"] > 0:
+						p.resources["Sheep"] -= 1
+						ui_add_resource_to_supply("Sheep")
+			else:
+				ui_robber_discard_resources(p, num_of_resources_to_discard)
 	
-	# All functions require a sync to the server!
+	# This player MUST move the robber
+	if player.type == "Bot":
+		pass
+	else:
+		ui_robber_choose_new_location()
 
-# TODO
-func activate_robber():
+func ui_robber_discard_resources(player, num_resources_to_discard):
+	
+	pass
+
+func ui_robber_choose_new_location():
+	# After choosing location, if more than one player settlement is adjacent to the tile, choose who to steal from
+	var players
+	ui_robber_choose_who_to_steal_from(players)
+	pass
+	
+func ui_robber_choose_who_to_steal_from(players):
 	pass
 
 # Sets certain UI buttons/elements as "active"/"not disabled" if the player meets the resource requirement for them,
@@ -393,17 +409,20 @@ func bot_decision_loop(player):
 
 	# If resource met and no viable settlement/city placements, then build road
 	while true:
+		# City
+		if player.resources["Wheat"] >= 2 and player.resources["Stone"] >= 3:
+			if bot_build_city(player):
+				continue
+			
 		# Settlement
 		if player.resources["Brick"] >= 1 and player.resources["Tree"] >= 1 and player.resources["Wheat"] >= 1 and player.resources["Sheep"] >= 1:
-			bot_build_settlement(player)
+			if bot_build_settlement(player):
+				continue
 			
 		# Road
 		if player.resources["Tree"] >= 1 and player.resources["Brick"] >= 1:
-			bot_build_road(player)
-			
-		# City
-		if player.resources["Wheat"] >= 2 and player.resources["Stone"] >= 3:
-			break
+			if bot_build_road(player):
+				continue
 			
 		# Development Card
 		if player.resources["Wheat"] >= 1 and player.resources["Stone"] >= 1 and player.resources["Sheep"] >= 1:
@@ -422,6 +441,61 @@ func bot_decision_loop(player):
 	# use development cards if needed
 	# go for longest road if close
 
+func bot_build_city(player):
+	print(player._name, "attempting to build city.")
+	var ui_element_for_selected_settlement = null
+	if player._name == "Bot 1":
+		ui_element_for_selected_settlement = $MapLayer/Bot1_City.duplicate()
+	if player._name == "Bot 2":
+		ui_element_for_selected_settlement = $MapLayer/Bot2_City.duplicate()
+	if player._name == "Bot 3":
+		ui_element_for_selected_settlement = $MapLayer/Bot3_City.duplicate()
+	
+	var rand_city_pos
+	if (len(player.settlements) > 0):
+		rand_city_pos = player.settlements.pick_random()
+	else:
+		print("no settlements available to turn into cities for player: ", player._name)
+		return false
+	
+	# remove the settlement UI texture
+	var i = 2
+	for n in get_node("MapLayer").get_children():
+		if n.get_class() == "TextureRect":
+			if n.position == (rand_city_pos + Vector2(-15, -15) + Vector2(-12, -9)):
+				n.queue_free()
+				
+	player.settlements.remove_at(player.settlements.find(rand_city_pos))
+	
+	player.cities.append(rand_city_pos)
+	player.vp += 1
+	ui_update_vp(player)
+	
+	# Place the City UI element
+	var offset_position = Vector2(-15, -15) + Vector2(-12, -9)
+	$MapLayer.add_child(ui_element_for_selected_settlement)
+	ui_element_for_selected_settlement.show()
+	ui_element_for_selected_settlement.position = rand_city_pos + offset_position
+	
+	player.resources["Stone"] -= 1
+	player.total_resources -= 1
+	ui_add_resource_to_supply("Stone")
+	player.resources["Stone"] -= 1
+	player.total_resources -= 1
+	ui_add_resource_to_supply("Stone")
+	player.resources["Stone"] -= 1
+	player.total_resources -= 1
+	ui_add_resource_to_supply("Stone")
+	player.resources["Wheat"] -= 1
+	player.total_resources -= 1
+	ui_add_resource_to_supply("Wheat")
+	player.resources["Wheat"] -= 1
+	player.total_resources -= 1
+	ui_add_resource_to_supply("Wheat")
+	
+	return true
+	emit_signal("selection_finished")
+	
 func bot_build_settlement(player):
 	print(player._name, "attempting to build settlement.")
 	var ui_element_for_selected_settlement = null
@@ -441,7 +515,7 @@ func bot_build_settlement(player):
 				possible_settlement_placements.append(ELIGIBLE_SETTLEMENT_VERTICES[i])
 	
 	if len(possible_settlement_placements) == 0:
-		return
+		return false
 	
 	var rand_settlement_pos = possible_settlement_placements.pick_random()
 	
@@ -471,9 +545,13 @@ func bot_build_settlement(player):
 			ELIGIBLE_SETTLEMENT_VERTICES.remove_at(ELIGIBLE_SETTLEMENT_VERTICES.find(vertices_to_remove[i]))
 	
 	player.resources["Tree"] -= 1
+	player.total_resources -= 1
 	player.resources["Brick"] -= 1
+	player.total_resources -= 1
 	player.resources["Wheat"] -= 1
+	player.total_resources -= 1
 	player.resources["Sheep"] -= 1
+	player.total_resources -= 1
 	
 	ui_add_resource_to_supply("Tree")
 	ui_add_resource_to_supply("Brick")
@@ -482,6 +560,7 @@ func bot_build_settlement(player):
 	
 	print(player._name, "built settlement.")
 	
+	return true
 	emit_signal("selection_finished")
 	
 func bot_build_road(player):
@@ -521,6 +600,9 @@ func bot_build_road(player):
 	
 	# For now, bots choose a random road to build
 	
+	if len(all_possible_road_placements) == 0:
+		return false
+		
 	var rand_road = all_possible_road_placements.pick_random()
 	
 	var road_ui_offset = Vector2(-25, 7.5)
@@ -552,11 +634,14 @@ func bot_build_road(player):
 	ui_element_for_road.rotation_degrees = degrees
 	
 	player.resources["Tree"] -= 1
+	player.total_resources -= 1
 	player.resources["Brick"] -= 1
+	player.total_resources -= 1
 	
 	ui_add_resource_to_supply("Tree")
 	ui_add_resource_to_supply("Brick")
 	
+	return true
 	emit_signal("selection_finished")
 	
 # Should only be allowed to be pressed if correct resources have been met, see activate_or_deactive_ui_buttons()
@@ -768,9 +853,7 @@ func _on_build_city_button_pressed() -> void:
 
 func city_button_pressed(node, vertex):
 	# Remove the settlement that is here, both in the UI and from the player's data
-	print(len(CLIENT.settlements))
 	CLIENT.settlements.remove_at(CLIENT.settlements.find(vertex))
-	print(len(CLIENT.settlements))
 	var i = 2
 	for n in get_node("MapLayer").get_children():
 		if n.get_class() == "TextureRect":
@@ -838,6 +921,19 @@ func generate_resources_for_all_players(dice_result, tile_positions_local, tile_
 							continue
 						if RESOURCE_NUM_MAPPING[resource_num_source_id] == dice_result:
 							resources.append(map_data.get_cell_source_id(tile_positions[j]))
+			# Do the same but for cities
+			for i in range(len(p.cities)):
+				for j in range(len(tile_positions_local)):
+					# Should be the three closest tiles, where pos is the center of the tile
+					var distance = sqrt(((tile_positions_local[j].x - p.cities[i].x)**2) + ((tile_positions_local[j].y - p.cities[i].y)**2))
+					if distance < 75:
+						# Get the tiles atlas id and use the mapping
+						var resource_num_source_id = resource_num_map_layer.get_cell_source_id(tile_positions[j])
+						if resource_num_source_id == -1:
+							continue
+						if RESOURCE_NUM_MAPPING[resource_num_source_id] == dice_result:
+							resources.append(map_data.get_cell_source_id(tile_positions[j]))
+							resources.append(map_data.get_cell_source_id(tile_positions[j]))
 							
 			# Do a lookup to mapping dict and add to player's resource dict
 			var UI_offset = global_ui_resource_offset
@@ -847,6 +943,7 @@ func generate_resources_for_all_players(dice_result, tile_positions_local, tile_
 				var resource = SOURCE_ID_TO_RESOURCE_MAPPING[id]
 				if ui_remove_resource_from_supply(resource) == true:
 					p.resources[resource] += 1
+					p.total_resources += 1
 					ui_add_to_resource_bar(resource)
 					
 		elif p.type == "Bot":
@@ -863,6 +960,19 @@ func generate_resources_for_all_players(dice_result, tile_positions_local, tile_
 						if RESOURCE_NUM_MAPPING[resource_num_source_id] == dice_result:
 							resources.append(map_data.get_cell_source_id(tile_positions[j]))
 							
+			for i in range(len(p.cities)):
+				for j in range(len(tile_positions_local)):
+					# Should be the three closest tiles, where pos is the center of the tile
+					var distance = sqrt(((tile_positions_local[j].x - p.cities[i].x)**2) + ((tile_positions_local[j].y - p.cities[i].y)**2))
+					if distance < 75:
+						# Get the tiles atlas id and use the mapping
+						var resource_num_source_id = resource_num_map_layer.get_cell_source_id(tile_positions[j])
+						if resource_num_source_id == -1:
+							continue
+						if RESOURCE_NUM_MAPPING[resource_num_source_id] == dice_result:
+							resources.append(map_data.get_cell_source_id(tile_positions[j]))
+							resources.append(map_data.get_cell_source_id(tile_positions[j]))
+							
 			# Do a lookup to mapping dict and add to player's resource dict
 			for id in resources:
 				if id == 6: # Skip desert tile
@@ -870,6 +980,7 @@ func generate_resources_for_all_players(dice_result, tile_positions_local, tile_
 				var resource = SOURCE_ID_TO_RESOURCE_MAPPING[id]
 				if ui_remove_resource_from_supply(resource) == true:
 					p.resources[resource] += 1
+					p.total_resources += 1
 			print(p._name, " resources: ", p.resources)
 			
 # Generate initial resources for the player, bot functionality added in for debug using global turn num
@@ -901,6 +1012,7 @@ func generate_initial_resources(map_data, tile_positions, tile_positions_local):
 				var resource = SOURCE_ID_TO_RESOURCE_MAPPING[id]
 				if ui_remove_resource_from_supply(resource) == true:
 					p.resources[resource] += 1
+					p.total_resources += 1
 					ui_add_to_resource_bar(resource)
 		
 		# If the client is a bot
@@ -921,6 +1033,7 @@ func generate_initial_resources(map_data, tile_positions, tile_positions_local):
 				var resource = SOURCE_ID_TO_RESOURCE_MAPPING[id]
 				if ui_remove_resource_from_supply(resource) == true:
 					p.resources[resource] += 1
+					p.total_resources += 1
 	
 	emit_signal("end_turn")
 	
@@ -1031,7 +1144,6 @@ func tile_map_coords_to_local_coords(tile_map, tile_positions) -> Array:
 
 # A client will only do this once when it is their turn, bot functionality is added here for testing
 func place_initial_settlements_and_roads(p):
-	
 
 	# If it is the client's turn and the client is not a bot
 	if p.type == "Player":

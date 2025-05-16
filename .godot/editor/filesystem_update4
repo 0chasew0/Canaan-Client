@@ -5,3 +5,4 @@ res://scenes/canaan.gd
 res://NetworkingClient.tscn
 res://scenes/game_select.tscn
 res://scenes/test.tscn
+res://player.gd

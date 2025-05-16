@@ -18,6 +18,7 @@ var resources = {
 	"Wheat": 0,
 	"Stone": 0
 }
+var total_resources = 0
 var last_vertex_selected = null
 var last_node_selected = null
 

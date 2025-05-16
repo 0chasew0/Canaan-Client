@@ -1,4 +1,4 @@
-[gd_scene load_steps=78 format=4 uid="uid://jivbdwftiitr"]
+[gd_scene load_steps=81 format=4 uid="uid://jivbdwftiitr"]
 
 [ext_resource type="Script" uid="uid://bw23uon3cp087" path="res://scenes/canaan.gd" id="1_d354y"]
 [ext_resource type="Script" uid="uid://14yc7lvh4r55" path="res://scenes/camera_2d.gd" id="2_sec5m"]
@@ -27,14 +27,17 @@
 [ext_resource type="Texture2D" uid="uid://5plym3wvhuun" path="res://images/Harbors/wheat_harbor.png" id="25_c08q8"]
 [ext_resource type="Texture2D" uid="uid://cxelann5cdetv" path="res://images/Harbors/wood_harbor.png" id="26_clk17"]
 [ext_resource type="Texture2D" uid="uid://cskq1akso1233" path="res://images/UI_Place_Settlement_Indicator.png" id="27_fb148"]
+[ext_resource type="Texture2D" uid="uid://c54lbg3xl0ibb" path="res://images/Pieces (White)/pieceWhite_border10.png" id="28_cs0nk"]
 [ext_resource type="Texture2D" uid="uid://bbm1kg3uwpf0v" path="res://images/Pieces (White)/pieceWhite_border08.png" id="28_ot51o"]
 [ext_resource type="Texture2D" uid="uid://bp8dh6srxprvm" path="res://images/Pieces (White)/pieceWhite_border12.png" id="29_cprfm"]
 [ext_resource type="Texture2D" uid="uid://knqxx5mol0j8" path="res://images/Pieces (Yellow)/pieceYellow_border11.png" id="29_qc4eu"]
 [ext_resource type="Texture2D" uid="uid://or4ge4y23xg2" path="res://images/Pieces (Red)/pieceRed_border08.png" id="30_btiyb"]
 [ext_resource type="Texture2D" uid="uid://ukynd5n8ewos" path="res://images/Pieces (Red)/pieceRed_border12.png" id="31_nllux"]
+[ext_resource type="Texture2D" uid="uid://bvgbtpbhflsr6" path="res://images/Pieces (Red)/pieceRed_border10.png" id="31_o1kvk"]
 [ext_resource type="Texture2D" uid="uid://ctkx6eiltpvxy" path="res://images/Pieces (Blue)/pieceBlue_border09.png" id="32_bfw5m"]
 [ext_resource type="Texture2D" uid="uid://dyrdhhvmrnv83" path="res://images/Pieces (Blue)/pieceBlue_border13.png" id="33_8ntd2"]
 [ext_resource type="Texture2D" uid="uid://bx2eqmglx0kkd" path="res://images/Pieces (Yellow)/pieceYellow_border07.png" id="34_lxjc8"]
+[ext_resource type="Texture2D" uid="uid://d0c5p4vjq6cw1" path="res://images/Pieces (Blue)/pieceBlue_border11.png" id="34_o1kvk"]
 [ext_resource type="Texture2D" uid="uid://d1j8tq3cl3vwb" path="res://images/robber.png" id="36_pohut"]
 [ext_resource type="Texture2D" uid="uid://cxrlfge3dtkrn" path="res://images/Resource_Cards/brick.png" id="36_vhk21"]
 [ext_resource type="Texture2D" uid="uid://ffptporsopha" path="res://images/Resource_Cards/sheep.png" id="37_doxtf"]
@@ -308,6 +311,23 @@ texture_normal = ExtResource("27_fb148")
 ignore_texture_size = true
 stretch_mode = 0
 
+[node name="Bot1_City" type="TextureRect" parent="MapLayer"]
+visible = false
+z_index = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -24.0
+offset_top = -24.0
+offset_right = 24.0
+offset_bottom = 24.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("28_cs0nk")
+expand_mode = 1
+
 [node name="Bot1_Settlement" type="TextureRect" parent="MapLayer"]
 visible = false
 z_index = 3
@@ -335,6 +355,23 @@ offset_bottom = 685.0
 texture = ExtResource("29_cprfm")
 expand_mode = 1
 
+[node name="Bot2_City" type="TextureRect" parent="MapLayer"]
+visible = false
+z_index = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -24.0
+offset_top = -24.0
+offset_right = 24.0
+offset_bottom = 24.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("31_o1kvk")
+expand_mode = 1
+
 [node name="Bot2_Settlement" type="TextureRect" parent="MapLayer"]
 visible = false
 z_index = 3
@@ -360,6 +397,23 @@ offset_top = 674.0
 offset_right = 806.0
 offset_bottom = 685.0
 texture = ExtResource("31_nllux")
+expand_mode = 1
+
+[node name="Bot3_City" type="TextureRect" parent="MapLayer"]
+visible = false
+z_index = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -24.0
+offset_top = -24.0
+offset_right = 24.0
+offset_bottom = 24.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("34_o1kvk")
 expand_mode = 1
 
 [node name="Bot3_Settlement" type="TextureRect" parent="MapLayer"]
