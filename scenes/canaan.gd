@@ -33,9 +33,10 @@ extends Node2D
 @onready var CLIENT = null
 @onready var CLIENT_INDEX = null
 
+@onready var tile_positions_local = []
+@onready var tile_positions = []
 # Debug vars
 @export var DEBUG_map_vertex_offset = Vector2(905, 671) # For the map vertices
-@onready var tile_positions_local = []
 @onready var ALL_ROAD_MIDPOINTS = [] # Stores all road midpoints
 
 @onready var ELIGIBLE_SETTLEMENT_VERTICES = [] # Contains a list of eligible vertices for settlement placement. This is shared between all players
@@ -44,6 +45,7 @@ extends Node2D
 # Signals
 signal selection_finished # Used for returning control back to a main function after a user selects an action or they timeout from that action
 signal end_turn # Used for signaling that a player or bots turn is over, usually used in the main game loop
+signal robber_done # Used for returning control back to main game loop
 
 func _ready() -> void:
 	
@@ -65,7 +67,7 @@ func _ready() -> void:
 	
 	await initialize_ui_boxes()
 	randomize() # Initializes randomizer, only call this once
-	var tile_positions = generate_rand_standard_map() # Map data contains coordinates of all cells of the map
+	tile_positions = generate_rand_standard_map() # Map data contains coordinates of all cells of the map
 	tile_positions_local = tile_map_coords_to_local_coords(standard_map, tile_positions)
 	
 	global_vertices = await generate_tile_vertices(tile_positions, standard_map)
@@ -77,7 +79,7 @@ func _ready() -> void:
 	await initialize_robber(standard_map, tile_positions)
 	
 	# Initialize UI button states
-	#await activate_or_deactivate_ui_buttons(p)
+	await activate_or_deactivate_ui_buttons()
 	
 	# Initialize chat box setting(s)
 	chat_log.append_text("[font_size=%s]Welcome to Canaan!" % chat_log_font_size)
@@ -113,8 +115,6 @@ func _ready() -> void:
 	main_game_loop(tile_positions, standard_map)
 	
 func main_game_loop(tile_positions, standard_map):
-	GLOBAL_TURN_NUM = 1
-	
 	# Bot functionality added for testing
 	for i in range(100): # Turn limit?
 		for p in ALL_PLAYERS:
@@ -136,14 +136,21 @@ func main_game_loop(tile_positions, standard_map):
 				# Generate resources for EACH player based on dice result, unless a 7 is rolled
 				# For friendly robber, check that no player has VP > 2, else do robber as normal
 				if p.dice_roll_result == 7:
-					for player in ALL_PLAYERS:
-						if player.vp < 3:
-							continue
-						else:
-							activate_robber(p)
-							
+					#for player in ALL_PLAYERS:
+						#if player.vp < 3:
+							#continue
+						#else:
+							#activate_robber(p)
+					await activate_robber(p)
+					#await robber_done
+					print("robber done")
+				
+				DEBUG_assert_resources_are_in_sync()
+					
 				await generate_resources_for_all_players(p.dice_roll_result, tile_positions_local, tile_positions, standard_map)
 				await activate_or_deactivate_ui_buttons()
+				
+				DEBUG_assert_resources_are_in_sync()
 				
 				# When player is done with turn
 				await roll_dice_btn.pressed
@@ -155,16 +162,35 @@ func main_game_loop(tile_positions, standard_map):
 				p.dice_roll_result = _on_roll_dice_pressed()
 				chat_log.append_text("[font_size=%s]\n%s rolled a %s." % [chat_log_font_size, p._name, p.dice_roll_result])
 				if p.dice_roll_result == 7:
-					for player in ALL_PLAYERS:
-						if player.vp < 3:
-							continue
-						else:
-							activate_robber(p)
+					#for player in ALL_PLAYERS:
+						#if player.vp < 3:
+							#continue
+						#else:
+							#activate_robber(p)
+					await activate_robber(p)
+					#print("robber in progress")
+					#await robber_done
+					print("robber done")
+					
+				DEBUG_assert_resources_are_in_sync()
+					
 				await generate_resources_for_all_players(p.dice_roll_result, tile_positions_local, tile_positions, standard_map)
+				
+				DEBUG_assert_resources_are_in_sync()
 				
 				bot_decision_loop(p)
 				
-
+				DEBUG_assert_resources_are_in_sync()
+			
+		
+func DEBUG_assert_resources_are_in_sync():
+	var total_resources_for_all_players = 0
+	var total_resources_in_supply = 0
+	for player in ALL_PLAYERS:
+		total_resources_for_all_players += player.total_resources
+	var resources = ["Tree", "Brick", "Wheat", "Stone", "Sheep"]
+	total_resources_in_supply = NUM_SUPPLY_BRICK + NUM_SUPPLY_SHEEP + NUM_SUPPLY_STONE + NUM_SUPPLY_TREE + NUM_SUPPLY_WHEAT
+	assert(total_resources_in_supply + total_resources_for_all_players == 95, "resources are out of sync! total resources between players and supply: " + str(total_resources_for_all_players + total_resources_in_supply) + ". Amount it should be: 95.")
 
 func initialize_ui_boxes() -> void:
 	#PLAYER_UI_BOX.get_node("PlayerName").text = "[font_size=18][center][b]Player"
@@ -237,49 +263,146 @@ func custom_sort_for_first_roll(a: Array, b: Array):
 		return false
 	return false
 
+signal done_picking
 func activate_robber(player):
 	for p in ALL_PLAYERS:
 		if p.total_resources > 7:
 			var num_of_resources_to_discard = floor(p.total_resources / 2)
+			print(p._name, " total resources: ", p.total_resources)
 			print(p._name, " discarding ", num_of_resources_to_discard, " resources.")
 			if p.type == "Bot":
 				for i in range(num_of_resources_to_discard):
 					if p.resources["Tree"] > 0:
 						p.resources["Tree"] -= 1
 						ui_add_resource_to_supply("Tree")
-					if p.resources["Brick"] > 0:
+					elif p.resources["Brick"] > 0:
 						p.resources["Brick"] -= 1
 						ui_add_resource_to_supply("Brick")
-					if p.resources["Stone"] > 0:
+					elif p.resources["Stone"] > 0:
 						p.resources["Stone"] -= 1
 						ui_add_resource_to_supply("Stone")
-					if p.resources["Wheat"] > 0:
+					elif p.resources["Wheat"] > 0:
 						p.resources["Wheat"] -= 1
 						ui_add_resource_to_supply("Wheat")
-					if p.resources["Sheep"] > 0:
+					elif p.resources["Sheep"] > 0:
 						p.resources["Sheep"] -= 1
 						ui_add_resource_to_supply("Sheep")
+					p.total_resources -= 1
 			else:
 				ui_robber_discard_resources(p, num_of_resources_to_discard)
+				await done_picking
+		else:
+			print(p._name, " has ", p.total_resources, " resources, doesn't discard any.")
 	
 	# This player MUST move the robber
 	if player.type == "Bot":
-		pass
+		# For now, just choose randomly
+		var random_robber_pos
+		while true:
+			random_robber_pos = tile_positions_local.pick_random() + Vector2(-32, -32)
+			if random_robber_pos == ROBBER_POSITION:
+				continue
+			else:
+				break
+		$MapLayer/Robber.position = random_robber_pos
+		ROBBER_POSITION = random_robber_pos
 	else:
 		ui_robber_choose_new_location()
+		await done_picking
+	return
 
 func ui_robber_discard_resources(player, num_resources_to_discard):
 	
-	pass
+	var ID_TO_RESOURCE_MAPPING = {
+		1: "Tree",
+		2: "Sheep",
+		3: "Brick",
+		4: "Wheat",
+		5: "Stone"
+	}
+	
+	var UI_OFFSET_MAPPING = {
+		1: 0,
+		2: 60,
+		3: 120,
+		4: 180,
+		5: 240
+	}
+	
+	$"UILayer/Resource Bar/Robber_Discard".show()
+	$"UILayer/Resource Bar/Robber_Discard".text = "[font_size=26][center]ROBBER! Discarded 0/%s resources." % num_resources_to_discard
+	
+	for j in range(num_resources_to_discard):
+		for i in range(len(player.PLAYER_RESOURCE_BAR_POSITIONS)):
+			# Dynamically create buttons on top of the resources as indicated by the player's resource bar positions
+			# Then connect a signal when they press that specific button and handle removing the correct resource
+			var curr_res = player.PLAYER_RESOURCE_BAR_POSITIONS[i]
+			if curr_res != null:
+			
+				var resource_name = ID_TO_RESOURCE_MAPPING[curr_res]
+				var UI_offset = UI_OFFSET_MAPPING[i+1]
+				
+				var copied_ui_resource = $"UILayer/Resource Bar/Resource_Discard_Btn".duplicate()
+				$"UILayer/Resource Bar".add_child(copied_ui_resource, true)
+				copied_ui_resource.position = Vector2(6.5 + UI_offset, 9.3)
+				copied_ui_resource.z_index = 1
+				copied_ui_resource.show()
+				
+				copied_ui_resource.pressed.connect(resource_discard_pressed.bind(resource_name, curr_res, player))
+			
+		await selection_finished
+		await get_tree().create_timer(0.01).timeout
+		$"UILayer/Resource Bar/Robber_Discard".text = "[font_size=26][center]ROBBER! Discarded %s/%s resources." % [j+1, num_resources_to_discard]
+	
+		# Cleanup # Remove UI elements
+		var i = 2
+		for node in get_node("UILayer/Resource Bar").get_children():
+			if node.name == ("Resource_Discard_Btn%s" % str(i)):
+				i+=1
+				$"UILayer/Resource Bar".remove_child(node)
+				node.queue_free()
+			
+	$"UILayer/Resource Bar/Robber_Discard".hide()
+	
+	emit_signal("done_picking")
+
+func resource_discard_pressed(resource_name, resource_id, player):
+	player.resources[resource_name] -= 1
+	player.total_resources -= 1
+	await ui_remove_from_resource_bar(resource_name)
+	await ui_add_resource_to_supply(resource_name)
+	
+	emit_signal("selection_finished")
 
 func ui_robber_choose_new_location():
+	
+	for i in range(len(tile_positions)):
+		var id = standard_map.get_cell_source_id(tile_positions[i])
+		var local_coords_for_center_of_tile = tile_positions_local[i]
+		
+		# Create UI elements for all possible positions, which is everywhere except the current position
+		if ROBBER_POSITION == local_coords_for_center_of_tile + Vector2(-32, -32):
+			continue
+		# ADD TRANSPARENT BUTTON OVER THE RESOURCE NUMBER ICON INSTEAD OF "POSSIBLE PLACEMENT INDICATOR"
+		var curr_UI_element = $MapLayer/Possible_Placement_Robber.duplicate()
+		$MapLayer.add_child(curr_UI_element, true)
+		curr_UI_element.show()
+		curr_UI_element.position = local_coords_for_center_of_tile
+
+		#curr_UI_element.pressed.connect(road_placement_pressed.bind(curr_UI_element, vertex))
+		
+		
+		#$MapLayer/Robber.position = local_coords_for_center_of_tile + Vector2(-32, -32)
+		#ROBBER_POSITION = local_coords_for_center_of_tile
+	
 	# After choosing location, if more than one player settlement is adjacent to the tile, choose who to steal from
 	var players
 	ui_robber_choose_who_to_steal_from(players)
-	pass
+	
+	emit_signal("done_picking")
 	
 func ui_robber_choose_who_to_steal_from(players):
-	pass
+	return
 
 # Sets certain UI buttons/elements as "active"/"not disabled" if the player meets the resource requirement for them,
 # indicating that they can afford the respective thing (settlement, city, road, development card, etc.)
@@ -311,6 +434,7 @@ func activate_or_deactivate_ui_buttons():
 	$UILayer/Bank_Trade_Btn_Background/Disabled_Mask.visible = bank_trade_button_state
 	
 	# Players can offer up trades where they don't offer anything, so that button will always be active/enabled
+	# except at the beginning of the game
 
 func ui_add_resource_to_supply(resource):
 	var RESOURCE_TO_ID_MAPPING = {
@@ -694,13 +818,16 @@ func _on_build_road_button_pressed() -> void:
 			
 	# Remove resources from player and from resource bar
 	CLIENT.resources["Tree"] -= 1
-	CLIENT.resources["Brick"] -= 1
-	
+	CLIENT.total_resources -= 1
 	ui_remove_from_resource_bar("Tree")
-	ui_remove_from_resource_bar("Brick")
-	
 	ui_add_resource_to_supply("Tree")
+	
+	CLIENT.resources["Brick"] -= 1
+	CLIENT.total_resources -= 1
+	ui_remove_from_resource_bar("Brick")
 	ui_add_resource_to_supply("Brick")
+	
+	
 	
 	activate_or_deactivate_ui_buttons()
 	
@@ -767,19 +894,25 @@ func _on_build_settlement_button_pressed() -> void:
 	
 	# Remove resources from player and from resource bar
 	CLIENT.resources["Tree"] -= 1
-	CLIENT.resources["Brick"] -= 1
-	CLIENT.resources["Wheat"] -= 1
-	CLIENT.resources["Sheep"] -= 1
-	
+	CLIENT.total_resources -= 1
 	ui_remove_from_resource_bar("Tree")
-	ui_remove_from_resource_bar("Brick")
-	ui_remove_from_resource_bar("Wheat")
-	ui_remove_from_resource_bar("Sheep")
-	
 	ui_add_resource_to_supply("Tree")
+	
+	CLIENT.resources["Brick"] -= 1
+	CLIENT.total_resources -= 1
+	ui_remove_from_resource_bar("Brick")
 	ui_add_resource_to_supply("Brick")
+	
+	CLIENT.resources["Wheat"] -= 1
+	CLIENT.total_resources -= 1
+	ui_remove_from_resource_bar("Wheat")
 	ui_add_resource_to_supply("Wheat")
+	
+	CLIENT.resources["Sheep"] -= 1
+	CLIENT.total_resources -= 1
+	ui_remove_from_resource_bar("Sheep")
 	ui_add_resource_to_supply("Sheep")
+	
 	
 	activate_or_deactivate_ui_buttons()
 
@@ -834,18 +967,27 @@ func _on_build_city_button_pressed() -> void:
 	
 	# Remove resources from player and from resource bar
 	CLIENT.resources["Stone"] -= 1
+	CLIENT.total_resources -= 1
 	ui_remove_from_resource_bar("Stone")
 	ui_add_resource_to_supply("Stone")
+	
 	CLIENT.resources["Stone"] -= 1
+	CLIENT.total_resources -= 1
 	ui_remove_from_resource_bar("Stone")
 	ui_add_resource_to_supply("Stone")
+	
 	CLIENT.resources["Stone"] -= 1
+	CLIENT.total_resources -= 1
 	ui_remove_from_resource_bar("Stone")
 	ui_add_resource_to_supply("Stone")
+	
 	CLIENT.resources["Wheat"] -= 1
+	CLIENT.total_resources -= 1
 	ui_remove_from_resource_bar("Wheat")
 	ui_add_resource_to_supply("Wheat")
+	
 	CLIENT.resources["Wheat"] -= 1
+	CLIENT.total_resources -= 1
 	ui_remove_from_resource_bar("Wheat")
 	ui_add_resource_to_supply("Wheat")
 	
@@ -1103,7 +1245,7 @@ func ui_remove_from_resource_bar(resource):
 		4: "Wheat",
 		5: "Stone"
 	}
-	
+	print("player discarded resource: ", resource)
 	var num_of_resource = CLIENT.resources[resource]
 	var resource_id = RESOURCE_TO_ID_MAPPING[resource]
 	if num_of_resource == 0: # Remove resource from bar completely
@@ -1119,7 +1261,7 @@ func ui_remove_from_resource_bar(resource):
 		CLIENT.PLAYER_RESOURCE_BAR_POSITIONS = CLIENT.PLAYER_RESOURCE_BAR_POSITIONS.slice(0, index_of_element_to_remove) + CLIENT.PLAYER_RESOURCE_BAR_POSITIONS.slice(index_of_element_to_remove + 1, len(CLIENT.PLAYER_RESOURCE_BAR_POSITIONS)+1)
 		CLIENT.PLAYER_RESOURCE_BAR_POSITIONS.append(null)
 		
-		print(CLIENT.PLAYER_RESOURCE_BAR_POSITIONS)
+		#print(CLIENT.PLAYER_RESOURCE_BAR_POSITIONS)
 		
 		for i in range(len(CLIENT.PLAYER_RESOURCE_BAR_POSITIONS)):
 			if CLIENT.PLAYER_RESOURCE_BAR_POSITIONS[i] == null:
