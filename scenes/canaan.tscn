@@ -1,4 +1,4 @@
-[gd_scene load_steps=81 format=4 uid="uid://jivbdwftiitr"]
+[gd_scene load_steps=86 format=4 uid="uid://jivbdwftiitr"]
 
 [ext_resource type="Script" uid="uid://bw23uon3cp087" path="res://scenes/canaan.gd" id="1_d354y"]
 [ext_resource type="Script" uid="uid://14yc7lvh4r55" path="res://scenes/camera_2d.gd" id="2_sec5m"]
@@ -44,10 +44,15 @@
 [ext_resource type="Texture2D" uid="uid://b80kxahhsfvqb" path="res://images/Resource_Cards/stone.png" id="38_ai2yn"]
 [ext_resource type="Texture2D" uid="uid://d0qovvy8by45j" path="res://images/Resource_Cards/tree.png" id="39_6qd3u"]
 [ext_resource type="Texture2D" uid="uid://c8l7lbpbq5huv" path="res://images/Resource_Cards/wheat.png" id="40_65qm3"]
+[ext_resource type="Texture2D" uid="uid://cmvidq1ewbjau" path="res://images/circle_select_normal_btn.png" id="41_vxofv"]
+[ext_resource type="Texture2D" uid="uid://coa5imoaw8l75" path="res://images/circle_select_pressed_btn.png" id="42_0mye4"]
 [ext_resource type="Texture2D" uid="uid://b3nqnchiq288i" path="res://images/bank_trade_icon.png" id="42_luowv"]
+[ext_resource type="BitMap" uid="uid://bsrbh8jw5rnlm" path="res://images/circle_select_normal_btn.bmp" id="42_o0owp"]
+[ext_resource type="Texture2D" uid="uid://unj21qye07gs" path="res://images/circle_select_hover_btn.png" id="43_0mye4"]
 [ext_resource type="Texture2D" uid="uid://bp52owf8bkx6j" path="res://images/player_trade_icon.png" id="43_c1tvx"]
 [ext_resource type="Texture2D" uid="uid://76ftlu6htlhi" path="res://images/development_card_NEEDS_ART.png" id="44_kovk3"]
 [ext_resource type="Texture2D" uid="uid://bnkbrkh0re7tt" path="res://images/Pieces (Yellow)/pieceYellow_border09.png" id="44_ppdgm"]
+[ext_resource type="Texture2D" uid="uid://bmi55g22wau02" path="res://images/Pieces (Blue)/pieceBlue_border08.png" id="45_1t8uu"]
 [ext_resource type="Texture2D" uid="uid://d2xema0qmnjg5" path="res://images/end_turn_icon.png" id="45_kovk3"]
 
 [sub_resource type="TileMapPattern" id="TileMapPattern_or3yt"]
@@ -523,6 +528,55 @@ grow_horizontal = 2
 grow_vertical = 2
 pivot_offset = Vector2(32, 32)
 texture = ExtResource("36_pohut")
+
+[node name="Robber_Choose_Resource_Tile_Btn" type="TextureButton" parent="MapLayer"]
+visible = false
+modulate = Color(1, 1, 1, 0.513726)
+z_index = 2
+offset_left = 488.0
+offset_top = 447.0
+offset_right = 638.0
+offset_bottom = 597.0
+scale = Vector2(0.45, 0.45)
+texture_normal = ExtResource("41_vxofv")
+texture_pressed = ExtResource("42_0mye4")
+texture_hover = ExtResource("43_0mye4")
+texture_click_mask = ExtResource("42_o0owp")
+
+[node name="Choose_Who_To_Rob_Container" type="ColorRect" parent="MapLayer"]
+visible = false
+z_index = 4
+offset_left = 28.0
+offset_top = 27.0
+offset_right = 247.0
+offset_bottom = 101.0
+color = Color(0, 0, 0, 1)
+
+[node name="Bot1_Choose_To_Rob_Btn" type="TextureButton" parent="MapLayer/Choose_Who_To_Rob_Container"]
+visible = false
+z_index = 3
+offset_top = 4.0
+offset_right = 64.0
+offset_bottom = 68.0
+texture_normal = ExtResource("28_ot51o")
+
+[node name="Bot2_Choose_To_Rob_Btn" type="TextureButton" parent="MapLayer/Choose_Who_To_Rob_Container"]
+visible = false
+z_index = 3
+offset_left = 73.0
+offset_top = 4.0
+offset_right = 137.0
+offset_bottom = 68.0
+texture_normal = ExtResource("30_btiyb")
+
+[node name="Bot3_Choose_To_Rob_Btn" type="TextureButton" parent="MapLayer/Choose_Who_To_Rob_Container"]
+visible = false
+z_index = 3
+offset_left = 146.0
+offset_top = 4.0
+offset_right = 210.0
+offset_bottom = 68.0
+texture_normal = ExtResource("45_1t8uu")
 
 [node name="UILayer" type="CanvasLayer" parent="."]
 

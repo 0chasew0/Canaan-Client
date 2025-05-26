@@ -306,8 +306,10 @@ func activate_robber(player):
 				break
 		$MapLayer/Robber.position = random_robber_pos
 		ROBBER_POSITION = random_robber_pos
+		
+		await bot_robber_steal(player, random_robber_pos + Vector2(32, 32))
 	else:
-		ui_robber_choose_new_location()
+		ui_robber_choose_new_location_client()
 		await done_picking
 	return
 
@@ -374,36 +376,222 @@ func resource_discard_pressed(resource_name, resource_id, player):
 	
 	emit_signal("selection_finished")
 
-func ui_robber_choose_new_location():
+func bot_robber_steal(player, local_coords_for_center_of_tile):
+	
+	var rob_players = []
+	for p in ALL_PLAYERS:
+		if p._name == player._name:
+			continue
+		for settlement_pos in p.settlements:
+			var distance = get_distance(local_coords_for_center_of_tile, settlement_pos)
+			if distance < 75:
+				# This player is eligible to be stolen from
+				rob_players.append(p)
+	
+	if len(rob_players) > 1:
+		var p = rob_players.pick_random()
+		
+		var viable_resources_to_steal = []
+		if p.resources["Tree"] > 0:
+			viable_resources_to_steal.append("Tree")
+		if p.resources["Brick"] > 0:
+			viable_resources_to_steal.append("Brick")
+		if p.resources["Stone"] > 0:
+			viable_resources_to_steal.append("Stone")
+		if p.resources["Sheep"] > 0:
+			viable_resources_to_steal.append("Sheep")
+		if p.resources["Wheat"] > 0:
+			viable_resources_to_steal.append("Wheat")
+		
+		if len(viable_resources_to_steal) == 0:
+			return
+		
+		var random_resource = viable_resources_to_steal.pick_random()
+		
+		p.resources[random_resource] -= 1
+		p.total_resources -= 1
+		
+		player.resources[random_resource] += 1
+		player.total_resources += 1
+		
+		print(player._name, " robbed a ", random_resource, " from ", p._name, "!")
+		
+		if p.type == "Player":
+			ui_remove_from_resource_bar(random_resource)
+		
+	elif len(rob_players) == 1:
+		var p = rob_players[0]
+		
+		var viable_resources_to_steal = []
+		if p.resources["Tree"] > 0:
+			viable_resources_to_steal.append("Tree")
+		if p.resources["Brick"] > 0:
+			viable_resources_to_steal.append("Brick")
+		if p.resources["Stone"] > 0:
+			viable_resources_to_steal.append("Stone")
+		if p.resources["Sheep"] > 0:
+			viable_resources_to_steal.append("Sheep")
+		if p.resources["Wheat"] > 0:
+			viable_resources_to_steal.append("Wheat")
+		
+		if len(viable_resources_to_steal) == 0:
+			return
+		
+		var random_resource = viable_resources_to_steal.pick_random()
+		
+		p.resources[random_resource] -= 1
+		p.total_resources -= 1
+		
+		player.resources[random_resource] += 1
+		player.total_resources += 1
+		
+		print(player._name, " robbed a ", random_resource, " from ", p._name, "!")
+		
+		if p.type == "Player":
+			ui_remove_from_resource_bar(random_resource)
+	else:
+		print("No one to rob from!")
+
+func ui_robber_choose_new_location_client():
 	
 	for i in range(len(tile_positions)):
 		var id = standard_map.get_cell_source_id(tile_positions[i])
 		var local_coords_for_center_of_tile = tile_positions_local[i]
 		
 		# Create UI elements for all possible positions, which is everywhere except the current position
-		if ROBBER_POSITION == local_coords_for_center_of_tile + Vector2(-32, -32):
+		if ROBBER_POSITION == local_coords_for_center_of_tile:
 			continue
-		# ADD TRANSPARENT BUTTON OVER THE RESOURCE NUMBER ICON INSTEAD OF "POSSIBLE PLACEMENT INDICATOR"
-		var curr_UI_element = $MapLayer/Possible_Placement_Robber.duplicate()
+
+		var curr_UI_element = $MapLayer/Robber_Choose_Resource_Tile_Btn.duplicate()
 		$MapLayer.add_child(curr_UI_element, true)
 		curr_UI_element.show()
-		curr_UI_element.position = local_coords_for_center_of_tile
-
-		#curr_UI_element.pressed.connect(road_placement_pressed.bind(curr_UI_element, vertex))
+		curr_UI_element.position = local_coords_for_center_of_tile + Vector2(-33, -26)
+		curr_UI_element.pressed.connect(ui_robber_new_location.bind(local_coords_for_center_of_tile))
 		
-		
-		#$MapLayer/Robber.position = local_coords_for_center_of_tile + Vector2(-32, -32)
-		#ROBBER_POSITION = local_coords_for_center_of_tile
+	await done_picking
 	
-	# After choosing location, if more than one player settlement is adjacent to the tile, choose who to steal from
-	var players
-	ui_robber_choose_who_to_steal_from(players)
+	emit_signal("done_picking")
+
+func ui_robber_new_location(local_coords_for_center_of_tile):
+	
+	var i = 2
+	for n in get_node("MapLayer").get_children():
+		if n.name == ("Robber_Choose_Resource_Tile_Btn%s" % i):
+			i+=1
+			$MapLayer.remove_child(n)
+			n.queue_free()
+	
+	$MapLayer/Robber.position = local_coords_for_center_of_tile + Vector2(-32, -32)
+	ROBBER_POSITION = local_coords_for_center_of_tile
+	
+	# Check if anyone's settlements are adjacent to this new placement. If so, steal from them.. if multiple players, choose who to steal from first
+	
+	var rob_players = []
+	for p in ALL_PLAYERS:
+		# Update this code for multiplayer, this should just be something like "not the client" a.k.a person placing the robber..
+		if p.type == "Player":
+			continue
+		else:
+			for settlement_pos in p.settlements:
+				var distance = get_distance(local_coords_for_center_of_tile, settlement_pos)
+				if distance < 75:
+					# This player is eligible to be stolen from
+					rob_players.append(p)
+					
+	if len(rob_players) > 1:
+		$MapLayer/Choose_Who_To_Rob_Container.position = local_coords_for_center_of_tile + Vector2(-100, -100)
+		$MapLayer/Choose_Who_To_Rob_Container.show()
+		
+		for p in rob_players:
+			if p._name == "Bot 1":
+				$MapLayer/Choose_Who_To_Rob_Container/Bot1_Choose_To_Rob_Btn.show()
+				$MapLayer/Choose_Who_To_Rob_Container/Bot1_Choose_To_Rob_Btn.pressed.connect(ui_choose_who_to_rob.bind(p))
+			elif p._name == "Bot 2":
+				$MapLayer/Choose_Who_To_Rob_Container/Bot2_Choose_To_Rob_Btn.show()
+				$MapLayer/Choose_Who_To_Rob_Container/Bot2_Choose_To_Rob_Btn.pressed.connect(ui_choose_who_to_rob.bind(p))
+			elif p._name == "Bot 3":
+				$MapLayer/Choose_Who_To_Rob_Container/Bot3_Choose_To_Rob_Btn.show()
+				$MapLayer/Choose_Who_To_Rob_Container/Bot3_Choose_To_Rob_Btn.pressed.connect(ui_choose_who_to_rob.bind(p))
+		
+		await done_picking
+		
+	
+	# Randomly steal a resource from the only player you can steal from
+	elif len(rob_players) == 1:
+		var player = rob_players[0]
+		
+		var viable_resources_to_steal = []
+		if player.resources["Tree"] > 0:
+			viable_resources_to_steal.append("Tree")
+		if player.resources["Brick"] > 0:
+			viable_resources_to_steal.append("Brick")
+		if player.resources["Stone"] > 0:
+			viable_resources_to_steal.append("Stone")
+		if player.resources["Sheep"] > 0:
+			viable_resources_to_steal.append("Sheep")
+		if player.resources["Wheat"] > 0:
+			viable_resources_to_steal.append("Wheat")
+		
+		if len(viable_resources_to_steal) == 0:
+			emit_signal("done_picking")
+			return
+		
+		var random_resource = viable_resources_to_steal.pick_random()
+		
+		player.resources[random_resource] -= 1
+		player.total_resources -= 1
+		
+		CLIENT.resources[random_resource] += 1
+		CLIENT.total_resources += 1
+		
+		print(CLIENT._name, " robbed a ", random_resource, " from ", player._name, "!")
+		
+		ui_add_to_resource_bar(random_resource)
+	
+	# No one is adjacent, don't steal
+	else:
+		print("No one to steal from!")
+		pass
+		
+	emit_signal("done_picking")
+
+func ui_choose_who_to_rob(player):
+	# Transfer random resource from player arg to the client
+	
+	for n in $MapLayer/Choose_Who_To_Rob_Container.get_children():
+		n.hide()
+	$MapLayer/Choose_Who_To_Rob_Container.hide()
+	
+	var viable_resources_to_steal = []
+	if player.resources["Tree"] > 0:
+		viable_resources_to_steal.append("Tree")
+	if player.resources["Brick"] > 0:
+		viable_resources_to_steal.append("Brick")
+	if player.resources["Stone"] > 0:
+		viable_resources_to_steal.append("Stone")
+	if player.resources["Sheep"] > 0:
+		viable_resources_to_steal.append("Sheep")
+	if player.resources["Wheat"] > 0:
+		viable_resources_to_steal.append("Wheat")
+	
+	if len(viable_resources_to_steal) == 0:
+		emit_signal("done_picking")
+		return
+	
+	var random_resource = viable_resources_to_steal.pick_random()
+	
+	player.resources[random_resource] -= 1
+	player.total_resources -= 1
+	
+	CLIENT.resources[random_resource] += 1
+	CLIENT.total_resources += 1
+	
+	ui_add_to_resource_bar(random_resource)
+	
+	print(CLIENT._name, " robbed a ", random_resource, " from ", player._name, "!")
 	
 	emit_signal("done_picking")
 	
-func ui_robber_choose_who_to_steal_from(players):
-	return
-
 # Sets certain UI buttons/elements as "active"/"not disabled" if the player meets the resource requirement for them,
 # indicating that they can afford the respective thing (settlement, city, road, development card, etc.)
 # Call this anytime after a player modifies their resources in any way (dice roll, dev card, trading, etc.)

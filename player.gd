@@ -4,6 +4,7 @@ class_name Player
 
 var _name
 var type
+var color
 var id # Player Num
 var dice_roll_result
 var turn_num

@@ -1,0 +1,16 @@
+[remap]
+
+importer="bitmap"
+type="BitMap"
+uid="uid://bsrbh8jw5rnlm"
+path="res://.godot/imported/circle_select_normal_btn.bmp-922b5802aefaa690c862bbff10fc3848.res"
+
+[deps]
+
+source_file="res://images/circle_select_normal_btn.bmp"
+dest_files=["res://.godot/imported/circle_select_normal_btn.bmp-922b5802aefaa690c862bbff10fc3848.res"]
+
+[params]
+
+create_from=0
+threshold=0.5
