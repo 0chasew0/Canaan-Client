@@ -22,6 +22,8 @@ var resources = {
 var total_resources = 0
 var last_vertex_selected = null
 var last_node_selected = null
+var knights_played = 0
+var longest_road = 0
 
 # UI
 var PLAYER_RESOURCE_BAR_POSITIONS = [null, null, null, null, null]

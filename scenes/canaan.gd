@@ -32,6 +32,7 @@ extends Node2D
 @onready var ALL_PLAYERS_TURN_NUMS = {}
 @onready var CLIENT = null
 @onready var CLIENT_INDEX = null
+@onready var DEVELOPMENT_CARDS = []
 
 @onready var tile_positions_local = []
 @onready var tile_positions = []
@@ -79,7 +80,7 @@ func _ready() -> void:
 	await initialize_robber(standard_map, tile_positions)
 	
 	# Initialize UI button states
-	await activate_or_deactivate_ui_buttons()
+	await ui_disable_all_buttons()
 	
 	# Initialize chat box setting(s)
 	chat_log.append_text("[font_size=%s]Welcome to Canaan!" % chat_log_font_size)
@@ -87,6 +88,9 @@ func _ready() -> void:
 	# Initialize road array
 	for i in range(PLAYER_COUNT):
 		ALL_OWNED_ROADS.append([])
+		
+	# Initialize development cards
+	await initialize_development_cards()
 	
 	# Main game loop for a client
 	await roll_for_who_goes_first()
@@ -120,7 +124,7 @@ func main_game_loop(tile_positions, standard_map):
 		for p in ALL_PLAYERS:
 			if p.type == "Player":
 				# Turn Initializers
-				await activate_or_deactivate_ui_buttons()
+				await ui_disable_all_buttons()
 				print("player turn")
 				#roll_dice_btn.disabled = false
 				
@@ -210,7 +214,36 @@ func initialize_robber(map_data, tile_positions):
 			ROBBER_POSITION = local_coords_for_center_of_tile
 			break
 	return
-			
+
+func initialize_development_cards():
+	var num_of_each_development_card = {
+		"Knight": 14,
+		"Monopoly": 2,
+		"Road": 2,
+		"Invention": 2,
+		"VP": 5
+	}
+	
+	var dev_card_to_index_mapping = {
+		0: "Knight",
+		1: "Monopoly",
+		2: "Road",
+		3: "Invention",
+		4: "VP"
+	}
+	for i in range(25):
+		var rand_dev_card_name
+		while true:
+			rand_dev_card_name = dev_card_to_index_mapping[randi_range(0, 4)]
+			var rand_dev_card_amt = num_of_each_development_card[rand_dev_card_name]
+			if rand_dev_card_amt == 0:
+				continue
+			else:
+				num_of_each_development_card[rand_dev_card_name] -= 1
+				break
+		DEVELOPMENT_CARDS.append(rand_dev_card_name)
+	DEVELOPMENT_CARDS.shuffle()
+
 # A client will only roll once
 func roll_for_who_goes_first():
 	# Determine who goes first by rolling for it
@@ -299,15 +332,15 @@ func activate_robber(player):
 		# For now, just choose randomly
 		var random_robber_pos
 		while true:
-			random_robber_pos = tile_positions_local.pick_random() + Vector2(-32, -32)
+			random_robber_pos = tile_positions_local.pick_random()
 			if random_robber_pos == ROBBER_POSITION:
 				continue
 			else:
 				break
-		$MapLayer/Robber.position = random_robber_pos
+		$MapLayer/Robber.position = random_robber_pos + Vector2(-32, -32)
 		ROBBER_POSITION = random_robber_pos
 		
-		await bot_robber_steal(player, random_robber_pos + Vector2(32, 32))
+		await bot_robber_steal(player, random_robber_pos)
 	else:
 		ui_robber_choose_new_location_client()
 		await done_picking
@@ -384,6 +417,11 @@ func bot_robber_steal(player, local_coords_for_center_of_tile):
 			continue
 		for settlement_pos in p.settlements:
 			var distance = get_distance(local_coords_for_center_of_tile, settlement_pos)
+			if distance < 75:
+				# This player is eligible to be stolen from
+				rob_players.append(p)
+		for city_pos in p.cities:
+			var distance = get_distance(local_coords_for_center_of_tile, city_pos)
 			if distance < 75:
 				# This player is eligible to be stolen from
 				rob_players.append(p)
@@ -497,6 +535,11 @@ func ui_robber_new_location(local_coords_for_center_of_tile):
 				if distance < 75:
 					# This player is eligible to be stolen from
 					rob_players.append(p)
+			for city_pos in p.cities:
+				var distance = get_distance(local_coords_for_center_of_tile, city_pos)
+				if distance < 75:
+					# This player is eligible to be stolen from
+					rob_players.append(p)
 					
 	if len(rob_players) > 1:
 		$MapLayer/Choose_Who_To_Rob_Container.position = local_coords_for_center_of_tile + Vector2(-100, -100)
@@ -591,7 +634,25 @@ func ui_choose_who_to_rob(player):
 	print(CLIENT._name, " robbed a ", random_resource, " from ", player._name, "!")
 	
 	emit_signal("done_picking")
+
+func ui_disable_all_buttons():
+	$UILayer/Build_City_Btn_Background/Build_City_Button.disabled = true
+	$UILayer/Build_City_Btn_Background/Disabled_Mask.visible = true
 	
+	$UILayer/Build_Road_Btn_Background/Build_Road_Button.disabled = true
+	$UILayer/Build_Road_Btn_Background/Disabled_Mask.visible = true
+	
+	$UILayer/Build_Settlement_Btn_Background/Build_Settlement_Button.disabled = true
+	$UILayer/Build_Settlement_Btn_Background/Disabled_Mask.visible = true
+	
+	$UILayer/Buy_Development_Card_Background/Buy_Development_Card_Button.disabled = true
+	$UILayer/Buy_Development_Card_Background/Disabled_Mask.visible = true
+	
+	$UILayer/Bank_Trade_Btn_Background/Trade_Button.disabled = true
+	$UILayer/Bank_Trade_Btn_Background/Disabled_Mask.visible = true
+	
+	$UILayer/Player_Trade_Btn_Background/Trade_Button.disabled = true
+	$UILayer/Player_Trade_Btn_Background/Disabled_Mask.visible = true
 # Sets certain UI buttons/elements as "active"/"not disabled" if the player meets the resource requirement for them,
 # indicating that they can afford the respective thing (settlement, city, road, development card, etc.)
 # Call this anytime after a player modifies their resources in any way (dice roll, dev card, trading, etc.)
@@ -621,8 +682,8 @@ func activate_or_deactivate_ui_buttons():
 	$UILayer/Bank_Trade_Btn_Background/Trade_Button.disabled = bank_trade_button_state
 	$UILayer/Bank_Trade_Btn_Background/Disabled_Mask.visible = bank_trade_button_state
 	
-	# Players can offer up trades where they don't offer anything, so that button will always be active/enabled
-	# except at the beginning of the game
+	$UILayer/Player_Trade_Btn_Background/Trade_Button.disabled = false
+	$UILayer/Player_Trade_Btn_Background/Disabled_Mask.visible = false
 
 func ui_add_resource_to_supply(resource):
 	var RESOURCE_TO_ID_MAPPING = {
@@ -743,6 +804,8 @@ func bot_decision_loop(player):
 		# Bank Trade
 		if player.resources["Brick"] >= 4 or player.resources["Tree"] >= 4 or player.resources["Sheep"] >= 4 or player.resources["Wheat"] >= 4 or player.resources["Stone"] >= 4:
 			break
+			
+		# Player Trade
 			
 		else:
 			break
@@ -955,7 +1018,11 @@ func bot_build_road(player):
 	
 	return true
 	emit_signal("selection_finished")
+
+func _on_buy_development_card_button_pressed() -> void:
+	print("development card button pressed")
 	
+
 # Should only be allowed to be pressed if correct resources have been met, see activate_or_deactive_ui_buttons()
 func _on_build_road_button_pressed() -> void:
 	print("Build road button pressed.")
@@ -1242,6 +1309,9 @@ func generate_resources_for_all_players(dice_result, tile_positions_local, tile_
 			var resources = []
 			for i in range(len(p.settlements)):
 				for j in range(len(tile_positions_local)):
+					if tile_positions_local[j] == ROBBER_POSITION:
+						
+						continue
 					# Should be the three closest tiles, where pos is the center of the tile
 					var distance = sqrt(((tile_positions_local[j].x - p.settlements[i].x)**2) + ((tile_positions_local[j].y - p.settlements[i].y)**2))
 					if distance < 75:
@@ -1254,6 +1324,9 @@ func generate_resources_for_all_players(dice_result, tile_positions_local, tile_
 			# Do the same but for cities
 			for i in range(len(p.cities)):
 				for j in range(len(tile_positions_local)):
+					if tile_positions_local[j] == ROBBER_POSITION:
+						
+						continue
 					# Should be the three closest tiles, where pos is the center of the tile
 					var distance = sqrt(((tile_positions_local[j].x - p.cities[i].x)**2) + ((tile_positions_local[j].y - p.cities[i].y)**2))
 					if distance < 75:
@@ -1280,6 +1353,9 @@ func generate_resources_for_all_players(dice_result, tile_positions_local, tile_
 			var resources = []
 			for i in range(len(p.settlements)):
 				for j in range(len(tile_positions_local)):
+					if tile_positions_local[j] == ROBBER_POSITION:
+						
+						continue
 					# Should be the three closest tiles, where pos is the center of the tile
 					var distance = sqrt(((tile_positions_local[j].x - p.settlements[i].x)**2) + ((tile_positions_local[j].y - p.settlements[i].y)**2))
 					if distance < 75:
@@ -1292,6 +1368,9 @@ func generate_resources_for_all_players(dice_result, tile_positions_local, tile_
 							
 			for i in range(len(p.cities)):
 				for j in range(len(tile_positions_local)):
+					if tile_positions_local[j] == ROBBER_POSITION:
+						
+						continue
 					# Should be the three closest tiles, where pos is the center of the tile
 					var distance = sqrt(((tile_positions_local[j].x - p.cities[i].x)**2) + ((tile_positions_local[j].y - p.cities[i].y)**2))
 					if distance < 75:

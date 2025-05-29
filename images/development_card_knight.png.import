@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://76ftlu6htlhi"
-path="res://.godot/imported/development_card_NEEDS_ART.png-c76eb73fcaa02e486d2803fef821e91c.ctex"
+uid="uid://b2ccd7w12v3gb"
+path="res://.godot/imported/development_card_knight.png-9a00a8f324cb9031938b0b86f5bdb459.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://images/development_card_NEEDS_ART.png"
-dest_files=["res://.godot/imported/development_card_NEEDS_ART.png-c76eb73fcaa02e486d2803fef821e91c.ctex"]
+source_file="res://images/development_card_knight.png"
+dest_files=["res://.godot/imported/development_card_knight.png-9a00a8f324cb9031938b0b86f5bdb459.ctex"]
 
 [params]
 
