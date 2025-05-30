@@ -1,4 +1,4 @@
-[gd_scene load_steps=87 format=4 uid="uid://jivbdwftiitr"]
+[gd_scene load_steps=92 format=4 uid="uid://jivbdwftiitr"]
 
 [ext_resource type="Script" uid="uid://bw23uon3cp087" path="res://scenes/canaan.gd" id="1_d354y"]
 [ext_resource type="Script" uid="uid://14yc7lvh4r55" path="res://scenes/camera_2d.gd" id="2_sec5m"]
@@ -55,6 +55,11 @@
 [ext_resource type="Texture2D" uid="uid://bmi55g22wau02" path="res://images/Pieces (Blue)/pieceBlue_border08.png" id="45_1t8uu"]
 [ext_resource type="Texture2D" uid="uid://d2xema0qmnjg5" path="res://images/end_turn_icon.png" id="45_kovk3"]
 [ext_resource type="Texture2D" uid="uid://dpeqktfbl3a2i" path="res://images/development_card_back.png" id="51_lbwaw"]
+[ext_resource type="Texture2D" uid="uid://dcybl63c7hrea" path="res://images/development_card_invention.png" id="56_lbwaw"]
+[ext_resource type="Texture2D" uid="uid://b2ccd7w12v3gb" path="res://images/development_card_knight.png" id="57_0kw8m"]
+[ext_resource type="Texture2D" uid="uid://ownui7vg6ac8" path="res://images/development_card_monopoly.png" id="58_yqqmq"]
+[ext_resource type="Texture2D" uid="uid://bw8xxdyusr8y3" path="res://images/development_card_road.png" id="59_46m4j"]
+[ext_resource type="Texture2D" uid="uid://drj43vsnjn6pg" path="res://images/development_card_vp.png" id="60_vos2g"]
 
 [sub_resource type="TileMapPattern" id="TileMapPattern_or3yt"]
 tile_data = PackedInt32Array(131072, 1, 0, 1, 1, 0, 65536, 1, 0, 131073, 1, 0, 196608, 1, 0, 262145, 1, 0, 2, 1, 0, 65537, 1, 0, 131074, 1, 0, 196609, 1, 0, 262146, 1, 0, 3, 1, 0, 65538, 1, 0, 131075, 1, 0, 196610, 1, 0, 262147, 1, 0, 65539, 1, 0, 131076, 1, 0, 196611, 1, 0)
@@ -749,6 +754,26 @@ bbcode_enabled = true
 text = "[font_size=30][center][b]25"
 scroll_active = false
 
+[node name="Select_Resource_From_Supply_Btn" type="Button" parent="UILayer/Supply"]
+visible = false
+modulate = Color(1, 1, 1, 0.490196)
+layout_mode = 0
+offset_left = 237.0
+offset_top = 27.0
+offset_right = 377.0
+offset_bottom = 217.0
+scale = Vector2(0.4, 0.44)
+
+[node name="Invention_DevCard_Text" type="RichTextLabel" parent="UILayer/Supply"]
+visible = false
+layout_mode = 0
+offset_left = -1546.0
+offset_top = 631.0
+offset_right = -639.0
+offset_bottom = 671.0
+bbcode_enabled = true
+text = "[font_size=26][center]Invention! Select any two resources from the supply."
+
 [node name="Player1Background" type="ColorRect" parent="UILayer"]
 offset_left = 1547.0
 offset_top = 435.0
@@ -1248,6 +1273,137 @@ offset_right = 96.0
 offset_bottom = 86.0
 color = Color(0.14902, 0.14902, 0.14902, 0.678431)
 
+[node name="Invention_DevCard" type="TextureRect" parent="UILayer"]
+visible = false
+offset_left = 627.0
+offset_top = 978.0
+offset_right = 767.0
+offset_bottom = 1168.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("56_lbwaw")
+
+[node name="Amount" type="RichTextLabel" parent="UILayer/Invention_DevCard"]
+layout_mode = 0
+offset_left = 107.5
+offset_top = -4.54545
+offset_right = 147.5
+offset_bottom = 36.4545
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]0"
+scroll_active = false
+
+[node name="Invention_DevCard" type="Button" parent="UILayer/Invention_DevCard"]
+visible = false
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Knight_DevCard" type="TextureRect" parent="UILayer"]
+visible = false
+offset_left = 355.0
+offset_top = 467.0
+offset_right = 495.0
+offset_bottom = 657.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("57_0kw8m")
+
+[node name="Amount" type="RichTextLabel" parent="UILayer/Knight_DevCard"]
+layout_mode = 0
+offset_left = 107.5
+offset_top = -4.54545
+offset_right = 147.5
+offset_bottom = 36.4545
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]0"
+scroll_active = false
+
+[node name="Knight_DevCard" type="Button" parent="UILayer/Knight_DevCard"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Monopoly_DevCard" type="TextureRect" parent="UILayer"]
+visible = false
+offset_left = 426.0
+offset_top = 467.0
+offset_right = 566.0
+offset_bottom = 657.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("58_yqqmq")
+
+[node name="Amount" type="RichTextLabel" parent="UILayer/Monopoly_DevCard"]
+layout_mode = 0
+offset_left = 107.5
+offset_top = -4.54545
+offset_right = 147.5
+offset_bottom = 36.4545
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]0"
+scroll_active = false
+
+[node name="Monopoly_DevCard" type="Button" parent="UILayer/Monopoly_DevCard"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Road_DevCard" type="TextureRect" parent="UILayer"]
+visible = false
+offset_left = 497.0
+offset_top = 467.0
+offset_right = 637.0
+offset_bottom = 657.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("59_46m4j")
+
+[node name="Amount" type="RichTextLabel" parent="UILayer/Road_DevCard"]
+layout_mode = 0
+offset_left = 107.5
+offset_top = -4.54545
+offset_right = 147.5
+offset_bottom = 36.4545
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]0"
+scroll_active = false
+
+[node name="Road_DevCard" type="Button" parent="UILayer/Road_DevCard"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="VP_DevCard" type="TextureRect" parent="UILayer"]
+visible = false
+offset_left = 568.0
+offset_top = 467.0
+offset_right = 708.0
+offset_bottom = 657.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("60_vos2g")
+
+[node name="Amount" type="RichTextLabel" parent="UILayer/VP_DevCard"]
+layout_mode = 0
+offset_left = 107.5
+offset_top = -4.54545
+offset_right = 147.5
+offset_bottom = 36.4545
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]0"
+scroll_active = false
+
+[node name="VP_DevCard" type="Button" parent="UILayer/VP_DevCard"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_right = 140.0
+offset_bottom = 189.0
+
 [connection signal="timeout" from="MapLayer/Player1_Settlement_Timer" to="." method="_on_player_1_settlement_timer_timeout"]
 [connection signal="pressed" from="UILayer/Roll_Dice" to="." method="_on_roll_dice_pressed"]
 [connection signal="pressed" from="UILayer/Buy_Development_Card_Background/Buy_Development_Card_Button" to="." method="_on_buy_development_card_button_pressed"]
@@ -1255,3 +1411,4 @@ color = Color(0.14902, 0.14902, 0.14902, 0.678431)
 [connection signal="pressed" from="UILayer/Build_Road_Btn_Background/Button_DEBUG" to="." method="_on_build_road_button_pressed"]
 [connection signal="pressed" from="UILayer/Build_Settlement_Btn_Background/Build_Settlement_Button" to="." method="_on_build_settlement_button_pressed"]
 [connection signal="pressed" from="UILayer/Build_City_Btn_Background/Build_City_Button" to="." method="_on_build_city_button_pressed"]
+[connection signal="pressed" from="UILayer/Invention_DevCard/Invention_DevCard" to="." method="_on_invention_dev_card_pressed"]

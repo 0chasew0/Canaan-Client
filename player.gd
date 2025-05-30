@@ -19,6 +19,13 @@ var resources = {
 	"Wheat": 0,
 	"Stone": 0
 }
+var dev_cards = {
+	"Invention_DevCard": 0,
+	"Knight_DevCard": 0,
+	"Monopoly_DevCard": 0,
+	"Road_DevCard": 0,
+	"VP_DevCard": 0
+}
 var total_resources = 0
 var last_vertex_selected = null
 var last_node_selected = null
@@ -27,3 +34,4 @@ var longest_road = 0
 
 # UI
 var PLAYER_RESOURCE_BAR_POSITIONS = [null, null, null, null, null]
+var PLAYER_RESOURCE_BAR_POSITIONS_DEVCARDS = [null, null, null, null, null]

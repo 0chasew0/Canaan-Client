@@ -156,6 +156,8 @@ func main_game_loop(tile_positions, standard_map):
 				
 				DEBUG_assert_resources_are_in_sync()
 				
+				await activate_development_card_btns()
+				
 				# When player is done with turn
 				await roll_dice_btn.pressed
 				#await $UILayer/End_Turn_Btn_Background/End_Turn_Button.pressed
@@ -216,33 +218,37 @@ func initialize_robber(map_data, tile_positions):
 	return
 
 func initialize_development_cards():
-	var num_of_each_development_card = {
-		"Knight": 14,
-		"Monopoly": 2,
-		"Road": 2,
-		"Invention": 2,
-		"VP": 5
-	}
+	#var num_of_each_development_card = {
+		#"Knight": 14,
+		#"Monopoly": 2,
+		#"Road": 2,
+		#"Invention": 2,
+		#"VP": 5
+	#}
+	#
+	#var dev_card_to_index_mapping = {
+		#0: "Knight",
+		#1: "Monopoly",
+		#2: "Road",
+		#3: "Invention",
+		#4: "VP"
+	#}
+	#for i in range(25):
+		#var rand_dev_card_name
+		#while true:
+			#rand_dev_card_name = dev_card_to_index_mapping[randi_range(0, 4)]
+			#var rand_dev_card_amt = num_of_each_development_card[rand_dev_card_name]
+			#if rand_dev_card_amt == 0:
+				#continue
+			#else:
+				#num_of_each_development_card[rand_dev_card_name] -= 1
+				#break
+		#DEVELOPMENT_CARDS.append(rand_dev_card_name)
+	#DEVELOPMENT_CARDS.shuffle()
 	
-	var dev_card_to_index_mapping = {
-		0: "Knight",
-		1: "Monopoly",
-		2: "Road",
-		3: "Invention",
-		4: "VP"
-	}
-	for i in range(25):
-		var rand_dev_card_name
-		while true:
-			rand_dev_card_name = dev_card_to_index_mapping[randi_range(0, 4)]
-			var rand_dev_card_amt = num_of_each_development_card[rand_dev_card_name]
-			if rand_dev_card_amt == 0:
-				continue
-			else:
-				num_of_each_development_card[rand_dev_card_name] -= 1
-				break
-		DEVELOPMENT_CARDS.append(rand_dev_card_name)
-	DEVELOPMENT_CARDS.shuffle()
+	# TESTING!
+	DEVELOPMENT_CARDS.resize(19)
+	DEVELOPMENT_CARDS.fill("Invention")
 
 # A client will only roll once
 func roll_for_who_goes_first():
@@ -635,6 +641,11 @@ func ui_choose_who_to_rob(player):
 	
 	emit_signal("done_picking")
 
+func activate_development_card_btns():
+	for node in get_node("UILayer/Resource Bar").get_children():
+		if node.name.contains("DevCard"):
+			node.get_children()[1].show()
+
 func ui_disable_all_buttons():
 	$UILayer/Build_City_Btn_Background/Build_City_Button.disabled = true
 	$UILayer/Build_City_Btn_Background/Disabled_Mask.visible = true
@@ -1019,9 +1030,181 @@ func bot_build_road(player):
 	return true
 	emit_signal("selection_finished")
 
+func ui_remove_from_resource_bar_dev_card(dev_card_name):
+	
+	var UI_OFFSET_MAPPING = {
+		1: 851,
+		2: 791,
+		3: 731,
+		4: 671,
+		5: 611
+	}
+	
+	print("player used dev card: ", dev_card_name)
+	var num_of_dev_card = CLIENT.dev_cards[dev_card_name]
+
+	if num_of_dev_card == 0: # Remove resource from bar completely
+		#var resource_offset = null
+		var index_of_element_to_remove = null
+		get_node("UILayer/Resource Bar/%s/" % dev_card_name).queue_free()
+		# Shift over all other elements if necessary
+		for i in range(len(CLIENT.PLAYER_RESOURCE_BAR_POSITIONS_DEVCARDS)):
+			if CLIENT.PLAYER_RESOURCE_BAR_POSITIONS_DEVCARDS[i] == dev_card_name:
+				#resource_offset = UI_OFFSET_MAPPING[CLIENT.PLAYER_RESOURCE_BAR_POSITIONS_DEVCARDS[i]]
+				index_of_element_to_remove = i
+		# Reconstruct bar positions array, recalculate positions
+		CLIENT.PLAYER_RESOURCE_BAR_POSITIONS_DEVCARDS = CLIENT.PLAYER_RESOURCE_BAR_POSITIONS_DEVCARDS.slice(0, index_of_element_to_remove) + CLIENT.PLAYER_RESOURCE_BAR_POSITIONS_DEVCARDS.slice(index_of_element_to_remove + 1, len(CLIENT.PLAYER_RESOURCE_BAR_POSITIONS_DEVCARDS)+1)
+		CLIENT.PLAYER_RESOURCE_BAR_POSITIONS_DEVCARDS.append(null)
+		
+		#print(CLIENT.PLAYER_RESOURCE_BAR_POSITIONS)
+		
+		for i in range(len(CLIENT.PLAYER_RESOURCE_BAR_POSITIONS_DEVCARDS)):
+			if CLIENT.PLAYER_RESOURCE_BAR_POSITIONS_DEVCARDS[i] == null:
+				continue
+
+			var curr_resource_node = get_node("UILayer/Resource Bar/%s/" % dev_card_name)
+			var UI_offset = UI_OFFSET_MAPPING[i+1]
+			curr_resource_node.position = Vector2(6.5 + UI_offset, 9.3)
+			
+	else: # Reduce number of resource in bar
+		for i in range(len(CLIENT.PLAYER_RESOURCE_BAR_POSITIONS_DEVCARDS)):
+			if CLIENT.PLAYER_RESOURCE_BAR_POSITIONS_DEVCARDS[i] == dev_card_name:
+				get_node("UILayer/Resource Bar/%s/Amount" % dev_card_name).text = "[font_size=30][center][b]%s" % CLIENT.dev_cards[dev_card_name]
+				return
+
+func ui_add_to_resource_bar_dev_card(dev_card_name):
+	var dev_card_node
+	match dev_card_name:
+		"Invention_DevCard":
+			dev_card_node = get_node("UILayer/Invention_DevCard").duplicate(1)
+		"Knight_DevCard":
+			dev_card_node = get_node("UILayer/Knight_DevCard").duplicate(1)
+		"Monopoly_DevCard":
+			dev_card_node = get_node("UILayer/Monopoly_DevCard").duplicate(1)
+		"Road_DevCard":
+			dev_card_node = get_node("UILayer/Road_DevCard").duplicate(1)
+		"VP_DevCard":
+			dev_card_node = get_node("UILayer/VP_DevCard").duplicate(1)
+		_:
+			print("Dev Card not found!")
+			return
+	
+	var UI_OFFSET_MAPPING = {
+		1: 851,
+		2: 791,
+		3: 731,
+		4: 671,
+		5: 611
+	}
+	
+	# Check to see if this resource is already on the resource bar first
+	for i in range(len(CLIENT.PLAYER_RESOURCE_BAR_POSITIONS_DEVCARDS)):
+		if CLIENT.PLAYER_RESOURCE_BAR_POSITIONS_DEVCARDS[i] == dev_card_name:
+			get_node("UILayer/Resource Bar/%s/Amount" % dev_card_name).text = "[font_size=30][center][b]%s" % CLIENT.dev_cards[dev_card_name]
+			return
+			
+	# If not, we need to add it to the bar
+	for i in range(len(CLIENT.PLAYER_RESOURCE_BAR_POSITIONS_DEVCARDS)):
+		if CLIENT.PLAYER_RESOURCE_BAR_POSITIONS_DEVCARDS[i] == null:
+			CLIENT.PLAYER_RESOURCE_BAR_POSITIONS_DEVCARDS[i] = dev_card_name # This says "Tree" is in this position on the resource bar
+			var copied_ui_resource = dev_card_node
+			$"UILayer/Resource Bar".add_child(copied_ui_resource, true)
+			var UI_offset = UI_OFFSET_MAPPING[i+1]
+			copied_ui_resource.position = Vector2(-6.5 + UI_offset, 9.3)
+			copied_ui_resource.z_index = 1
+			copied_ui_resource.get_children()[0].text = "[font_size=30][center][b]%s" % CLIENT.dev_cards[dev_card_name]
+			copied_ui_resource.show()
+			return
+
 func _on_buy_development_card_button_pressed() -> void:
 	print("development card button pressed")
 	
+	var dev_card_name = DEVELOPMENT_CARDS.pop_at(0)
+	
+	dev_card_name = dev_card_name + "_DevCard"
+	
+	print("client got dev card: ", dev_card_name)
+	
+	CLIENT.dev_cards[dev_card_name] += 1
+	
+	CLIENT.resources["Stone"] -= 1
+	CLIENT.total_resources -= 1
+	ui_remove_from_resource_bar("Stone")
+	ui_add_resource_to_supply("Stone")
+	
+	CLIENT.resources["Sheep"] -= 1
+	CLIENT.total_resources -= 1
+	ui_remove_from_resource_bar("Sheep")
+	ui_add_resource_to_supply("Sheep")
+	
+	CLIENT.resources["Wheat"] -= 1
+	CLIENT.total_resources -= 1
+	ui_remove_from_resource_bar("Wheat")
+	ui_add_resource_to_supply("Wheat")
+	
+	activate_or_deactivate_ui_buttons()
+	
+	# Match name to UI element, place on resource bar
+	ui_add_to_resource_bar_dev_card(dev_card_name)
+
+func _on_invention_dev_card_pressed() -> void:
+	# Take any two resources from the supply -- have user just click on the supply?
+	
+	var dev_card_name = "Invention_DevCard"
+	
+	CLIENT.dev_cards[dev_card_name] -= 1
+	
+	$UILayer/Supply/Invention_DevCard_Text.show()
+	
+	var UI_offsets = {
+		1: 4,
+		2: 61,
+		3: 119,
+		4: 178,
+		5: 237
+	}
+	
+	var supply_resources_in_order = {
+		1: "Brick",
+		2: "Sheep",
+		3: "Stone",
+		4: "Tree",
+		5: "Wheat"
+	}
+	
+	for i in range(5):
+		var copied_ui_resource = $"UILayer/Supply/Select_Resource_From_Supply_Btn".duplicate()
+		$"UILayer/Supply".add_child(copied_ui_resource, true)
+		copied_ui_resource.position = Vector2(UI_offsets[i+1], 27)
+		copied_ui_resource.z_index = 1
+		copied_ui_resource.show()
+		
+		copied_ui_resource.pressed.connect(resource_from_supply_chosen.bind(supply_resources_in_order[i+1]))
+	
+	# The player gets two resources of any type of their choice
+	await done_picking
+	await done_picking
+	
+	# Remove the buttons
+	# Cleanup / Remove UI elements
+	var i = 2
+	for node in get_node("UILayer/Supply").get_children():
+		if node.name == ("Select_Resource_From_Supply_Btn%s" % str(i)):
+			i+=1
+			$"UILayer/Supply".remove_child(node)
+			node.queue_free()
+	
+	$UILayer/Supply/Invention_DevCard_Text.hide()
+	ui_remove_from_resource_bar_dev_card("Invention_DevCard")
+	
+func resource_from_supply_chosen(resource_name):
+	CLIENT.resources[resource_name] += 1
+	CLIENT.total_resources += 1
+	
+	ui_add_to_resource_bar(resource_name)
+	ui_remove_resource_from_supply(resource_name)
+	
+	emit_signal("done_picking")
 
 # Should only be allowed to be pressed if correct resources have been met, see activate_or_deactive_ui_buttons()
 func _on_build_road_button_pressed() -> void:
@@ -1445,7 +1628,7 @@ func generate_initial_resources(map_data, tile_positions, tile_positions_local):
 					p.total_resources += 1
 	
 	emit_signal("end_turn")
-	
+
 func ui_add_to_resource_bar(resource):
 	# Add UI elements depending on what resource it is, and if it already exists in the resource bar
 	
