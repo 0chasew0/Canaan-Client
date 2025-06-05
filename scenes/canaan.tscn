@@ -774,6 +774,36 @@ offset_bottom = 671.0
 bbcode_enabled = true
 text = "[font_size=26][center]Invention! Select any two resources from the supply."
 
+[node name="Knight_DevCard_Text" type="RichTextLabel" parent="UILayer/Supply"]
+visible = false
+layout_mode = 0
+offset_left = -1546.0
+offset_top = 631.0
+offset_right = -639.0
+offset_bottom = 671.0
+bbcode_enabled = true
+text = "[font_size=26][center]Knight! Choose a new location for the robber."
+
+[node name="Road_DevCard_Text" type="RichTextLabel" parent="UILayer/Supply"]
+visible = false
+layout_mode = 0
+offset_left = -1546.0
+offset_top = 631.0
+offset_right = -639.0
+offset_bottom = 671.0
+bbcode_enabled = true
+text = "[font_size=26][center]Road building! Build two roads for free."
+
+[node name="Monopoly_DevCard_Text" type="RichTextLabel" parent="UILayer/Supply"]
+visible = false
+layout_mode = 0
+offset_left = -1546.0
+offset_top = 631.0
+offset_right = -603.0
+offset_bottom = 671.0
+bbcode_enabled = true
+text = "[font_size=26][center]Monopoly! Select a resource, then all players give you all of that resource."
+
 [node name="Player1Background" type="ColorRect" parent="UILayer"]
 offset_left = 1547.0
 offset_top = 435.0
@@ -1321,6 +1351,7 @@ text = "[font_size=30][center][b]0"
 scroll_active = false
 
 [node name="Knight_DevCard" type="Button" parent="UILayer/Knight_DevCard"]
+visible = false
 modulate = Color(1, 1, 1, 0.592157)
 layout_mode = 0
 offset_right = 140.0
@@ -1347,6 +1378,7 @@ text = "[font_size=30][center][b]0"
 scroll_active = false
 
 [node name="Monopoly_DevCard" type="Button" parent="UILayer/Monopoly_DevCard"]
+visible = false
 modulate = Color(1, 1, 1, 0.592157)
 layout_mode = 0
 offset_right = 140.0
@@ -1373,6 +1405,7 @@ text = "[font_size=30][center][b]0"
 scroll_active = false
 
 [node name="Road_DevCard" type="Button" parent="UILayer/Road_DevCard"]
+visible = false
 modulate = Color(1, 1, 1, 0.592157)
 layout_mode = 0
 offset_right = 140.0
@@ -1398,12 +1431,6 @@ bbcode_enabled = true
 text = "[font_size=30][center][b]0"
 scroll_active = false
 
-[node name="VP_DevCard" type="Button" parent="UILayer/VP_DevCard"]
-modulate = Color(1, 1, 1, 0.592157)
-layout_mode = 0
-offset_right = 140.0
-offset_bottom = 189.0
-
 [connection signal="timeout" from="MapLayer/Player1_Settlement_Timer" to="." method="_on_player_1_settlement_timer_timeout"]
 [connection signal="pressed" from="UILayer/Roll_Dice" to="." method="_on_roll_dice_pressed"]
 [connection signal="pressed" from="UILayer/Buy_Development_Card_Background/Buy_Development_Card_Button" to="." method="_on_buy_development_card_button_pressed"]
@@ -1412,3 +1439,6 @@ offset_bottom = 189.0
 [connection signal="pressed" from="UILayer/Build_Settlement_Btn_Background/Build_Settlement_Button" to="." method="_on_build_settlement_button_pressed"]
 [connection signal="pressed" from="UILayer/Build_City_Btn_Background/Build_City_Button" to="." method="_on_build_city_button_pressed"]
 [connection signal="pressed" from="UILayer/Invention_DevCard/Invention_DevCard" to="." method="_on_invention_dev_card_pressed"]
+[connection signal="pressed" from="UILayer/Knight_DevCard/Knight_DevCard" to="." method="_on_knight_dev_card_pressed"]
+[connection signal="pressed" from="UILayer/Monopoly_DevCard/Monopoly_DevCard" to="." method="_on_monopoly_dev_card_pressed"]
+[connection signal="pressed" from="UILayer/Road_DevCard/Road_DevCard" to="." method="_on_road_dev_card_pressed"]

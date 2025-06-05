@@ -12,6 +12,7 @@ var vp = 0
 var settlements = []
 var cities = []
 var roads = []
+var harbors = [] # 3:1, Sheep, Wheat .. etc.
 var resources = {
 	"Tree": 0,
 	"Sheep": 0,
@@ -31,6 +32,7 @@ var last_vertex_selected = null
 var last_node_selected = null
 var knights_played = 0
 var longest_road = 0
+var dev_card_played_this_turn = false
 
 # UI
 var PLAYER_RESOURCE_BAR_POSITIONS = [null, null, null, null, null]
