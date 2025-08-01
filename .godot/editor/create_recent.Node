@@ -1,7 +1,7 @@
+ColorRect
 Button
 RichTextLabel
 TextureRect
-ColorRect
 TextureButton
 Timer
 TileMapLayer

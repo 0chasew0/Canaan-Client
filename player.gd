@@ -33,6 +33,9 @@ var last_node_selected = null
 var knights_played = 0
 var longest_road = 0
 var dev_card_played_this_turn = false
+var chosen_resources_trade = [] # Should only be used when the trade popup is active
+var chosen_resources_bank_trade = []
+var chosen_resources_player_trade = []
 
 # UI
 var PLAYER_RESOURCE_BAR_POSITIONS = [null, null, null, null, null]

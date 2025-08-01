@@ -631,7 +631,7 @@ offset_right = 239.0
 offset_bottom = 27.0
 theme_override_colors/default_color = Color(0, 0, 0, 1)
 bbcode_enabled = true
-text = "[font_size=18][center][b]Supply"
+text = "[font_size=18][center][b]Bank"
 scroll_active = false
 
 [node name="Brick" type="TextureRect" parent="UILayer/Supply"]
@@ -1139,7 +1139,7 @@ offset_right = 1010.0
 offset_bottom = 1073.0
 color = Color(0.701593, 0.804474, 0.664316, 1)
 
-[node name="Trade_Button" type="TextureButton" parent="UILayer/Bank_Trade_Btn_Background"]
+[node name="Bank_Trade_Button" type="TextureButton" parent="UILayer/Bank_Trade_Btn_Background"]
 layout_mode = 0
 offset_left = 14.0
 offset_top = 11.0
@@ -1161,7 +1161,7 @@ offset_right = 1112.0
 offset_bottom = 1073.0
 color = Color(0.701593, 0.804474, 0.664316, 1)
 
-[node name="Trade_Button" type="TextureButton" parent="UILayer/Player_Trade_Btn_Background"]
+[node name="Player_Trade_Button" type="TextureButton" parent="UILayer/Player_Trade_Btn_Background"]
 layout_mode = 0
 offset_left = 14.0
 offset_top = 11.0
@@ -1431,8 +1431,368 @@ bbcode_enabled = true
 text = "[font_size=30][center][b]0"
 scroll_active = false
 
+[node name="Bank_Trade_Popup" type="ColorRect" parent="UILayer"]
+visible = false
+offset_left = 1.0
+offset_top = 694.0
+offset_right = 908.0
+offset_bottom = 978.0
+color = Color(0.701961, 0.803922, 0.662745, 1)
+
+[node name="Dynamic_Player_Area" type="ColorRect" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_right = 437.0
+offset_bottom = 142.0
+color = Color(0.701961, 0.803922, 0.662745, 1)
+
+[node name="Dynamic_Bank_Area" type="ColorRect" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 454.0
+offset_right = 907.0
+offset_bottom = 142.0
+color = Color(0.701961, 0.803922, 0.662745, 1)
+
+[node name="Brick_Player" type="TextureRect" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 27.0
+offset_top = 193.0
+offset_right = 167.0
+offset_bottom = 383.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("36_vhk21")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Bank_Trade_Popup/Brick_Player"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Brick_Player_Btn" type="Button" parent="UILayer/Bank_Trade_Popup/Brick_Player"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_top = 5.81741e-05
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Sheep_Player" type="TextureRect" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 84.0
+offset_top = 193.0
+offset_right = 224.0
+offset_bottom = 383.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("37_doxtf")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Bank_Trade_Popup/Sheep_Player"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Sheep_Player_Btn" type="Button" parent="UILayer/Bank_Trade_Popup/Sheep_Player"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_top = 5.81741e-05
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Stone_Player" type="TextureRect" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 142.0
+offset_top = 193.0
+offset_right = 282.0
+offset_bottom = 383.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("38_ai2yn")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Bank_Trade_Popup/Stone_Player"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Stone_Player_Btn" type="Button" parent="UILayer/Bank_Trade_Popup/Stone_Player"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_top = 5.81741e-05
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Tree_Player" type="TextureRect" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 201.0
+offset_top = 193.0
+offset_right = 341.0
+offset_bottom = 383.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("39_6qd3u")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Bank_Trade_Popup/Tree_Player"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Tree_Player_Btn" type="Button" parent="UILayer/Bank_Trade_Popup/Tree_Player"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_top = 5.81741e-05
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Wheat_Player" type="TextureRect" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 260.0
+offset_top = 193.0
+offset_right = 400.0
+offset_bottom = 383.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("40_65qm3")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Bank_Trade_Popup/Wheat_Player"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Wheat_Player_Btn" type="Button" parent="UILayer/Bank_Trade_Popup/Wheat_Player"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_top = 5.81741e-05
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Brick_Bank" type="TextureRect" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 585.0
+offset_top = 193.0
+offset_right = 725.0
+offset_bottom = 383.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("36_vhk21")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Bank_Trade_Popup/Brick_Bank"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Brick_Bank_Btn" type="Button" parent="UILayer/Bank_Trade_Popup/Brick_Bank"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_top = 5.81741e-05
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Sheep_Bank" type="TextureRect" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 642.0
+offset_top = 193.0
+offset_right = 782.0
+offset_bottom = 383.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("37_doxtf")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Bank_Trade_Popup/Sheep_Bank"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Sheep_Bank_Btn" type="Button" parent="UILayer/Bank_Trade_Popup/Sheep_Bank"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_top = 5.81741e-05
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Tree_Bank" type="TextureRect" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 759.0
+offset_top = 193.0
+offset_right = 899.0
+offset_bottom = 383.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("39_6qd3u")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Bank_Trade_Popup/Tree_Bank"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Tree_Bank_Btn" type="Button" parent="UILayer/Bank_Trade_Popup/Tree_Bank"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_top = 5.81741e-05
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Stone_Bank" type="TextureRect" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 700.0
+offset_top = 193.0
+offset_right = 840.0
+offset_bottom = 383.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("38_ai2yn")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Bank_Trade_Popup/Stone_Bank"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Stone_Bank_Btn" type="Button" parent="UILayer/Bank_Trade_Popup/Stone_Bank"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_top = 5.81741e-05
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Wheat_Bank" type="TextureRect" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 818.0
+offset_top = 193.0
+offset_right = 958.0
+offset_bottom = 383.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("40_65qm3")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Bank_Trade_Popup/Wheat_Bank"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Wheat_Bank_Btn" type="Button" parent="UILayer/Bank_Trade_Popup/Wheat_Bank"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_top = 5.81741e-05
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Divider1" type="ColorRect" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 907.0
+offset_top = 142.0
+offset_right = 920.0
+offset_bottom = 1050.0
+rotation = 1.5708
+color = Color(1, 0.776471, 0.27451, 1)
+
+[node name="Divider2" type="ColorRect" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 437.0
+offset_right = 454.0
+offset_bottom = 151.0
+color = Color(1, 0.776471, 0.27451, 1)
+
+[node name="Divider3" type="ColorRect" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 913.0
+offset_top = 101.0
+offset_right = 1015.0
+offset_bottom = 198.0
+color = Color(0.701961, 0.803922, 0.662745, 1)
+
+[node name="Finish_Trade_Btn" type="TextureButton" parent="UILayer/Bank_Trade_Popup/Divider3"]
+z_index = 1
+layout_mode = 0
+offset_left = 14.0
+offset_top = 19.0
+offset_right = 88.0
+offset_bottom = 88.0
+texture_normal = ExtResource("45_kovk3")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Tip2" type="RichTextLabel" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 328.0
+offset_top = 214.0
+offset_right = 572.0
+offset_bottom = 267.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Select resources for trading to/from the Bank"
+scroll_active = false
+
+[node name="Tip3" type="RichTextLabel" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 610.0
+offset_top = 162.0
+offset_right = 854.0
+offset_bottom = 189.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Bank's resources"
+scroll_active = false
+
+[node name="Tip" type="RichTextLabel" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 56.0
+offset_top = 162.0
+offset_right = 300.0
+offset_bottom = 189.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Your resources"
+scroll_active = false
+
 [connection signal="timeout" from="MapLayer/Player1_Settlement_Timer" to="." method="_on_player_1_settlement_timer_timeout"]
 [connection signal="pressed" from="UILayer/Roll_Dice" to="." method="_on_roll_dice_pressed"]
+[connection signal="pressed" from="UILayer/Bank_Trade_Btn_Background/Bank_Trade_Button" to="." method="_on_bank_trade_button_pressed"]
 [connection signal="pressed" from="UILayer/Buy_Development_Card_Background/Buy_Development_Card_Button" to="." method="_on_buy_development_card_button_pressed"]
 [connection signal="pressed" from="UILayer/Build_Road_Btn_Background/Build_Road_Button" to="." method="_on_build_road_button_pressed"]
 [connection signal="pressed" from="UILayer/Build_Road_Btn_Background/Button_DEBUG" to="." method="_on_build_road_button_pressed"]
@@ -1442,3 +1802,4 @@ scroll_active = false
 [connection signal="pressed" from="UILayer/Knight_DevCard/Knight_DevCard" to="." method="_on_knight_dev_card_pressed"]
 [connection signal="pressed" from="UILayer/Monopoly_DevCard/Monopoly_DevCard" to="." method="_on_monopoly_dev_card_pressed"]
 [connection signal="pressed" from="UILayer/Road_DevCard/Road_DevCard" to="." method="_on_road_dev_card_pressed"]
+[connection signal="pressed" from="UILayer/Bank_Trade_Popup/Brick_Player/Brick_Player_Btn" to="." method="_on_BANK_TRADE_brick_player_btn_pressed"]
