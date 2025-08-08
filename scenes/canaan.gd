@@ -317,7 +317,9 @@ func _on_bank_trade_button_pressed() -> void:
 		for node in $UILayer/Bank_Trade_Popup/Dynamic_Bank_Area.get_children():
 			$UILayer/Bank_Trade_Popup/Dynamic_Bank_Area.remove_child(node)
 			node.queue_free()
-			
+		
+		$UILayer/Bank_Trade_Popup/Divider4/Invalid_Trade_Text.hide()
+		
 		activate_or_deactivate_ui_buttons()
 	else: # Cleanup: Use some loops here
 		ui_disable_all_buttons(["Bank_Trade_Button"])
@@ -357,7 +359,7 @@ func _on_bank_trade_button_pressed() -> void:
 		$UILayer/Bank_Trade_Popup/Stone_Bank/Stone_Bank_Btn.visible = false if NUM_SUPPLY_STONE == 0 else true
 		$UILayer/Bank_Trade_Popup/Wheat_Bank/Wheat_Bank_Btn.visible = false if NUM_SUPPLY_WHEAT == 0 else true
 		$UILayer/Bank_Trade_Popup/Tree_Bank/Tree_Bank_Btn.visible = false if NUM_SUPPLY_TREE == 0 else true
-		
+
 
 func _on_BANK_TRADE_stone_player_btn_pressed() -> void:
 	await bank_trade_add_resource_to_player_area("Stone")
@@ -513,14 +515,76 @@ func check_if_valid_bank_trade() -> bool:
 	# Check that correct resources have been made for trade, taking into account bank supply numbers
 	# Check for harbors/valid 3:1 or 2:1 trades
 	
-	#CLIENT.chosen_resources_trade
-	#CLIENT.chosen_resources_bank_trade
-	#CLIENT.harbors
-	
-	
 	if len(CLIENT.chosen_resources_trade) >= 2 and len(CLIENT.chosen_resources_bank_trade) >= 1:
 		if len(CLIENT.harbors) > 0: # If they have harbors, take them into consideration when trading
-			pass
+			if "3:1" in CLIENT.harbors and len(CLIENT.chosen_resources_trade) >= 3:
+				var player_resource = CLIENT.chosen_resources_trade[0]
+				var loop_range = 3
+				if player_resource in CLIENT.harbors: # This handles the case where the player has a 3:1 but also a 2:1 AND selected that resource to trade
+					loop_range = 2
+				for i in range(0, len(CLIENT.chosen_resources_trade), loop_range):
+					if len(CLIENT.chosen_resources_bank_trade) >= 1:
+						var left_trade = CLIENT.chosen_resources_trade.slice(i, i+loop_range)
+						var right_trade = CLIENT.chosen_resources_bank_trade.pop_at(0)
+						
+						print("left trade: ", CLIENT.chosen_resources_trade, " right trade: ", CLIENT.chosen_resources_bank_trade)
+						
+						for j in range(0, loop_range):
+							CLIENT.resources[left_trade[0]] -= 1
+							CLIENT.total_resources -= 1
+							ui_remove_from_resource_bar(left_trade[0])
+							ui_add_resource_to_supply(left_trade[0])
+						
+						CLIENT.resources[right_trade] += 1
+						CLIENT.total_resources += 1
+						ui_add_to_resource_bar(right_trade)
+						ui_remove_resource_from_supply(right_trade)
+				return true
+			else: # 2:1, matching based on resource
+				var player_resource = CLIENT.chosen_resources_trade[0]
+				if player_resource in CLIENT.harbors:
+					for i in range(0, len(CLIENT.chosen_resources_trade), 2):
+						if len(CLIENT.chosen_resources_bank_trade) >= 1:
+							var left_trade = CLIENT.chosen_resources_trade.slice(i, i+2)
+							var right_trade = CLIENT.chosen_resources_bank_trade.pop_at(0)
+							
+							print("left trade: ", CLIENT.chosen_resources_trade, " right trade: ", CLIENT.chosen_resources_bank_trade)
+							
+							for j in range(0, 2):
+								CLIENT.resources[left_trade[0]] -= 1
+								CLIENT.total_resources -= 1
+								ui_remove_from_resource_bar(left_trade[0])
+								ui_add_resource_to_supply(left_trade[0])
+							
+							CLIENT.resources[right_trade] += 1
+							CLIENT.total_resources += 1
+							ui_add_to_resource_bar(right_trade)
+							ui_remove_resource_from_supply(right_trade)
+					return true
+				elif len(CLIENT.chosen_resources_trade) >= 4: # 4:1, 8:2, etc.
+					for i in range(0, len(CLIENT.chosen_resources_trade), 4):
+						if len(CLIENT.chosen_resources_bank_trade) >= 1:
+							var left_trade = CLIENT.chosen_resources_trade.slice(i, i+4)
+							var right_trade = CLIENT.chosen_resources_bank_trade.pop_at(0)
+							
+							print("left trade: ", CLIENT.chosen_resources_trade, " right trade: ", CLIENT.chosen_resources_bank_trade)
+							
+							for j in range(0, 4):
+								CLIENT.resources[left_trade[0]] -= 1
+								CLIENT.total_resources -= 1
+								ui_remove_from_resource_bar(left_trade[0])
+								ui_add_resource_to_supply(left_trade[0])
+
+							
+							CLIENT.resources[right_trade] += 1
+							CLIENT.total_resources += 1
+							ui_add_to_resource_bar(right_trade)
+							ui_remove_resource_from_supply(right_trade)
+							
+					return true
+				else:
+					return false
+			
 		elif len(CLIENT.chosen_resources_trade) >= 4: # 4:1, 8:2, etc.
 			for i in range(0, len(CLIENT.chosen_resources_trade), 4):
 				if len(CLIENT.chosen_resources_bank_trade) >= 1:
@@ -529,30 +593,18 @@ func check_if_valid_bank_trade() -> bool:
 					
 					print("left trade: ", CLIENT.chosen_resources_trade, " right trade: ", CLIENT.chosen_resources_bank_trade)
 					
-					CLIENT.resources[left_trade[0]] -= 1
-					CLIENT.total_resources -= 1
-					ui_remove_from_resource_bar(left_trade[0])
-					ui_add_resource_to_supply(left_trade[0])
-					CLIENT.resources[left_trade[0]] -= 1
-					CLIENT.total_resources -= 1
-					ui_remove_from_resource_bar(left_trade[0])
-					ui_add_resource_to_supply(left_trade[0])
-					CLIENT.resources[left_trade[0]] -= 1
-					CLIENT.total_resources -= 1
-					ui_remove_from_resource_bar(left_trade[0])
-					ui_add_resource_to_supply(left_trade[0])
-					CLIENT.resources[left_trade[0]] -= 1
-					CLIENT.total_resources -= 1
-					ui_remove_from_resource_bar(left_trade[0])
-					ui_add_resource_to_supply(left_trade[0])
+					for j in range(0, 4):
+						CLIENT.resources[left_trade[0]] -= 1
+						CLIENT.total_resources -= 1
+						ui_remove_from_resource_bar(left_trade[0])
+						ui_add_resource_to_supply(left_trade[0])
+
 					
 					CLIENT.resources[right_trade] += 1
 					CLIENT.total_resources += 1
 					ui_add_to_resource_bar(right_trade)
 					ui_remove_resource_from_supply(right_trade)
 					
-				else:
-					break
 			return true
 				
 		else:
@@ -954,17 +1006,17 @@ func ui_disable_all_buttons(exclude=[]): # Optionally, provide a list of buttons
 # Call this anytime after a player modifies their resources in any way (dice roll, dev card, trading, etc.)
 func activate_or_deactivate_ui_buttons():
 	# Road
-	var build_road_button_state = false if CLIENT.resources["Brick"] >= 1 and CLIENT.resources["Tree"] >= 1 else true
+	var build_road_button_state = false if CLIENT.resources["Brick"] >= 1 and CLIENT.resources["Tree"] >= 1 and len(CLIENT.roads) <= 15 else true
 	$UILayer/Build_Road_Btn_Background/Build_Road_Button.disabled = build_road_button_state
 	$UILayer/Build_Road_Btn_Background/Disabled_Mask.visible = build_road_button_state
 	
 	# Settlement
-	var build_settlement_button_state = false if CLIENT.resources["Brick"] >= 1 and CLIENT.resources["Tree"] >= 1 and CLIENT.resources["Wheat"] >= 1 and CLIENT.resources["Sheep"] >= 1 else true
+	var build_settlement_button_state = false if CLIENT.resources["Brick"] >= 1 and CLIENT.resources["Tree"] >= 1 and CLIENT.resources["Wheat"] >= 1 and CLIENT.resources["Sheep"] >= 1 and len(CLIENT.settlements) <= 5 else true
 	$UILayer/Build_Settlement_Btn_Background/Build_Settlement_Button.disabled = build_settlement_button_state
 	$UILayer/Build_Settlement_Btn_Background/Disabled_Mask.visible = build_settlement_button_state
 	
 	# City
-	var build_city_button_state = false if CLIENT.resources["Wheat"] >= 2 and CLIENT.resources["Stone"] >= 3 else true
+	var build_city_button_state = false if CLIENT.resources["Wheat"] >= 2 and CLIENT.resources["Stone"] >= 3 and len(CLIENT.cities) <= 4 else true
 	$UILayer/Build_City_Btn_Background/Build_City_Button.disabled = build_city_button_state
 	$UILayer/Build_City_Btn_Background/Disabled_Mask.visible = build_city_button_state
 	
@@ -1129,17 +1181,17 @@ func bot_decision_loop(player):
 				continue
 		
 		# City
-		if player.resources["Wheat"] >= 2 and player.resources["Stone"] >= 3:
+		if player.resources["Wheat"] >= 2 and player.resources["Stone"] >= 3 and len(player.cities) <= 4:
 			if bot_build_city(player):
 				continue
 			
 		# Settlement
-		if player.resources["Brick"] >= 1 and player.resources["Tree"] >= 1 and player.resources["Wheat"] >= 1 and player.resources["Sheep"] >= 1:
+		if player.resources["Brick"] >= 1 and player.resources["Tree"] >= 1 and player.resources["Wheat"] >= 1 and player.resources["Sheep"] >= 1 and len(player.settlements) <= 5:
 			if bot_build_settlement(player):
 				continue
 			
 		# Road
-		if player.resources["Tree"] >= 1 and player.resources["Brick"] >= 1:
+		if player.resources["Tree"] >= 1 and player.resources["Brick"] >= 1 and len(player.roads) <= 15:
 			if bot_build_road(player, false):
 				continue
 			

@@ -9,9 +9,9 @@ var id # Player Num
 var dice_roll_result
 var turn_num
 var vp = 0
-var settlements = []
-var cities = []
-var roads = []
+var settlements = [] # Max 5
+var cities = [] # Max 4
+var roads = [] # Max 15
 var harbors = [] # 3:1, Sheep, Wheat .. etc.
 var resources = {
 	"Tree": 0,
