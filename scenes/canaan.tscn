@@ -1,4 +1,4 @@
-[gd_scene load_steps=92 format=4 uid="uid://jivbdwftiitr"]
+[gd_scene load_steps=94 format=4 uid="uid://jivbdwftiitr"]
 
 [ext_resource type="Script" uid="uid://bw23uon3cp087" path="res://scenes/canaan.gd" id="1_d354y"]
 [ext_resource type="Script" uid="uid://14yc7lvh4r55" path="res://scenes/camera_2d.gd" id="2_sec5m"]
@@ -60,6 +60,8 @@
 [ext_resource type="Texture2D" uid="uid://ownui7vg6ac8" path="res://images/development_card_monopoly.png" id="58_yqqmq"]
 [ext_resource type="Texture2D" uid="uid://bw8xxdyusr8y3" path="res://images/development_card_road.png" id="59_46m4j"]
 [ext_resource type="Texture2D" uid="uid://drj43vsnjn6pg" path="res://images/development_card_vp.png" id="60_vos2g"]
+[ext_resource type="Texture2D" uid="uid://belbrrenp3qwh" path="res://images/arrow_reserve.png" id="61_yqqmq"]
+[ext_resource type="Texture2D" uid="uid://bxupousf85g7" path="res://images/decline.png" id="62_46m4j"]
 
 [sub_resource type="TileMapPattern" id="TileMapPattern_or3yt"]
 tile_data = PackedInt32Array(131072, 1, 0, 1, 1, 0, 65536, 1, 0, 131073, 1, 0, 196608, 1, 0, 262145, 1, 0, 2, 1, 0, 65537, 1, 0, 131074, 1, 0, 196609, 1, 0, 262146, 1, 0, 3, 1, 0, 65538, 1, 0, 131075, 1, 0, 196610, 1, 0, 262147, 1, 0, 65539, 1, 0, 131076, 1, 0, 196611, 1, 0)
@@ -1813,6 +1815,7 @@ text = "[font_size=18][center]Your resources"
 scroll_active = false
 
 [node name="Player_Trade_Popup" type="ColorRect" parent="UILayer"]
+visible = false
 offset_left = 1.0
 offset_top = 694.0
 offset_right = 908.0
@@ -2128,14 +2131,14 @@ color = Color(1, 0.360784, 0.27451, 1)
 
 [node name="Invalid_Trade_Text" type="RichTextLabel" parent="UILayer/Player_Trade_Popup/Divider4"]
 layout_mode = 0
-offset_left = 16.0007
-offset_top = 187.0
-offset_right = 178.001
-offset_bottom = 217.0
+offset_left = 16.0
+offset_top = 208.0
+offset_right = 224.0
+offset_bottom = 238.0
 rotation = -1.5708
 theme_override_colors/default_color = Color(0, 0, 0, 1)
 bbcode_enabled = true
-text = "[font_size=25][center]Invalid trade!"
+text = "[font_size=25][center]3 trades max!"
 scroll_active = false
 
 [node name="Divider2" type="ColorRect" parent="UILayer/Player_Trade_Popup"]
@@ -2198,9 +2201,281 @@ bbcode_enabled = true
 text = "[font_size=18][center]Your resources"
 scroll_active = false
 
+[node name="Player_Trade_Offer_Template" type="ColorRect" parent="UILayer"]
+visible = false
+offset_left = 1225.0
+offset_top = 307.0
+offset_right = 1540.0
+offset_bottom = 550.0
+scale = Vector2(1, 0.880002)
+color = Color(1, 0.996078, 0.729412, 1)
+
+[node name="Who_Offered_Trade" type="RichTextLabel" parent="UILayer/Player_Trade_Offer_Template"]
+layout_mode = 0
+offset_left = 1.0
+offset_top = 5.0
+offset_right = 316.0
+offset_bottom = 44.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Player offered trade:"
+
+[node name="Brick_Player" type="TextureRect" parent="UILayer/Player_Trade_Offer_Template"]
+visible = false
+layout_mode = 0
+offset_left = 11.0
+offset_top = 39.0
+offset_right = 151.0
+offset_bottom = 229.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("36_vhk21")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Player_Trade_Offer_Template/Brick_Player"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Sheep_Player" type="TextureRect" parent="UILayer/Player_Trade_Offer_Template"]
+visible = false
+layout_mode = 0
+offset_left = 68.0
+offset_top = 39.0
+offset_right = 208.0
+offset_bottom = 229.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("37_doxtf")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Player_Trade_Offer_Template/Sheep_Player"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 6.81821
+offset_right = 133.0
+offset_bottom = 47.8182
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Stone_Player" type="TextureRect" parent="UILayer/Player_Trade_Offer_Template"]
+visible = false
+layout_mode = 0
+offset_left = 126.0
+offset_top = 39.0
+offset_right = 266.0
+offset_bottom = 229.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("38_ai2yn")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Player_Trade_Offer_Template/Stone_Player"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 6.81821
+offset_right = 133.0
+offset_bottom = 47.8182
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Tree_Player" type="TextureRect" parent="UILayer/Player_Trade_Offer_Template"]
+visible = false
+layout_mode = 0
+offset_left = 185.0
+offset_top = 39.0
+offset_right = 325.0
+offset_bottom = 229.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("39_6qd3u")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Player_Trade_Offer_Template/Tree_Player"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 6.81821
+offset_right = 133.0
+offset_bottom = 47.8182
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Wheat_Player" type="TextureRect" parent="UILayer/Player_Trade_Offer_Template"]
+visible = false
+layout_mode = 0
+offset_left = 244.0
+offset_top = 39.0
+offset_right = 384.0
+offset_bottom = 229.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("40_65qm3")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Player_Trade_Offer_Template/Wheat_Player"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 6.81821
+offset_right = 133.0
+offset_bottom = 47.8182
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Brick_Bank" type="TextureRect" parent="UILayer/Player_Trade_Offer_Template"]
+visible = false
+layout_mode = 0
+offset_left = 11.0
+offset_top = 151.0
+offset_right = 151.0
+offset_bottom = 341.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("36_vhk21")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Player_Trade_Offer_Template/Brick_Bank"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Sheep_Bank" type="TextureRect" parent="UILayer/Player_Trade_Offer_Template"]
+visible = false
+layout_mode = 0
+offset_left = 68.0
+offset_top = 151.0
+offset_right = 208.0
+offset_bottom = 341.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("37_doxtf")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Player_Trade_Offer_Template/Sheep_Bank"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 6.81821
+offset_right = 133.0
+offset_bottom = 47.8182
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Stone_Bank" type="TextureRect" parent="UILayer/Player_Trade_Offer_Template"]
+visible = false
+layout_mode = 0
+offset_left = 126.0
+offset_top = 151.0
+offset_right = 266.0
+offset_bottom = 341.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("38_ai2yn")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Player_Trade_Offer_Template/Stone_Bank"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 6.81821
+offset_right = 133.0
+offset_bottom = 47.8182
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Tree_Bank" type="TextureRect" parent="UILayer/Player_Trade_Offer_Template"]
+visible = false
+layout_mode = 0
+offset_left = 185.0
+offset_top = 151.0
+offset_right = 325.0
+offset_bottom = 341.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("39_6qd3u")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Player_Trade_Offer_Template/Tree_Bank"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 6.81821
+offset_right = 133.0
+offset_bottom = 47.8182
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Wheat_Bank" type="TextureRect" parent="UILayer/Player_Trade_Offer_Template"]
+visible = false
+layout_mode = 0
+offset_left = 244.0
+offset_top = 151.0
+offset_right = 384.0
+offset_bottom = 341.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("40_65qm3")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Player_Trade_Offer_Template/Wheat_Bank"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 6.81821
+offset_right = 133.0
+offset_bottom = 47.8182
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Trade_Arrows" type="TextureRect" parent="UILayer/Player_Trade_Offer_Template"]
+layout_mode = 0
+offset_left = 172.0
+offset_top = 126.0
+offset_right = 300.0
+offset_bottom = 254.0
+rotation = 1.5708
+scale = Vector2(0.183802, 0.288845)
+texture = ExtResource("61_yqqmq")
+
+[node name="Accept_Trade_Btn_Background" type="ColorRect" parent="UILayer/Player_Trade_Offer_Template"]
+layout_mode = 0
+offset_left = -47.0
+offset_top = 154.0
+offset_right = -1.0
+offset_bottom = 198.0
+color = Color(0.65098, 0.745098, 0.619608, 1)
+
+[node name="Accept_Trade_Btn" type="TextureButton" parent="UILayer/Player_Trade_Offer_Template/Accept_Trade_Btn_Background"]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 4.0
+offset_right = 43.0
+offset_bottom = 44.0
+texture_normal = ExtResource("45_kovk3")
+
+[node name="Decline_Trade_Btn_Background" type="ColorRect" parent="UILayer/Player_Trade_Offer_Template"]
+layout_mode = 0
+offset_left = -47.0
+offset_top = 38.0
+offset_right = -1.0
+offset_bottom = 82.0
+color = Color(0.65098, 0.745098, 0.619608, 1)
+
+[node name="Decline_Trade_Btn" type="TextureButton" parent="UILayer/Player_Trade_Offer_Template/Decline_Trade_Btn_Background"]
+layout_mode = 0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = 45.0
+offset_bottom = 43.0
+texture_normal = ExtResource("62_46m4j")
+
 [connection signal="timeout" from="MapLayer/Player1_Settlement_Timer" to="." method="_on_player_1_settlement_timer_timeout"]
 [connection signal="pressed" from="UILayer/Roll_Dice" to="." method="_on_roll_dice_pressed"]
 [connection signal="pressed" from="UILayer/Bank_Trade_Btn_Background/Bank_Trade_Button" to="." method="_on_bank_trade_button_pressed"]
+[connection signal="pressed" from="UILayer/Player_Trade_Btn_Background/Player_Trade_Button" to="." method="_on_player_trade_button_pressed"]
 [connection signal="pressed" from="UILayer/Buy_Development_Card_Background/Buy_Development_Card_Button" to="." method="_on_buy_development_card_button_pressed"]
 [connection signal="pressed" from="UILayer/Build_Road_Btn_Background/Build_Road_Button" to="." method="_on_build_road_button_pressed"]
 [connection signal="pressed" from="UILayer/Build_Road_Btn_Background/Button_DEBUG" to="." method="_on_build_road_button_pressed"]
@@ -2221,3 +2496,14 @@ scroll_active = false
 [connection signal="pressed" from="UILayer/Bank_Trade_Popup/Stone_Bank/Stone_Bank_Btn" to="." method="_on_BANK_TRADE_stone_bank_btn_pressed"]
 [connection signal="pressed" from="UILayer/Bank_Trade_Popup/Wheat_Bank/Wheat_Bank_Btn" to="." method="_on_BANK_TRADE_wheat_bank_btn_pressed"]
 [connection signal="pressed" from="UILayer/Bank_Trade_Popup/Finish_Trade_Btn/Finish_Trade_Btn" to="." method="_on_finish_BANK_trade_btn_pressed"]
+[connection signal="pressed" from="UILayer/Player_Trade_Popup/Brick_Player/Brick_Player_Btn" to="." method="_on_PLAYER_TRADE_brick_player_btn_pressed"]
+[connection signal="pressed" from="UILayer/Player_Trade_Popup/Sheep_Player/Sheep_Player_Btn" to="." method="_on_PLAYER_TRADE_sheep_player_btn_pressed"]
+[connection signal="pressed" from="UILayer/Player_Trade_Popup/Stone_Player/Stone_Player_Btn" to="." method="_on_PLAYER_TRADE_stone_player_btn_pressed"]
+[connection signal="pressed" from="UILayer/Player_Trade_Popup/Tree_Player/Tree_Player_Btn" to="." method="_on_PLAYER_TRADE_tree_player_btn_pressed"]
+[connection signal="pressed" from="UILayer/Player_Trade_Popup/Wheat_Player/Wheat_Player_Btn" to="." method="_on_PLAYER_TRADE_wheat_player_btn_pressed"]
+[connection signal="pressed" from="UILayer/Player_Trade_Popup/Brick_Bank/Brick_Bank_Btn" to="." method="_on_PLAYER_TRADE_brick_bank_btn_pressed"]
+[connection signal="pressed" from="UILayer/Player_Trade_Popup/Sheep_Bank/Sheep_Bank_Btn" to="." method="_on_PLAYER_TRADE_sheep_bank_btn_pressed"]
+[connection signal="pressed" from="UILayer/Player_Trade_Popup/Tree_Bank/Tree_Bank_Btn" to="." method="_on_PLAYER_TRADE_tree_bank_btn_pressed"]
+[connection signal="pressed" from="UILayer/Player_Trade_Popup/Stone_Bank/Stone_Bank_Btn" to="." method="_on_PLAYER_TRADE_stone_bank_btn_pressed"]
+[connection signal="pressed" from="UILayer/Player_Trade_Popup/Wheat_Bank/Wheat_Bank_Btn" to="." method="_on_PLAYER_TRADE_wheat_bank_btn_pressed"]
+[connection signal="pressed" from="UILayer/Player_Trade_Popup/Finish_Trade_Btn/Finish_Trade_Btn" to="." method="_on_PLAYER_TRADE_finish_trade_btn_pressed"]

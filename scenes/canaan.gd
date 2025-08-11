@@ -45,6 +45,7 @@ extends Node2D
 
 @onready var ELIGIBLE_SETTLEMENT_VERTICES = [] # Contains a list of eligible vertices for settlement placement. This is shared between all players
 @onready var ELIGIBLE_ROAD_VERTICES_SETUP = []
+@onready var global_player_trades = []
 
 # Signals
 signal selection_finished # Used for returning control back to a main function after a user selects an action or they timeout from that action
@@ -359,7 +360,6 @@ func _on_bank_trade_button_pressed() -> void:
 		$UILayer/Bank_Trade_Popup/Stone_Bank/Stone_Bank_Btn.visible = false if NUM_SUPPLY_STONE == 0 else true
 		$UILayer/Bank_Trade_Popup/Wheat_Bank/Wheat_Bank_Btn.visible = false if NUM_SUPPLY_WHEAT == 0 else true
 		$UILayer/Bank_Trade_Popup/Tree_Bank/Tree_Bank_Btn.visible = false if NUM_SUPPLY_TREE == 0 else true
-
 
 func _on_BANK_TRADE_stone_player_btn_pressed() -> void:
 	await bank_trade_add_resource_to_player_area("Stone")
@@ -3059,3 +3059,215 @@ func check_win():
 
 func end_game():
 	print("Game over!")
+
+
+func _on_player_trade_button_pressed() -> void:
+	# Pop up (or hide) UI, set variables
+	$UILayer/Player_Trade_Popup.visible = !$UILayer/Player_Trade_Popup.visible
+	if $UILayer/Player_Trade_Popup.visible == false:
+		CLIENT.chosen_resources_trade = []
+		CLIENT.chosen_resources_player_trade = []
+		for node in $UILayer/Player_Trade_Popup/Dynamic_Player_Area.get_children():
+			$UILayer/Player_Trade_Popup/Dynamic_Player_Area.remove_child(node)
+			node.queue_free()
+		for node in $UILayer/Player_Trade_Popup/Dynamic_Bank_Area.get_children():
+			$UILayer/Player_Trade_Popup/Dynamic_Bank_Area.remove_child(node)
+			node.queue_free()
+		
+		$UILayer/Player_Trade_Popup/Divider4.hide()
+		
+		activate_or_deactivate_ui_buttons()
+	else: # Cleanup: Use some loops here
+		ui_disable_all_buttons(["Player_Trade_Button"])
+		
+		get_node("UILayer/Player_Trade_Popup/Brick_Player/Num_Remaining").text = "[font_size=30][center][b]%s" % CLIENT.resources["Brick"]
+		get_node("UILayer/Player_Trade_Popup/Sheep_Player/Num_Remaining").text = "[font_size=30][center][b]%s" % CLIENT.resources["Sheep"]
+		get_node("UILayer/Player_Trade_Popup/Stone_Player/Num_Remaining").text = "[font_size=30][center][b]%s" % CLIENT.resources["Stone"]
+		get_node("UILayer/Player_Trade_Popup/Wheat_Player/Num_Remaining").text = "[font_size=30][center][b]%s" % CLIENT.resources["Wheat"]
+		get_node("UILayer/Player_Trade_Popup/Tree_Player/Num_Remaining").text = "[font_size=30][center][b]%s" % CLIENT.resources["Tree"]
+		
+		$UILayer/Player_Trade_Popup/Brick_Player.visible = true
+		$UILayer/Player_Trade_Popup/Sheep_Player.visible = true
+		$UILayer/Player_Trade_Popup/Stone_Player.visible = true
+		$UILayer/Player_Trade_Popup/Wheat_Player.visible = true 
+		$UILayer/Player_Trade_Popup/Tree_Player.visible = true
+
+		$UILayer/Player_Trade_Popup/Brick_Player/Brick_Player_Btn.visible = false if CLIENT.resources["Brick"] == 0 else true
+		$UILayer/Player_Trade_Popup/Sheep_Player/Sheep_Player_Btn.visible = false if CLIENT.resources["Sheep"] == 0 else true
+		$UILayer/Player_Trade_Popup/Stone_Player/Stone_Player_Btn.visible = false if CLIENT.resources["Stone"] == 0 else true
+		$UILayer/Player_Trade_Popup/Wheat_Player/Wheat_Player_Btn.visible = false if CLIENT.resources["Wheat"] == 0 else true
+		$UILayer/Player_Trade_Popup/Tree_Player/Tree_Player_Btn.visible = false if CLIENT.resources["Tree"] == 0 else true
+
+func player_trade_add_resource_to_player_area(resource):
+	
+	if resource not in CLIENT.chosen_resources_trade: # Add resource to player area
+		var new_node = get_node("UILayer/Player_Trade_Popup/%s_Player" % resource).duplicate(0) # Don't duplicate the signal
+		new_node.get_child(1).pressed.connect(player_trade_remove_resource_from_player_area.bind(new_node, resource))
+		new_node.position = Vector2(new_node.position.x, 32)
+		new_node.get_child(0).text = "[font_size=30][center][b]1"
+		$UILayer/Player_Trade_Popup/Dynamic_Player_Area.add_child(new_node)
+	else: # If already there, just increase num_remaining
+		var existing_node
+		for node in $UILayer/Player_Trade_Popup/Dynamic_Player_Area.get_children(true):
+			if resource in node.name:
+				existing_node = node
+				break
+		#var existing_node = $UILayer/Player_Trade_Popup/Dynamic_Player_Area.get_child(0)
+		var num_remaining = int(existing_node.get_child(0).text.get_slice("[font_size=30][center][b]", 1)) + 1
+		existing_node.get_child(0).text = "[font_size=30][center][b]%s" % str(num_remaining)
+	
+	# Decrease num_remaining for the player's resources
+	var num_remaining = int(get_node("UILayer/Player_Trade_Popup/%s_Player/Num_Remaining" % resource).text.get_slice("[font_size=30][center][b]", 1)) - 1
+	if num_remaining == 0:
+		get_node("UILayer/Player_Trade_Popup/%s_Player/Num_Remaining" % resource).text = "[font_size=30][center][b]%s" % str(num_remaining)
+		get_node("UILayer/Player_Trade_Popup/%s_Player/%s_Player_Btn" % [resource, resource]).hide()
+	else:
+		get_node("UILayer/Player_Trade_Popup/%s_Player/Num_Remaining" % resource).text = "[font_size=30][center][b]%s" % str(num_remaining)
+	
+	CLIENT.chosen_resources_trade.append(resource)
+	
+	print(CLIENT.chosen_resources_trade)
+	
+func player_trade_add_resource_to_bank_area(resource):
+	
+	if resource not in CLIENT.chosen_resources_player_trade:
+		var new_node = get_node("UILayer/Player_Trade_Popup/%s_Bank" % resource).duplicate(0) # Don't duplicate the signal
+		new_node.get_child(1).pressed.connect(player_trade_remove_resource_from_bank_area.bind(new_node, resource))
+		new_node.get_child(0).text = "[font_size=30][center][b]1"
+		new_node.get_child(0).show()
+		$UILayer/Player_Trade_Popup/Dynamic_Bank_Area.add_child(new_node)
+		new_node.position = Vector2(new_node.position.x - 454, 32)
+	else: # If already there, just increase num_remaining
+		var existing_node
+		for node in $UILayer/Player_Trade_Popup/Dynamic_Bank_Area.get_children(true):
+			if resource in node.name:
+				existing_node = node
+				break
+		var num_remaining = int(existing_node.get_child(0).text.get_slice("[font_size=30][center][b]", 1)) + 1
+		existing_node.get_child(0).text = "[font_size=30][center][b]%s" % str(num_remaining)
+	
+	# Decrease num_remaining for the player's resources
+	var num_remaining = int(get_node("UILayer/Player_Trade_Popup/%s_Bank/Num_Remaining" % resource).text.get_slice("[font_size=30][center][b]", 1)) - 1
+	if num_remaining == 0:
+		get_node("UILayer/Player_Trade_Popup/%s_Bank/Num_Remaining" % resource).text = "[font_size=30][center][b]%s" % str(num_remaining)
+		get_node("UILayer/Player_Trade_Popup/%s_Bank/%s_Bank_Btn" % [resource, resource]).hide()
+	else:
+		get_node("UILayer/Player_Trade_Popup/%s_Bank/Num_Remaining" % resource).text = "[font_size=30][center][b]%s" % str(num_remaining)
+	
+	CLIENT.chosen_resources_player_trade.append(resource)
+	
+	print(CLIENT.chosen_resources_player_trade)
+	
+func player_trade_remove_resource_from_player_area(node, resource):
+	if int(node.get_child(0).text.get_slice("[font_size=30][center][b]", 1)) == 1:
+		
+		# Add back this resource for the player's resources
+		var num_remaining = int(get_node("UILayer/Player_Trade_Popup/%s_Player/Num_Remaining" % resource).text.get_slice("[font_size=30][center][b]", 1)) + 1
+		get_node("UILayer/Player_Trade_Popup/%s_Player/Num_Remaining" % resource).text = "[font_size=30][center][b]%s" % str(num_remaining)
+		
+		var index_of_element_to_remove = CLIENT.chosen_resources_trade.find(resource)
+		CLIENT.chosen_resources_trade.remove_at(index_of_element_to_remove)
+		
+		get_node("UILayer/Player_Trade_Popup/%s_Player/%s_Player_Btn" % [resource, resource]).show()
+		
+		$UILayer/Player_Trade_Popup/Dynamic_Player_Area.remove_child(node)
+		node.queue_free()
+		
+	else: # just decrease num_remaining in the player area, and increase the value for the player's resources
+		var num_remaining = int(node.get_child(0).text.get_slice("[font_size=30][center][b]", 1)) - 1
+		node.get_child(0).text = "[font_size=30][center][b]%s" % str(num_remaining)
+		var index_of_element_to_remove = CLIENT.chosen_resources_trade.find(resource)
+		CLIENT.chosen_resources_trade.remove_at(index_of_element_to_remove)
+		
+		# Increase
+		num_remaining = int(get_node("UILayer/Player_Trade_Popup/%s_Player/Num_Remaining" % resource).text.get_slice("[font_size=30][center][b]", 1)) + 1
+		get_node("UILayer/Player_Trade_Popup/%s_Player/%s_Player_Btn" % [resource, resource]).show()
+		get_node("UILayer/Player_Trade_Popup/%s_Player/Num_Remaining" % resource).text = "[font_size=30][center][b]%s" % str(num_remaining)
+	
+	print(CLIENT.chosen_resources_trade)
+
+func player_trade_remove_resource_from_bank_area(node, resource):
+	if int(node.get_child(0).text.get_slice("[font_size=30][center][b]", 1)) == 1:
+		
+		var index_of_element_to_remove = CLIENT.chosen_resources_player_trade.find(resource)
+		CLIENT.chosen_resources_player_trade.remove_at(index_of_element_to_remove)
+		
+		$UILayer/Player_Trade_Popup/Dynamic_Bank_Area.remove_child(node)
+		node.queue_free()
+		
+	else: # just decrease num_remaining in the player area, and increase the value for the player's resources
+		var num_remaining = int(node.get_child(0).text.get_slice("[font_size=30][center][b]", 1)) - 1
+		node.get_child(0).text = "[font_size=30][center][b]%s" % str(num_remaining)
+		var index_of_element_to_remove = CLIENT.chosen_resources_player_trade.find(resource)
+		CLIENT.chosen_resources_player_trade.remove_at(index_of_element_to_remove)
+		
+	
+	print(CLIENT.chosen_resources_player_trade)
+
+func _on_PLAYER_TRADE_brick_player_btn_pressed() -> void:
+	await player_trade_add_resource_to_player_area("Brick")
+
+func _on_PLAYER_TRADE_sheep_player_btn_pressed() -> void:
+	await player_trade_add_resource_to_player_area("Sheep")
+
+func _on_PLAYER_TRADE_stone_player_btn_pressed() -> void:
+	await player_trade_add_resource_to_player_area("Stone")
+
+func _on_PLAYER_TRADE_tree_player_btn_pressed() -> void:
+	await player_trade_add_resource_to_player_area("Tree")
+
+func _on_PLAYER_TRADE_wheat_player_btn_pressed() -> void:
+	await player_trade_add_resource_to_player_area("Wheat")
+
+func _on_PLAYER_TRADE_brick_bank_btn_pressed() -> void:
+	await player_trade_add_resource_to_bank_area("Brick")
+
+func _on_PLAYER_TRADE_sheep_bank_btn_pressed() -> void:
+	await player_trade_add_resource_to_bank_area("Sheep")
+
+func _on_PLAYER_TRADE_tree_bank_btn_pressed() -> void:
+	await player_trade_add_resource_to_bank_area("Tree")
+
+func _on_PLAYER_TRADE_wheat_bank_btn_pressed() -> void:
+	await player_trade_add_resource_to_bank_area("Wheat")
+
+func _on_PLAYER_TRADE_stone_bank_btn_pressed() -> void:
+	await player_trade_add_resource_to_bank_area("Stone")
+
+func _on_PLAYER_TRADE_finish_trade_btn_pressed() -> void:
+	
+	# Alert player they need to cancel or have a trade accepted to propose another trade. Max trades: 3
+	if len(global_player_trades) == 3:
+		$UILayer/Player_Trade_Popup/Divider4.show()
+		return
+	else:
+		var new_trade = $UILayer/Player_Trade_Offer_Template.duplicate()
+		
+		new_trade.get_child(0).text = "[font_size=18][center]%s offered trade:" % CLIENT._name
+		new_trade.name = "Player_Trade_Offer_%s" % str(len(global_player_trades) + 1)
+		
+		var new_trade_children = new_trade.get_children(true)
+		for resource in CLIENT.chosen_resources_trade:
+			for child in new_trade_children:
+				if child.name == resource + "_Player":
+					child.show()
+					child.get_child(0).text = "[font_size=30][center][b]%s" % CLIENT.chosen_resources_trade.count(resource)
+					break
+					
+		for resource in CLIENT.chosen_resources_player_trade:
+			for child in new_trade_children:
+				if child.name == resource + "_Bank":
+					child.show()
+					child.get_child(0).text = "[font_size=30][center][b]%s" % CLIENT.chosen_resources_player_trade.count(resource)
+					break
+		
+		new_trade.show()
+		
+		new_trade.position = Vector2(new_trade.position.x, (307 + (225 * len(global_player_trades))))
+
+		$UILayer.add_child(new_trade)
+		global_player_trades.append(new_trade) # If there are existing trades, then different behavior to positioning will apply
+		print(global_player_trades)
+		await _on_player_trade_button_pressed()
+		# Set signals for template, show correct trade
+		# ...

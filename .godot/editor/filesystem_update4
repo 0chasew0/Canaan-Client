@@ -1,8 +1,7 @@
-res://NetworkingClient.tscn
+res://scenes/canaan.tscn
 res://scenes/resource_num_scaling.gdshader
 res://scenes/harbor_rotation.gdshader
-res://scenes/game_select.tscn
-res://scenes/canaan.tscn
-res://scenes/test.tscn
 res://scenes/canaan.gd
-res://player.gd
+res://NetworkingClient.tscn
+res://scenes/game_select.tscn
+res://scenes/test.tscn
