@@ -2202,7 +2202,6 @@ text = "[font_size=18][center]Your resources"
 scroll_active = false
 
 [node name="Player_Trade_Offer_Template" type="ColorRect" parent="UILayer"]
-visible = false
 offset_left = 1225.0
 offset_top = 307.0
 offset_right = 1540.0
@@ -2440,37 +2439,109 @@ rotation = 1.5708
 scale = Vector2(0.183802, 0.288845)
 texture = ExtResource("61_yqqmq")
 
-[node name="Accept_Trade_Btn_Background" type="ColorRect" parent="UILayer/Player_Trade_Offer_Template"]
+[node name="Accept_Or_Decline_Trade_Btn_Background" type="ColorRect" parent="UILayer/Player_Trade_Offer_Template"]
 layout_mode = 0
 offset_left = -47.0
-offset_top = 154.0
+offset_top = 1.52588e-05
 offset_right = -1.0
-offset_bottom = 198.0
-color = Color(0.65098, 0.745098, 0.619608, 1)
-
-[node name="Accept_Trade_Btn" type="TextureButton" parent="UILayer/Player_Trade_Offer_Template/Accept_Trade_Btn_Background"]
-layout_mode = 0
-offset_left = 3.0
-offset_top = 4.0
-offset_right = 43.0
 offset_bottom = 44.0
-texture_normal = ExtResource("45_kovk3")
-
-[node name="Decline_Trade_Btn_Background" type="ColorRect" parent="UILayer/Player_Trade_Offer_Template"]
-layout_mode = 0
-offset_left = -47.0
-offset_top = 38.0
-offset_right = -1.0
-offset_bottom = 82.0
 color = Color(0.65098, 0.745098, 0.619608, 1)
 
-[node name="Decline_Trade_Btn" type="TextureButton" parent="UILayer/Player_Trade_Offer_Template/Decline_Trade_Btn_Background"]
+[node name="Decline_Trade_Btn" type="TextureButton" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background"]
+visible = false
 layout_mode = 0
 offset_left = 5.0
 offset_top = 3.0
 offset_right = 45.0
 offset_bottom = 43.0
 texture_normal = ExtResource("62_46m4j")
+
+[node name="Accept_Trade_Btn" type="TextureButton" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background"]
+visible = false
+layout_mode = 0
+offset_left = 3.0
+offset_top = 3.40909
+offset_right = 43.0
+offset_bottom = 43.4091
+texture_normal = ExtResource("45_kovk3")
+
+[node name="Accept_Or_Decline_Trade_Btn_Background2" type="ColorRect" parent="UILayer/Player_Trade_Offer_Template"]
+layout_mode = 0
+offset_left = -47.0
+offset_top = 63.6362
+offset_right = -1.0
+offset_bottom = 107.636
+color = Color(0.65098, 0.745098, 0.619608, 1)
+
+[node name="Decline_Trade_Btn" type="TextureButton" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background2"]
+visible = false
+layout_mode = 0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = 45.0
+offset_bottom = 43.0
+texture_normal = ExtResource("62_46m4j")
+
+[node name="Accept_Trade_Btn2" type="TextureButton" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background2"]
+visible = false
+layout_mode = 0
+offset_left = 3.0
+offset_top = 3.40907
+offset_right = 43.0
+offset_bottom = 43.4091
+texture_normal = ExtResource("45_kovk3")
+
+[node name="Accept_Or_Decline_Trade_Btn_Background3" type="ColorRect" parent="UILayer/Player_Trade_Offer_Template"]
+layout_mode = 0
+offset_left = -47.0
+offset_top = 130.682
+offset_right = -1.0
+offset_bottom = 174.682
+color = Color(0.65098, 0.745098, 0.619608, 1)
+
+[node name="Decline_Trade_Btn" type="TextureButton" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background3"]
+visible = false
+layout_mode = 0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = 45.0
+offset_bottom = 43.0
+texture_normal = ExtResource("62_46m4j")
+
+[node name="Accept_Trade_Btn3" type="TextureButton" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background3"]
+visible = false
+layout_mode = 0
+offset_left = 3.0
+offset_top = 3.40909
+offset_right = 43.0
+offset_bottom = 43.4091
+texture_normal = ExtResource("45_kovk3")
+
+[node name="Accept_Or_Decline_Trade_Btn_Background4" type="ColorRect" parent="UILayer/Player_Trade_Offer_Template"]
+layout_mode = 0
+offset_left = -47.0
+offset_top = 198.863
+offset_right = -1.0
+offset_bottom = 242.863
+color = Color(0.65098, 0.745098, 0.619608, 1)
+
+[node name="Decline_Trade_Btn" type="TextureButton" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background4"]
+visible = false
+layout_mode = 0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = 45.0
+offset_bottom = 43.0
+texture_normal = ExtResource("62_46m4j")
+
+[node name="Accept_Trade_Btn4" type="TextureButton" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background4"]
+visible = false
+layout_mode = 0
+offset_left = 3.0
+offset_top = 3.40907
+offset_right = 43.0
+offset_bottom = 43.4091
+texture_normal = ExtResource("45_kovk3")
 
 [connection signal="timeout" from="MapLayer/Player1_Settlement_Timer" to="." method="_on_player_1_settlement_timer_timeout"]
 [connection signal="pressed" from="UILayer/Roll_Dice" to="." method="_on_roll_dice_pressed"]

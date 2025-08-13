@@ -3264,10 +3264,61 @@ func _on_PLAYER_TRADE_finish_trade_btn_pressed() -> void:
 		new_trade.show()
 		
 		new_trade.position = Vector2(new_trade.position.x, (307 + (225 * len(global_player_trades))))
+		
+		#var trade_counts = {
+			#"Tree": CLIENT.chosen_resources_player_trade.count("Tree"),
+			#"Stone": CLIENT.chosen_resources_player_trade.count("Stone"),
+			#"Brick": CLIENT.chosen_resources_player_trade.count("Brick"),
+			#"Wheat": CLIENT.chosen_resources_player_trade.count("Wheat"),
+			#"Sheep": CLIENT.chosen_resources_player_trade.count("Sheep")
+		#}
+		
+		var index = -1
+		var valid_players_to_trade_with = []
+		for player in ALL_PLAYERS:
+			if player == CLIENT:
+				new_trade.get_child(index).get_child(0).show() # Shows the decline button automatically
+			else:
+				if CLIENT.chosen_resources_player_trade.is_empty():
+					valid_players_to_trade_with.append(player)
+					continue
+				else:
+					if player.resources.count("Tree") < CLIENT.chosen_resources_player_trade.count("Tree"):
+						new_trade.get_child(index).get_child(0).show()
+						continue
+					if player.resources.count("Brick") < CLIENT.chosen_resources_player_trade.count("Brick"):
+						new_trade.get_child(index).get_child(0).show()
+						continue
+					if player.resources.count("Stone") < CLIENT.chosen_resources_player_trade.count("Stone"):
+						new_trade.get_child(index).get_child(0).show()
+						continue
+					if player.resources.count("Wheat") < CLIENT.chosen_resources_player_trade.count("Wheat"):
+						new_trade.get_child(index).get_child(0).show()
+						continue
+					if player.resources.count("Sheep") < CLIENT.chosen_resources_player_trade.count("Sheep"):
+						new_trade.get_child(index).get_child(0).show()
+						continue
+					else:
+						valid_players_to_trade_with.append(player)
+					
+			index -= 1
+		
+		# Send trade to players.
+		for p in valid_players_to_trade_with:
+			if p.type == "Bot":
+				pass
+				# bot_accept_or_decline_player_trade_decision()
+			else:
+				pass
+				# Multiplayer function!
+		
+		
+		# -1 is Decline btn. -2 is Accept btn
+		#new_trade.get_child(-1).pressed.connect(accept_player_trade.bind(CLIENT, CLIENT.chosen_resources_trade, CLIENT.chosen_resources_player_trade, new_trade))
 
 		$UILayer.add_child(new_trade)
 		global_player_trades.append(new_trade) # If there are existing trades, then different behavior to positioning will apply
 		print(global_player_trades)
-		await _on_player_trade_button_pressed()
-		# Set signals for template, show correct trade
-		# ...
+		
+func accept_player_trade(player, left_trade, right_trade, trade_node):
+	print(player + " accepted trade: " + trade_node.name + " ( " + left_trade + "for " + right_trade + " ) ")
