@@ -105,6 +105,7 @@ func _ready() -> void:
 	
 	# Main game loop for a client
 	await roll_for_who_goes_first()
+	roll_dice_btn.disabled = true
 	# Place initial settlements and roads for all players
 	# First round
 	for p in ALL_PLAYERS:
@@ -135,6 +136,8 @@ func main_game_loop(tile_positions, standard_map):
 		for p in ALL_PLAYERS:
 			if p.type == "Player":
 				# Turn Initializers
+				roll_dice_btn.disabled = false
+				roll_dice_btn.text = "Roll Dice"
 				await ui_disable_all_buttons()
 				print("player turn")
 				p.dev_card_played_this_turn = false
@@ -148,7 +151,7 @@ func main_game_loop(tile_positions, standard_map):
 				await roll_dice_btn.pressed # Wait for user to roll dice before continuing
 				p.dice_roll_result = _on_roll_dice_pressed()
 				chat_log.append_text("[font_size=%s]\n%s rolled a %s." % [chat_log_font_size, p._name, p.dice_roll_result])
-				#roll_dice_btn.disabled = true
+				roll_dice_btn.disabled = true
 				
 				# Generate resources for EACH player based on dice result, unless a 7 is rolled
 				# For friendly robber, check that no player has VP > 2, else do robber as normal
@@ -168,8 +171,15 @@ func main_game_loop(tile_positions, standard_map):
 				DEBUG_assert_resources_are_in_sync()
 				
 				# When player is done with turn
-				await roll_dice_btn.pressed
-				#await $UILayer/End_Turn_Btn_Background/End_Turn_Button.pressed
+				#await roll_dice_btn.pressed
+				await $UILayer/End_Turn_Btn_Background/End_Turn_Button.pressed
+				
+				#  !! Reset certain variables after player's turn is done
+				for j in range(0, len(global_player_trades)):
+					$UILayer.remove_child(global_player_trades[j])
+					global_player_trades[j].queue_free()
+				global_player_trades.clear()
+				
 
 			else:
 				# Disable all buttons when it's not the client's turn
@@ -1001,6 +1011,9 @@ func ui_disable_all_buttons(exclude=[]): # Optionally, provide a list of buttons
 	$UILayer/Player_Trade_Btn_Background/Player_Trade_Button.disabled = false if "Player_Trade_Button" in exclude else true
 	$UILayer/Player_Trade_Btn_Background/Disabled_Mask.visible = false if "Player_Trade_Button" in exclude else true
 	
+	$UILayer/End_Turn_Btn_Background/End_Turn_Button.disabled = false if "End_Turn_Button" in exclude else true
+	$UILayer/End_Turn_Btn_Background/Disabled_Mask.visible = false if "End_Turn_Button" in exclude else true
+	
 # Sets certain UI buttons/elements as "active"/"not disabled" if the player meets the resource requirement for them,
 # indicating that they can afford the respective thing (settlement, city, road, development card, etc.)
 # Call this anytime after a player modifies their resources in any way (dice roll, dev card, trading, etc.)
@@ -1032,6 +1045,9 @@ func activate_or_deactivate_ui_buttons():
 	
 	$UILayer/Player_Trade_Btn_Background/Player_Trade_Button.disabled = false
 	$UILayer/Player_Trade_Btn_Background/Disabled_Mask.visible = false
+	
+	$UILayer/End_Turn_Btn_Background/End_Turn_Button.disabled = false 
+	$UILayer/End_Turn_Btn_Background/Disabled_Mask.visible = false
 	
 func ui_check_client_harbors_for_bank_trade_btn() -> bool:
 	# Returns true if the client has a harbor and the correct resources to match that harbor
@@ -3246,6 +3262,7 @@ func _on_PLAYER_TRADE_finish_trade_btn_pressed() -> void:
 		new_trade.get_child(0).text = "[font_size=18][center]%s offered trade:" % CLIENT._name
 		new_trade.name = "Player_Trade_Offer_%s" % str(len(global_player_trades) + 1)
 		
+		
 		var new_trade_children = new_trade.get_children(true)
 		for resource in CLIENT.chosen_resources_trade:
 			for child in new_trade_children:
@@ -3263,7 +3280,7 @@ func _on_PLAYER_TRADE_finish_trade_btn_pressed() -> void:
 		
 		new_trade.show()
 		
-		new_trade.position = Vector2(new_trade.position.x, (307 + (225 * len(global_player_trades))))
+		new_trade.position = Vector2(new_trade.position.x, (297 + (235 * len(global_player_trades))))
 		
 		#var trade_counts = {
 			#"Tree": CLIENT.chosen_resources_player_trade.count("Tree"),
@@ -3276,49 +3293,146 @@ func _on_PLAYER_TRADE_finish_trade_btn_pressed() -> void:
 		var index = -1
 		var valid_players_to_trade_with = []
 		for player in ALL_PLAYERS:
+			new_trade.get_child(index).get_child(2).text = player._name
 			if player == CLIENT:
 				new_trade.get_child(index).get_child(0).show() # Shows the decline button automatically
+				valid_players_to_trade_with.append(null)
+				index -= 1
+				continue
 			else:
+				valid_players_to_trade_with.append(player)
 				if CLIENT.chosen_resources_player_trade.is_empty():
-					valid_players_to_trade_with.append(player)
 					continue
 				else:
-					if player.resources.count("Tree") < CLIENT.chosen_resources_player_trade.count("Tree"):
+					if player.resources.get("Tree") < CLIENT.chosen_resources_player_trade.count("Tree"):
 						new_trade.get_child(index).get_child(0).show()
+						var index_of_player = valid_players_to_trade_with.find(player)
+						valid_players_to_trade_with[index_of_player] = null
+						index -= 1
 						continue
-					if player.resources.count("Brick") < CLIENT.chosen_resources_player_trade.count("Brick"):
+					if player.resources.get("Brick") < CLIENT.chosen_resources_player_trade.count("Brick"):
 						new_trade.get_child(index).get_child(0).show()
+						var index_of_player = valid_players_to_trade_with.find(player)
+						valid_players_to_trade_with[index_of_player] = null
+						index -= 1
 						continue
-					if player.resources.count("Stone") < CLIENT.chosen_resources_player_trade.count("Stone"):
+					if player.resources.get("Stone") < CLIENT.chosen_resources_player_trade.count("Stone"):
 						new_trade.get_child(index).get_child(0).show()
+						var index_of_player = valid_players_to_trade_with.find(player)
+						valid_players_to_trade_with[index_of_player] = null
+						index -= 1
 						continue
-					if player.resources.count("Wheat") < CLIENT.chosen_resources_player_trade.count("Wheat"):
+					if player.resources.get("Wheat") < CLIENT.chosen_resources_player_trade.count("Wheat"):
 						new_trade.get_child(index).get_child(0).show()
+						var index_of_player = valid_players_to_trade_with.find(player)
+						valid_players_to_trade_with[index_of_player] = null
+						index -= 1
 						continue
-					if player.resources.count("Sheep") < CLIENT.chosen_resources_player_trade.count("Sheep"):
+					if player.resources.get("Sheep") < CLIENT.chosen_resources_player_trade.count("Sheep"):
 						new_trade.get_child(index).get_child(0).show()
+						var index_of_player = valid_players_to_trade_with.find(player)
+						valid_players_to_trade_with[index_of_player] = null
+						index -= 1
 						continue
 					else:
-						valid_players_to_trade_with.append(player)
+						index -= 1
+						continue
 					
-			index -= 1
+			
 		
-		# Send trade to players.
+		index = -1
+		# Send trade to players. For bots, instantly decide via func
 		for p in valid_players_to_trade_with:
+			if p == null:
+				index -= 1
+				continue
 			if p.type == "Bot":
-				pass
-				# bot_accept_or_decline_player_trade_decision()
+				var decision = bot_accept_or_decline_player_trade_decision(p, CLIENT.chosen_resources_trade)
+				if decision == true: # Show the accept button for the client
+					new_trade.get_child(index).get_child(0).hide()
+					new_trade.get_child(index).get_child(1).show()
+					new_trade.get_child(index).get_child(1).pressed.connect(client_accept_player_trade_with_bot.bind(p, new_trade, CLIENT.chosen_resources_trade, CLIENT.chosen_resources_player_trade))
+				else:
+					new_trade.get_child(index).get_child(0).show()
+				index -= 1
 			else:
 				pass
 				# Multiplayer function!
-		
-		
+
 		# -1 is Decline btn. -2 is Accept btn
 		#new_trade.get_child(-1).pressed.connect(accept_player_trade.bind(CLIENT, CLIENT.chosen_resources_trade, CLIENT.chosen_resources_player_trade, new_trade))
 
 		$UILayer.add_child(new_trade)
 		global_player_trades.append(new_trade) # If there are existing trades, then different behavior to positioning will apply
 		print(global_player_trades)
+
+func client_accept_player_trade_with_bot(bot_trading_with, trade_node, offered_resources, requested_resources):
+	# Swap resources with player_trading_with, and remove the trade_node, adjusting global_player_trades and shifting UI elements if needed
+	
+	for resource in offered_resources:
+		CLIENT.resources[resource] -= 1
+		CLIENT.total_resources -= 1
+		ui_remove_from_resource_bar(resource)
 		
-func accept_player_trade(player, left_trade, right_trade, trade_node):
-	print(player + " accepted trade: " + trade_node.name + " ( " + left_trade + "for " + right_trade + " ) ")
+		bot_trading_with.resources[resource] += 1
+		bot_trading_with.total_resources += 1
+		
+	for resource in requested_resources:
+		CLIENT.resources[resource] += 1
+		CLIENT.total_resources += 1
+		ui_add_to_resource_bar(resource)
+		
+		bot_trading_with.resources[resource] -= 1
+		bot_trading_with.total_resources -= 1
+		
+	global_player_trades.remove_at(global_player_trades.find(trade_node))
+	
+	$UILayer.remove_child(trade_node)
+	trade_node.queue_free()
+	
+	# Check that other existing trades are still valid, and update their position if so
+	var trade_nodes_to_remove = []
+	for i in range(0, len(global_player_trades)):
+		
+		var node = global_player_trades[i]
+		offered_resources = []
+		for child in node.get_children():
+			if "Player" in child.name and child.visible == true:
+				for j in range(int(child.get_child(0).text.get_slice("[font_size=30][center][b]", 1))):
+					offered_resources.append(child.name.get_slice("_Player", 0))
+		
+		if CLIENT.resources.get("Tree") < offered_resources.count("Tree"):
+			trade_nodes_to_remove.append(node)
+		if CLIENT.resources.get("Brick") < offered_resources.count("Brick"):
+			trade_nodes_to_remove.append(node)
+		if CLIENT.resources.get("Stone") < offered_resources.count("Stone"):
+			trade_nodes_to_remove.append(node)
+		if CLIENT.resources.get("Wheat") < offered_resources.count("Wheat"):
+			trade_nodes_to_remove.append(node)
+		if CLIENT.resources.get("Sheep") < offered_resources.count("Sheep"):
+			trade_nodes_to_remove.append(node)
+			
+	for node in trade_nodes_to_remove:
+		global_player_trades.remove_at(global_player_trades.find(node))
+		$UILayer.remove_child(node)
+		node.queue_free()
+		
+	# Reorder existing trades
+	for i in range(0, len(global_player_trades)):
+		global_player_trades[i].position = Vector2(global_player_trades[i].position.x, (297 + (235 * i)))
+		
+	# Refresh the popup with updated resources
+	_on_player_trade_button_pressed() # Close it first
+	_on_player_trade_button_pressed() # Reopen it
+
+func bot_accept_or_decline_player_trade_decision(player, resources_being_offered: Array) -> bool:
+	# TODO: Add some better decision making...
+	# Would most likely follow a real player's decision making, weighing how much the trade would benefit each player, taking into consideration the VP of each player, how impactful the resources gained would be for being able to build new roads/cities/settlements, etc... this can get very complicated!
+	
+	var coin_flip = randi_range(0,1)
+	if coin_flip == 0:
+		return true
+	return false
+
+#func accept_player_trade(player, left_trade, right_trade, trade_node):
+	#print(player + " accepted trade: " + trade_node.name + " ( " + left_trade + "for " + right_trade + " ) ")

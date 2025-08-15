@@ -1,4 +1,4 @@
-[gd_scene load_steps=94 format=4 uid="uid://jivbdwftiitr"]
+[gd_scene load_steps=93 format=4 uid="uid://jivbdwftiitr"]
 
 [ext_resource type="Script" uid="uid://bw23uon3cp087" path="res://scenes/canaan.gd" id="1_d354y"]
 [ext_resource type="Script" uid="uid://14yc7lvh4r55" path="res://scenes/camera_2d.gd" id="2_sec5m"]
@@ -59,7 +59,6 @@
 [ext_resource type="Texture2D" uid="uid://b2ccd7w12v3gb" path="res://images/development_card_knight.png" id="57_0kw8m"]
 [ext_resource type="Texture2D" uid="uid://ownui7vg6ac8" path="res://images/development_card_monopoly.png" id="58_yqqmq"]
 [ext_resource type="Texture2D" uid="uid://bw8xxdyusr8y3" path="res://images/development_card_road.png" id="59_46m4j"]
-[ext_resource type="Texture2D" uid="uid://drj43vsnjn6pg" path="res://images/development_card_vp.png" id="60_vos2g"]
 [ext_resource type="Texture2D" uid="uid://belbrrenp3qwh" path="res://images/arrow_reserve.png" id="61_yqqmq"]
 [ext_resource type="Texture2D" uid="uid://bxupousf85g7" path="res://images/decline.png" id="62_46m4j"]
 
@@ -1413,46 +1412,26 @@ layout_mode = 0
 offset_right = 140.0
 offset_bottom = 189.0
 
-[node name="VP_DevCard" type="TextureRect" parent="UILayer"]
-visible = false
-offset_left = 568.0
-offset_top = 467.0
-offset_right = 708.0
-offset_bottom = 657.0
-scale = Vector2(0.4, 0.44)
-texture = ExtResource("60_vos2g")
-
-[node name="Amount" type="RichTextLabel" parent="UILayer/VP_DevCard"]
-layout_mode = 0
-offset_left = 107.5
-offset_top = -4.54545
-offset_right = 147.5
-offset_bottom = 36.4545
-theme_override_colors/default_color = Color(0, 0, 0, 1)
-bbcode_enabled = true
-text = "[font_size=30][center][b]0"
-scroll_active = false
-
 [node name="Bank_Trade_Popup" type="ColorRect" parent="UILayer"]
 visible = false
 offset_left = 1.0
 offset_top = 694.0
 offset_right = 908.0
 offset_bottom = 978.0
-color = Color(0.701961, 0.803922, 0.662745, 1)
+color = Color(0.701961, 0.803922, 0.662745, 0.537255)
 
 [node name="Dynamic_Player_Area" type="ColorRect" parent="UILayer/Bank_Trade_Popup"]
 layout_mode = 0
 offset_right = 437.0
 offset_bottom = 142.0
-color = Color(0.701961, 0.803922, 0.662745, 1)
+color = Color(0.701961, 0.803922, 0.662745, 0.52549)
 
 [node name="Dynamic_Bank_Area" type="ColorRect" parent="UILayer/Bank_Trade_Popup"]
 layout_mode = 0
 offset_left = 454.0
 offset_right = 907.0
 offset_bottom = 142.0
-color = Color(0.701961, 0.803922, 0.662745, 1)
+color = Color(0.701961, 0.803922, 0.662745, 0.52549)
 
 [node name="Brick_Player" type="TextureRect" parent="UILayer/Bank_Trade_Popup"]
 layout_mode = 0
@@ -1820,20 +1799,20 @@ offset_left = 1.0
 offset_top = 694.0
 offset_right = 908.0
 offset_bottom = 978.0
-color = Color(0.701961, 0.803922, 0.662745, 1)
+color = Color(0.701961, 0.803922, 0.662745, 0.537255)
 
 [node name="Dynamic_Player_Area" type="ColorRect" parent="UILayer/Player_Trade_Popup"]
 layout_mode = 0
 offset_right = 437.0
 offset_bottom = 142.0
-color = Color(0.701961, 0.803922, 0.662745, 1)
+color = Color(0.701961, 0.803922, 0.662745, 0.517647)
 
 [node name="Dynamic_Bank_Area" type="ColorRect" parent="UILayer/Player_Trade_Popup"]
 layout_mode = 0
 offset_left = 454.0
 offset_right = 907.0
 offset_bottom = 142.0
-color = Color(0.701961, 0.803922, 0.662745, 1)
+color = Color(0.701961, 0.803922, 0.662745, 0.517647)
 
 [node name="Brick_Player" type="TextureRect" parent="UILayer/Player_Trade_Popup"]
 layout_mode = 0
@@ -2202,12 +2181,13 @@ text = "[font_size=18][center]Your resources"
 scroll_active = false
 
 [node name="Player_Trade_Offer_Template" type="ColorRect" parent="UILayer"]
+visible = false
 offset_left = 1225.0
-offset_top = 307.0
+offset_top = 297.0
 offset_right = 1540.0
-offset_bottom = 550.0
+offset_bottom = 540.0
 scale = Vector2(1, 0.880002)
-color = Color(1, 0.996078, 0.729412, 1)
+color = Color(1, 0.996078, 0.729412, 0.678431)
 
 [node name="Who_Offered_Trade" type="RichTextLabel" parent="UILayer/Player_Trade_Offer_Template"]
 layout_mode = 0
@@ -2441,10 +2421,10 @@ texture = ExtResource("61_yqqmq")
 
 [node name="Accept_Or_Decline_Trade_Btn_Background" type="ColorRect" parent="UILayer/Player_Trade_Offer_Template"]
 layout_mode = 0
-offset_left = -47.0
-offset_top = 1.52588e-05
-offset_right = -1.0
-offset_bottom = 44.0
+offset_left = -62.0
+offset_top = 6.81818
+offset_right = -16.0
+offset_bottom = 50.8182
 color = Color(0.65098, 0.745098, 0.619608, 1)
 
 [node name="Decline_Trade_Btn" type="TextureButton" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background"]
@@ -2465,12 +2445,23 @@ offset_right = 43.0
 offset_bottom = 43.4091
 texture_normal = ExtResource("45_kovk3")
 
+[node name="Player_Name" type="RichTextLabel" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background"]
+layout_mode = 0
+offset_left = -25.0
+offset_top = -22.7272
+offset_right = 68.0
+offset_bottom = 0.272785
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+text = "noodlelou"
+scroll_active = false
+horizontal_alignment = 1
+
 [node name="Accept_Or_Decline_Trade_Btn_Background2" type="ColorRect" parent="UILayer/Player_Trade_Offer_Template"]
 layout_mode = 0
-offset_left = -47.0
-offset_top = 63.6362
-offset_right = -1.0
-offset_bottom = 107.636
+offset_left = -62.0
+offset_top = 72.7271
+offset_right = -16.0
+offset_bottom = 116.727
 color = Color(0.65098, 0.745098, 0.619608, 1)
 
 [node name="Decline_Trade_Btn" type="TextureButton" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background2"]
@@ -2482,21 +2473,32 @@ offset_right = 45.0
 offset_bottom = 43.0
 texture_normal = ExtResource("62_46m4j")
 
-[node name="Accept_Trade_Btn2" type="TextureButton" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background2"]
+[node name="Accept_Trade_Btn" type="TextureButton" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background2"]
 visible = false
 layout_mode = 0
 offset_left = 3.0
-offset_top = 3.40907
+offset_top = 3.40909
 offset_right = 43.0
 offset_bottom = 43.4091
 texture_normal = ExtResource("45_kovk3")
 
+[node name="Player_Name" type="RichTextLabel" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background2"]
+layout_mode = 0
+offset_left = -25.0
+offset_top = -22.7272
+offset_right = 68.0
+offset_bottom = 0.272785
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+text = "noodlelou"
+scroll_active = false
+horizontal_alignment = 1
+
 [node name="Accept_Or_Decline_Trade_Btn_Background3" type="ColorRect" parent="UILayer/Player_Trade_Offer_Template"]
 layout_mode = 0
-offset_left = -47.0
-offset_top = 130.682
-offset_right = -1.0
-offset_bottom = 174.682
+offset_left = -62.0
+offset_top = 138.636
+offset_right = -16.0
+offset_bottom = 182.636
 color = Color(0.65098, 0.745098, 0.619608, 1)
 
 [node name="Decline_Trade_Btn" type="TextureButton" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background3"]
@@ -2508,7 +2510,7 @@ offset_right = 45.0
 offset_bottom = 43.0
 texture_normal = ExtResource("62_46m4j")
 
-[node name="Accept_Trade_Btn3" type="TextureButton" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background3"]
+[node name="Accept_Trade_Btn" type="TextureButton" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background3"]
 visible = false
 layout_mode = 0
 offset_left = 3.0
@@ -2517,12 +2519,23 @@ offset_right = 43.0
 offset_bottom = 43.4091
 texture_normal = ExtResource("45_kovk3")
 
+[node name="Player_Name" type="RichTextLabel" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background3"]
+layout_mode = 0
+offset_left = -25.0
+offset_top = -22.7272
+offset_right = 68.0
+offset_bottom = 0.272785
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+text = "noodlelou"
+scroll_active = false
+horizontal_alignment = 1
+
 [node name="Accept_Or_Decline_Trade_Btn_Background4" type="ColorRect" parent="UILayer/Player_Trade_Offer_Template"]
 layout_mode = 0
-offset_left = -47.0
-offset_top = 198.863
-offset_right = -1.0
-offset_bottom = 242.863
+offset_left = -62.0
+offset_top = 205.681
+offset_right = -16.0
+offset_bottom = 249.681
 color = Color(0.65098, 0.745098, 0.619608, 1)
 
 [node name="Decline_Trade_Btn" type="TextureButton" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background4"]
@@ -2534,14 +2547,25 @@ offset_right = 45.0
 offset_bottom = 43.0
 texture_normal = ExtResource("62_46m4j")
 
-[node name="Accept_Trade_Btn4" type="TextureButton" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background4"]
+[node name="Accept_Trade_Btn" type="TextureButton" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background4"]
 visible = false
 layout_mode = 0
 offset_left = 3.0
-offset_top = 3.40907
+offset_top = 3.40909
 offset_right = 43.0
 offset_bottom = 43.4091
 texture_normal = ExtResource("45_kovk3")
+
+[node name="Player_Name" type="RichTextLabel" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background4"]
+layout_mode = 0
+offset_left = -25.0
+offset_top = -22.7272
+offset_right = 68.0
+offset_bottom = 0.272785
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+text = "noodlelou"
+scroll_active = false
+horizontal_alignment = 1
 
 [connection signal="timeout" from="MapLayer/Player1_Settlement_Timer" to="." method="_on_player_1_settlement_timer_timeout"]
 [connection signal="pressed" from="UILayer/Roll_Dice" to="." method="_on_roll_dice_pressed"]
