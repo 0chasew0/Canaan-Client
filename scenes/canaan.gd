@@ -18,6 +18,8 @@ extends Node2D
 @onready var NUM_SUPPLY_WHEAT = 19
 @onready var NUM_SUPPLY_STONE = 19
 @onready var NUM_SUPPLY_DEV_CARD = 25
+@export var global_road_ui_offset = Vector2(-25, 7.5)
+@export var global_road_ui_btn_offset = Vector2(-10, -3.5)
 
 # Game state variables
 @onready var ALL_PLAYERS = []
@@ -55,18 +57,21 @@ signal robber_done # Used for returning control back to main game loop
 func _ready() -> void:
 	
 	var PLAYER = load("res://player.gd")
+	var colors = ["#ffcc00", "#f3f3f3", "#1ea7e1", "#e86a17"]
 	for i in range(PLAYER_COUNT):
 		if i == 0: # In multiplayer, this should check for whether this is a bot or player
 			var PLAYER_OBJ = PLAYER.new()
 			PLAYER_OBJ._name = "Player 1"
 			PLAYER_OBJ.type = "Player"
 			PLAYER_OBJ.id = i+1
+			PLAYER_OBJ.color = colors[i]
 			ALL_PLAYERS.append(PLAYER_OBJ)
 			CLIENT = PLAYER_OBJ
 		else:
 			var BOT = PLAYER.new()
 			BOT._name = ("Bot %s" % str(i))
 			BOT.type = "Bot"
+			BOT.color = colors[i]
 			BOT.id = i+1
 			ALL_PLAYERS.append(BOT)
 	
@@ -217,11 +222,12 @@ func DEBUG_assert_resources_are_in_sync():
 	assert(total_resources_in_supply + total_resources_for_all_players == 95, "resources are out of sync! total resources between players and supply: " + str(total_resources_for_all_players + total_resources_in_supply) + ". Amount it should be: 95.")
 
 func initialize_ui_boxes() -> void:
-	#PLAYER_UI_BOX.get_node("PlayerName").text = "[font_size=18][center][b]Player"
-	#BOT_1_UI_BOX.get_node("PlayerName").text = "[font_size=18][center][b]Bot 1"
-	#BOT_2_UI_BOX.get_node("PlayerName").text = "[font_size=18][center][b]Bot 2"
-	#BOT_3_UI_BOX.get_node("PlayerName").text = "[font_size=18][center][b]Bot 3"
-	pass
+	var index = 1
+	for p in ALL_PLAYERS:
+		get_node("UILayer/Player%sBackground/PlayerName" % index).text = "[font_size=18][center][b]%s" % p._name
+		get_node("UILayer/Player%sBackground" % index).color = p.color
+		index += 1
+	
 
 
 func initialize_robber(map_data, tile_positions):
@@ -1406,7 +1412,7 @@ func bot_build_road(player, devcard):
 	var elements_to_remove = []
 	for i in range(len(ALL_OWNED_ROADS)):
 		for j in range(len(all_possible_road_placements)):
-			var placement_account_for_offset = (all_possible_road_placements[j] + Vector2(-10, -3.5))
+			var placement_account_for_offset = (all_possible_road_placements[j] + global_road_ui_btn_offset)
 			if placement_account_for_offset in ALL_OWNED_ROADS[i]:
 				elements_to_remove.append(all_possible_road_placements[j])
 	for i in range(len(elements_to_remove)):
@@ -1420,8 +1426,8 @@ func bot_build_road(player, devcard):
 		
 	var rand_road = all_possible_road_placements.pick_random()
 	
-	var road_ui_offset = Vector2(-25, 7.5)
-	var rand_road_node_pos = rand_road + Vector2(-10, -3.5)
+	var road_ui_offset = global_road_ui_offset
+	var rand_road_node_pos = rand_road + global_road_ui_btn_offset
 	
 	$MapLayer.add_child(ui_element_for_road)
 	ui_element_for_road.show()
@@ -1447,6 +1453,10 @@ func bot_build_road(player, devcard):
 	var slope = ((rand_road.y - closest_point.y) / (rand_road.x - closest_point.x))
 	var degrees = rad_to_deg(atan(slope))
 	ui_element_for_road.rotation_degrees = degrees
+	
+	if degrees == 90 or degrees == -90:
+		ui_element_for_road.position = Vector2(ui_element_for_road.position.x + 6.3, ui_element_for_road.position.y)
+	
 	
 	if devcard == false:
 		player.resources["Tree"] -= 1
@@ -1908,7 +1918,7 @@ func _on_build_road_button_pressed(devcard=false) -> void:
 	var elements_to_remove = []
 	for i in range(len(ALL_OWNED_ROADS)):
 		for j in range(len(all_possible_road_placements)):
-			var placement_account_for_offset = (all_possible_road_placements[j] + Vector2(-10, -3.5))
+			var placement_account_for_offset = (all_possible_road_placements[j] + global_road_ui_btn_offset)
 			if placement_account_for_offset in ALL_OWNED_ROADS[i]:
 				elements_to_remove.append(all_possible_road_placements[j])
 	for i in range(len(elements_to_remove)):
@@ -1917,7 +1927,7 @@ func _on_build_road_button_pressed(devcard=false) -> void:
 	
 	# Display the UI elements
 	for vertex in all_possible_road_placements:
-		var road_ui_btn_offset = Vector2(-10, -3.5)
+		var road_ui_btn_offset = global_road_ui_btn_offset
 		
 		var curr_UI_element = $MapLayer/Possible_Placement_Road.duplicate()
 		$MapLayer.add_child(curr_UI_element, true)
@@ -1954,7 +1964,7 @@ func _on_build_road_button_pressed(devcard=false) -> void:
 	
 func road_placement_pressed(midpoint_btn_node, road_midpoint):
 	# When the midpoint button is pressed -- show a road between the two points and add that point as a road to this player
-	var road_ui_offset = Vector2(-25, 7.5)
+	var road_ui_offset = global_road_ui_offset
 	
 	var ui_element_for_road = $MapLayer/Player1_Road.duplicate()
 	$MapLayer.add_child(ui_element_for_road)
@@ -1981,6 +1991,9 @@ func road_placement_pressed(midpoint_btn_node, road_midpoint):
 	var slope = ((road_midpoint.y - closest_point.y) / (road_midpoint.x - closest_point.x))
 	var degrees = rad_to_deg(atan(slope))
 	ui_element_for_road.rotation_degrees = degrees
+	
+	if degrees == 90 or degrees == -90:
+		ui_element_for_road.position = Vector2(ui_element_for_road.position.x + 6.3, ui_element_for_road.position.y)
 	
 	emit_signal("selection_finished")
 
@@ -2507,7 +2520,7 @@ func place_initial_settlements_and_roads(p):
 func possible_road_placements_setup_phase(settlement_pos) -> void:
 	# Given a single point -- find all possible road placements branching from it using distance formula
 	
-	var road_ui_btn_offset = Vector2(-10, -3.5)
+	var road_ui_btn_offset = global_road_ui_btn_offset
 	
 	for vertex in ALL_ROAD_MIDPOINTS:
 		var distance = sqrt(((vertex.x - settlement_pos.x)**2) + ((vertex.y - settlement_pos.y)**2))
@@ -2522,7 +2535,7 @@ func possible_road_placements_setup_phase(settlement_pos) -> void:
 func road_placement_pressed_setup_phase(midpoint_btn_node, GLOBAL_TURN_NUM, connected_vertex, settlement_vertex):
 	
 	# When the midpoint button is pressed -- show a road between the two points and add that point as a road to this player
-	var road_ui_offset = Vector2(-25, 7.5)
+	var road_ui_offset = global_road_ui_offset
 	var ui_element_for_road = $MapLayer/Player1_Road.duplicate()
 	$MapLayer.add_child(ui_element_for_road)
 	ui_element_for_road.show()
@@ -2535,6 +2548,12 @@ func road_placement_pressed_setup_phase(midpoint_btn_node, GLOBAL_TURN_NUM, conn
 	# Use slope and arctan between two points to calculate how to rotate the UI element
 	var slope = ((connected_vertex.y - settlement_vertex.y) / (connected_vertex.x - settlement_vertex.x))
 	var degrees = rad_to_deg(atan(slope))
+	
+	print(slope, degrees)
+	
+	if degrees == 90 or degrees == -90:
+		ui_element_for_road.position = Vector2(ui_element_for_road.position.x + 6.3, ui_element_for_road.position.y)
+	
 	ui_element_for_road.rotation_degrees = degrees
 	
 	update_eligible_settlement_vertices(CLIENT.last_vertex_selected, CLIENT.last_node_selected)
@@ -2560,10 +2579,10 @@ func bot_place_initial_road(settlement_pos, player) -> void:
 	var rand_num = randi_range(0, len(eligible_road_placements)-1)
 	var chosen_road = eligible_road_placements[rand_num]
 	
-	player.roads.append(chosen_road + Vector2(-10, -3.5))
-	ALL_OWNED_ROADS[ALL_PLAYERS.find(player)].append(chosen_road + Vector2(-10, -3.5))
+	player.roads.append(chosen_road + global_road_ui_btn_offset)
+	ALL_OWNED_ROADS[ALL_PLAYERS.find(player)].append(chosen_road + global_road_ui_btn_offset)
 	
-	var road_ui_offset = Vector2(-25, 7.5) + Vector2(-10, -3.5)
+	var road_ui_offset = global_road_ui_offset + global_road_ui_btn_offset
 	$MapLayer.add_child(ui_element_for_road)
 	ui_element_for_road.show()
 	ui_element_for_road.pivot_offset = Vector2(ui_element_for_road.size.x / 2, ui_element_for_road.size.y / 2)
@@ -2573,6 +2592,9 @@ func bot_place_initial_road(settlement_pos, player) -> void:
 	var slope = ((chosen_road.y - settlement_pos.y) / (chosen_road.x - settlement_pos.x))
 	var degrees = rad_to_deg(atan(slope))
 	ui_element_for_road.rotation_degrees = degrees
+	
+	if degrees == 90 or degrees == -90:
+		ui_element_for_road.position = Vector2(ui_element_for_road.position.x + 6.3, ui_element_for_road.position.y)
 
 # Initialize settlement placement buttons group -- this is done once for each game!
 # Afterwards, make changes to the group

@@ -1,8 +1,9 @@
-[gd_scene load_steps=93 format=4 uid="uid://jivbdwftiitr"]
+[gd_scene load_steps=94 format=4 uid="uid://jivbdwftiitr"]
 
 [ext_resource type="Script" uid="uid://bw23uon3cp087" path="res://scenes/canaan.gd" id="1_d354y"]
 [ext_resource type="Script" uid="uid://14yc7lvh4r55" path="res://scenes/camera_2d.gd" id="2_sec5m"]
 [ext_resource type="Texture2D" uid="uid://djglnqvthqtah" path="res://images/Dirt/dirt_14.png" id="2_y5yh0"]
+[ext_resource type="VideoStream" uid="uid://c70hkwtyb021d" path="res://images/water_background.ogv" id="3_46m4j"]
 [ext_resource type="Texture2D" uid="uid://bv63g4podrub6" path="res://images/Grass/grass_05.png" id="3_lk8ig"]
 [ext_resource type="Texture2D" uid="uid://b6n4bu03fr25o" path="res://images/Mars/mars_07.png" id="4_t3oo1"]
 [ext_resource type="Texture2D" uid="uid://bpyol5iri4dvd" path="res://images/wheat.png" id="5_xcn6w"]
@@ -248,11 +249,27 @@ sources/8 = SubResource("TileSetAtlasSource_5aaxl")
 y_sort_enabled = true
 script = ExtResource("1_d354y")
 chat_log_font_size = 22
+global_road_ui_offset = Vector2(-26, 7.5)
 DEBUG_map_vertex_offset = Vector2(908, 671)
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(960, 536)
 script = ExtResource("2_sec5m")
+min_zoom = 1.0
+max_zoom = 4.0
+
+[node name="VideoStreamPlayer" type="VideoStreamPlayer" parent="."]
+visible = false
+z_index = 1
+offset_left = -1010.0
+offset_top = -127.0
+offset_right = 3103.0
+offset_bottom = 2120.0
+mouse_filter = 2
+stream = ExtResource("3_46m4j")
+autoplay = true
+expand = true
+loop = true
 
 [node name="Background" type="ColorRect" parent="."]
 z_index = 1
@@ -349,10 +366,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -24.0
-offset_top = -24.0
-offset_right = 24.0
-offset_bottom = 24.0
+offset_left = 26.0
+offset_top = 5.0
+offset_right = 74.0
+offset_bottom = 53.0
 grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("28_cs0nk")
@@ -394,9 +411,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -24.0
-offset_top = -24.0
+offset_top = 47.0
 offset_right = 24.0
-offset_bottom = 24.0
+offset_bottom = 95.0
 grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("31_o1kvk")
@@ -609,7 +626,7 @@ offset_left = 1349.0
 offset_top = 8.0
 offset_right = 1903.0
 offset_bottom = 293.0
-color = Color(1, 0.701961, 0.168627, 1)
+color = Color(0.701961, 0.803922, 0.662745, 1)
 
 [node name="Chat_Log" type="RichTextLabel" parent="UILayer/Chat"]
 layout_mode = 0
@@ -810,6 +827,7 @@ offset_left = 1547.0
 offset_top = 435.0
 offset_right = 1903.0
 offset_bottom = 550.0
+color = Color(0.952941, 0.952941, 0.952941, 1)
 
 [node name="PlayerName" type="RichTextLabel" parent="UILayer/Player1Background"]
 layout_mode = 0
@@ -1418,20 +1436,20 @@ offset_left = 1.0
 offset_top = 694.0
 offset_right = 908.0
 offset_bottom = 978.0
-color = Color(0.701961, 0.803922, 0.662745, 0.537255)
+color = Color(0.701961, 0.803922, 0.662745, 0.588235)
 
 [node name="Dynamic_Player_Area" type="ColorRect" parent="UILayer/Bank_Trade_Popup"]
 layout_mode = 0
 offset_right = 437.0
 offset_bottom = 142.0
-color = Color(0.701961, 0.803922, 0.662745, 0.52549)
+color = Color(0.701961, 0.803922, 0.662745, 0.588235)
 
 [node name="Dynamic_Bank_Area" type="ColorRect" parent="UILayer/Bank_Trade_Popup"]
 layout_mode = 0
 offset_left = 454.0
 offset_right = 907.0
 offset_bottom = 142.0
-color = Color(0.701961, 0.803922, 0.662745, 0.52549)
+color = Color(0.701961, 0.803922, 0.662745, 0.588235)
 
 [node name="Brick_Player" type="TextureRect" parent="UILayer/Bank_Trade_Popup"]
 layout_mode = 0
@@ -1799,20 +1817,20 @@ offset_left = 1.0
 offset_top = 694.0
 offset_right = 908.0
 offset_bottom = 978.0
-color = Color(0.701961, 0.803922, 0.662745, 0.537255)
+color = Color(0.701961, 0.803922, 0.662745, 0.588235)
 
 [node name="Dynamic_Player_Area" type="ColorRect" parent="UILayer/Player_Trade_Popup"]
 layout_mode = 0
 offset_right = 437.0
 offset_bottom = 142.0
-color = Color(0.701961, 0.803922, 0.662745, 0.517647)
+color = Color(0.701961, 0.803922, 0.662745, 0.588235)
 
 [node name="Dynamic_Bank_Area" type="ColorRect" parent="UILayer/Player_Trade_Popup"]
 layout_mode = 0
 offset_left = 454.0
 offset_right = 907.0
 offset_bottom = 142.0
-color = Color(0.701961, 0.803922, 0.662745, 0.517647)
+color = Color(0.701961, 0.803922, 0.662745, 0.588235)
 
 [node name="Brick_Player" type="TextureRect" parent="UILayer/Player_Trade_Popup"]
 layout_mode = 0

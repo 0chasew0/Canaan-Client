@@ -35,8 +35,8 @@ func _unhandled_input(event):
 	
 	if position_before_drag and event is InputEventMouseMotion:
 		self.global_position = position_before_drag2 + (position_before_drag - event.global_position) * (1/zoom_level)
-		self.global_position.x = clamp(self.global_position.x, -2000, 2000)
-		self.global_position.y = clamp(self.global_position.y, -1000, 1000)
+		self.global_position.x = clamp(self.global_position.x, -100, 2000)
+		self.global_position.y = clamp(self.global_position.y, -100, 1500)
 
 
 func set_zoom_level(level: float, mouse_world_position = self.get_global_mouse_position()):
