@@ -27,6 +27,7 @@ var dev_cards = {
 	"Road_DevCard": 0,
 	"VP_DevCard": 0
 }
+var total_dev_cards = 0
 var total_resources = 0
 var last_vertex_selected = null
 var last_node_selected = null

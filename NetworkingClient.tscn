@@ -29,6 +29,5 @@ text = "Disconnect"
 
 [connection signal="pressed" from="Lobby/ConnectBtn" to="." method="_on_connect_btn_pressed"]
 [connection signal="pressed" from="Lobby/DisconnectBtn" to="." method="_on_disconnect_btn_pressed"]
-[connection signal="pressed" from="GameSelect/Canaan_4_Player" to="." method="_on_canaan_4_player_pressed"]
 
 [editable path="GameSelect"]

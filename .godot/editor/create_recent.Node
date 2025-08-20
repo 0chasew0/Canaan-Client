@@ -1,8 +1,9 @@
-VideoStreamPlayer
+Button
 RichTextLabel
 ColorRect
+VBoxContainer
+VideoStreamPlayer
 TextureButton
-Button
 TextureRect
 Timer
 TileMapLayer
@@ -11,4 +12,3 @@ CanvasLayer
 SubViewport
 Camera2D
 Control
-Node

@@ -2585,6 +2585,81 @@ text = "noodlelou"
 scroll_active = false
 horizontal_alignment = 1
 
+[node name="Version" type="RichTextLabel" parent="UILayer"]
+offset_left = -10.0
+offset_top = 7.0
+offset_right = 125.0
+offset_bottom = 41.0
+bbcode_enabled = true
+text = "[center] [font_size=20] v0.0.1 beta
+"
+
+[node name="DEBUG_show_debug_info" type="Button" parent="UILayer"]
+offset_left = 129.0
+offset_top = 5.0
+offset_right = 260.0
+offset_bottom = 46.0
+text = "Show debug info"
+
+[node name="debug_info" type="RichTextLabel" parent="UILayer/DEBUG_show_debug_info"]
+visible = false
+layout_mode = 0
+offset_left = -122.0
+offset_top = 44.0
+offset_right = 299.0
+offset_bottom = 829.0
+bbcode_enabled = true
+
+[node name="End_Game_Screen" type="ColorRect" parent="UILayer"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -370.0
+offset_top = -235.5
+offset_right = 370.0
+offset_bottom = 235.5
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+color = Color(1, 0.996078, 0.729412, 1)
+
+[node name="Game_Over" type="RichTextLabel" parent="UILayer/End_Game_Screen"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -206.0
+offset_top = -244.5
+offset_right = 206.0
+offset_bottom = 114.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=50] [center] Game over!
+Winner: "
+
+[node name="Back_To_Menu_Btn" type="Button" parent="UILayer/End_Game_Screen"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -84.5
+offset_top = -91.5
+offset_right = 84.5
+offset_bottom = -36.5
+grow_horizontal = 2
+grow_vertical = 0
+text = "Return to menu"
+
 [connection signal="timeout" from="MapLayer/Player1_Settlement_Timer" to="." method="_on_player_1_settlement_timer_timeout"]
 [connection signal="pressed" from="UILayer/Roll_Dice" to="." method="_on_roll_dice_pressed"]
 [connection signal="pressed" from="UILayer/Bank_Trade_Btn_Background/Bank_Trade_Button" to="." method="_on_bank_trade_button_pressed"]
@@ -2620,3 +2695,5 @@ horizontal_alignment = 1
 [connection signal="pressed" from="UILayer/Player_Trade_Popup/Stone_Bank/Stone_Bank_Btn" to="." method="_on_PLAYER_TRADE_stone_bank_btn_pressed"]
 [connection signal="pressed" from="UILayer/Player_Trade_Popup/Wheat_Bank/Wheat_Bank_Btn" to="." method="_on_PLAYER_TRADE_wheat_bank_btn_pressed"]
 [connection signal="pressed" from="UILayer/Player_Trade_Popup/Finish_Trade_Btn/Finish_Trade_Btn" to="." method="_on_PLAYER_TRADE_finish_trade_btn_pressed"]
+[connection signal="pressed" from="UILayer/DEBUG_show_debug_info" to="." method="_on_debug_show_debug_info_pressed"]
+[connection signal="pressed" from="UILayer/End_Game_Screen/Back_To_Menu_Btn" to="." method="_on_back_to_menu_btn_pressed"]

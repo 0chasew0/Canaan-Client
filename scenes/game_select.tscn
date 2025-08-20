@@ -1,4 +1,6 @@
-[gd_scene format=3 uid="uid://b81k73kbrjw18"]
+[gd_scene load_steps=2 format=3 uid="uid://b81k73kbrjw18"]
+
+[ext_resource type="Script" uid="uid://6w6x5avmq525" path="res://scenes/game_select.gd" id="1_8y7ss"]
 
 [node name="GameSelect" type="Control"]
 layout_mode = 3
@@ -7,6 +9,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_8y7ss")
 
 [node name="Background" type="ColorRect" parent="."]
 layout_mode = 1
@@ -17,26 +20,52 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.747305, 0.869658, 0.609046, 1)
 
-[node name="Game_Select" type="RichTextLabel" parent="."]
+[node name="Canaan" type="RichTextLabel" parent="."]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_bottom = 76.0
+offset_bottom = 277.0
 grow_horizontal = 2
 bbcode_enabled = true
-text = "[center] [b] [font_size=50] Select Game"
+text = "[center] [b] [font_size=100] Canaan [font_size=25]
+by Noodle Studios
+"
 
-[node name="Canaan_4_Player" type="Button" parent="."]
+[node name="Version" type="RichTextLabel" parent="."]
+layout_mode = 2
+offset_left = 1776.0
+offset_top = 1038.0
+offset_right = 1911.0
+offset_bottom = 1072.0
+grow_horizontal = 2
+bbcode_enabled = true
+text = "[center] [font_size=20] v0.0.1 beta
+"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -82.5
-offset_top = -38.0
-offset_right = 82.5
-offset_bottom = 38.0
+offset_left = -231.0
+offset_top = -151.5
+offset_right = 231.0
+offset_bottom = 151.5
 grow_horizontal = 2
 grow_vertical = 2
-text = "Canaan (1-4 players)"
+alignment = 1
+
+[node name="Canaan_Singleplayer" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Play Singleplayer (with bots)"
+
+[node name="Canaan_4_Player" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+disabled = true
+text = "Play Multiplayer (2-4 players) (Coming soon!)"
+
+[connection signal="pressed" from="VBoxContainer/Canaan_Singleplayer" to="." method="_on_canaan_singleplayer_pressed"]

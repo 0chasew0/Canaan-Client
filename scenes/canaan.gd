@@ -48,6 +48,8 @@ extends Node2D
 @onready var ELIGIBLE_SETTLEMENT_VERTICES = [] # Contains a list of eligible vertices for settlement placement. This is shared between all players
 @onready var ELIGIBLE_ROAD_VERTICES_SETUP = []
 @onready var global_player_trades = []
+@onready var global_player_with_largest_army = null
+@onready var global_player_with_longest_road = null
 
 # Signals
 signal selection_finished # Used for returning control back to a main function after a user selects an action or they timeout from that action
@@ -99,7 +101,7 @@ func _ready() -> void:
 	await ui_disable_all_buttons()
 	
 	# Initialize chat box setting(s)
-	chat_log.append_text("[font_size=%s]Welcome to Canaan!" % chat_log_font_size)
+	chat_log.append_text("[font_size=%s]Welcome to Canaan!\n" % chat_log_font_size)
 	
 	# Initialize road array
 	for i in range(PLAYER_COUNT):
@@ -123,7 +125,7 @@ func _ready() -> void:
 	
 	generate_initial_resources(standard_map, tile_positions, tile_positions_local)
 		
-	chat_log.append_text("[font_size=%s]\nAll players done placing settlements and roads." % chat_log_font_size)
+	chat_log.append_text("All players done placing settlements and roads.\n")
 	
 	for player in ALL_PLAYERS:
 		player.vp = 2
@@ -144,7 +146,7 @@ func main_game_loop(tile_positions, standard_map):
 				roll_dice_btn.disabled = false
 				roll_dice_btn.text = "Roll Dice"
 				await ui_disable_all_buttons()
-				print("player turn")
+				chat_log.append_text("Player turn!\n")
 				p.dev_card_played_this_turn = false
 				#roll_dice_btn.disabled = false
 				
@@ -155,7 +157,7 @@ func main_game_loop(tile_positions, standard_map):
 				
 				await roll_dice_btn.pressed # Wait for user to roll dice before continuing
 				p.dice_roll_result = _on_roll_dice_pressed()
-				chat_log.append_text("[font_size=%s]\n%s rolled a %s." % [chat_log_font_size, p._name, p.dice_roll_result])
+				chat_log.append_text("%s rolled a %s. \n" % [p._name, p.dice_roll_result])
 				roll_dice_btn.disabled = true
 				
 				# Generate resources for EACH player based on dice result, unless a 7 is rolled
@@ -191,7 +193,7 @@ func main_game_loop(tile_positions, standard_map):
 				# Simulate dice roll
 				p.dev_card_played_this_turn = false
 				p.dice_roll_result = _on_roll_dice_pressed()
-				chat_log.append_text("[font_size=%s]\n%s rolled a %s." % [chat_log_font_size, p._name, p.dice_roll_result])
+				chat_log.append_text("%s rolled a %s.\n" % [p._name, p.dice_roll_result])
 				if p.dice_roll_result == 7:
 					#for player in ALL_PLAYERS:
 						#if player.vp < 3:
@@ -199,7 +201,7 @@ func main_game_loop(tile_positions, standard_map):
 						#else:
 							#activate_robber(p)
 					await activate_robber(p)
-					print("robber done")
+					#print("robber done")
 					
 				DEBUG_assert_resources_are_in_sync()
 					
@@ -274,7 +276,7 @@ func initialize_development_cards():
 func roll_for_who_goes_first():
 	# Determine who goes first by rolling for it
 	# Upate player_turn var from server?
-	chat_log.append_text("[font_size=%s]\nRoll for turn order!" % chat_log_font_size)
+	chat_log.append_text("Roll for turn order!\n")
 	
 	var turn_order = []
 	for player in ALL_PLAYERS:
@@ -284,14 +286,14 @@ func roll_for_who_goes_first():
 			turn_order.append([player.dice_roll_result, player])
 			
 			# Update the chat log
-			var fmt_str = "[font_size=%s]\nPlayer %s rolled a %s"
-			var act_str = fmt_str % [chat_log_font_size, player.id, player.dice_roll_result]
+			var fmt_str = "Player %s rolled a %s\n"
+			var act_str = fmt_str % [player.id, player.dice_roll_result]
 			chat_log.append_text(act_str)
 		else:
 			player.dice_roll_result = _on_roll_dice_pressed()
 			turn_order.append([player.dice_roll_result, player])
-			var fmt_str = "[font_size=%s]\nPlayer %s rolled a %s"
-			var act_str = fmt_str % [chat_log_font_size, player.id, player.dice_roll_result]
+			var fmt_str = "Player %s rolled a %s\n"
+			var act_str = fmt_str % [player.id, player.dice_roll_result]
 			chat_log.append_text(act_str)
 		GLOBAL_TURN_NUM += 1
 		
@@ -305,11 +307,9 @@ func roll_for_who_goes_first():
 			CLIENT_INDEX = i
 		# Store bot indexes too?
 
-	
-	chat_log.append_text("\n")
 	for i in ALL_PLAYERS.size():
-		var fmt_str = "[font_size=%s]\n%s %s goes %s!"
-		var act_str = fmt_str % [chat_log_font_size, ALL_PLAYERS[i].type, ALL_PLAYERS[i].id, i+1]
+		var fmt_str = "%s %s goes %s!\n"
+		var act_str = fmt_str % [ALL_PLAYERS[i].type, ALL_PLAYERS[i].id, i+1]
 		chat_log.append_text(act_str)
 		
 	is_roll_for_turn = false
@@ -432,8 +432,6 @@ func bank_trade_remove_resource_from_player_area(node, resource):
 		num_remaining = int(get_node("UILayer/Bank_Trade_Popup/%s_Player/Num_Remaining" % resource).text.get_slice("[font_size=30][center][b]", 1)) + 1
 		get_node("UILayer/Bank_Trade_Popup/%s_Player/%s_Player_Btn" % [resource, resource]).show()
 		get_node("UILayer/Bank_Trade_Popup/%s_Player/Num_Remaining" % resource).text = "[font_size=30][center][b]%s" % str(num_remaining)
-	
-	print(CLIENT.chosen_resources_trade)
 
 func bank_trade_add_resource_to_player_area(resource):
 	
@@ -465,7 +463,6 @@ func bank_trade_add_resource_to_player_area(resource):
 		if "Player" in node.name and node.name != "Dynamic_Player_Area":
 			node.hide()
 	
-	print(CLIENT.chosen_resources_trade)
 
 # If the player presses on the resource they added up for trade, remove that resource and add it back to their resources
 func bank_trade_remove_resource_from_bank_area(node, resource):
@@ -492,8 +489,6 @@ func bank_trade_remove_resource_from_bank_area(node, resource):
 		num_remaining = int(get_node("UILayer/Bank_Trade_Popup/%s_Bank/Num_Remaining" % resource).text.get_slice("[font_size=30][center][b]", 1)) + 1
 		get_node("UILayer/Bank_Trade_Popup/%s_Bank/%s_Bank_Btn" % [resource, resource]).show()
 		get_node("UILayer/Bank_Trade_Popup/%s_Bank/Num_Remaining" % resource).text = "[font_size=30][center][b]%s" % str(num_remaining)
-	
-	print(CLIENT.chosen_resources_bank_trade)
 
 func bank_trade_add_resource_to_bank_area(resource):
 	
@@ -525,7 +520,7 @@ func bank_trade_add_resource_to_bank_area(resource):
 		if "Bank" in node.name and node.name != "Dynamic_Bank_Area":
 			node.hide()
 	
-	print(CLIENT.chosen_resources_bank_trade)
+	#print(CLIENT.chosen_resources_bank_trade)
 
 func check_if_valid_bank_trade() -> bool:
 	# Check that correct resources have been made for trade, taking into account bank supply numbers
@@ -543,7 +538,7 @@ func check_if_valid_bank_trade() -> bool:
 						var left_trade = CLIENT.chosen_resources_trade.slice(i, i+loop_range)
 						var right_trade = CLIENT.chosen_resources_bank_trade.pop_at(0)
 						
-						print("left trade: ", CLIENT.chosen_resources_trade, " right trade: ", CLIENT.chosen_resources_bank_trade)
+						#print("left trade: ", CLIENT.chosen_resources_trade, " right trade: ", CLIENT.chosen_resources_bank_trade)
 						
 						for j in range(0, loop_range):
 							CLIENT.resources[left_trade[0]] -= 1
@@ -555,6 +550,8 @@ func check_if_valid_bank_trade() -> bool:
 						CLIENT.total_resources += 1
 						ui_add_to_resource_bar(right_trade)
 						ui_remove_resource_from_supply(right_trade)
+						
+				ui_update_resources(CLIENT)
 				return true
 			else: # 2:1, matching based on resource
 				var player_resource = CLIENT.chosen_resources_trade[0]
@@ -564,7 +561,7 @@ func check_if_valid_bank_trade() -> bool:
 							var left_trade = CLIENT.chosen_resources_trade.slice(i, i+2)
 							var right_trade = CLIENT.chosen_resources_bank_trade.pop_at(0)
 							
-							print("left trade: ", CLIENT.chosen_resources_trade, " right trade: ", CLIENT.chosen_resources_bank_trade)
+							#print("left trade: ", CLIENT.chosen_resources_trade, " right trade: ", CLIENT.chosen_resources_bank_trade)
 							
 							for j in range(0, 2):
 								CLIENT.resources[left_trade[0]] -= 1
@@ -576,6 +573,8 @@ func check_if_valid_bank_trade() -> bool:
 							CLIENT.total_resources += 1
 							ui_add_to_resource_bar(right_trade)
 							ui_remove_resource_from_supply(right_trade)
+							
+					ui_update_resources(CLIENT)
 					return true
 				elif len(CLIENT.chosen_resources_trade) >= 4: # 4:1, 8:2, etc.
 					for i in range(0, len(CLIENT.chosen_resources_trade), 4):
@@ -583,7 +582,7 @@ func check_if_valid_bank_trade() -> bool:
 							var left_trade = CLIENT.chosen_resources_trade.slice(i, i+4)
 							var right_trade = CLIENT.chosen_resources_bank_trade.pop_at(0)
 							
-							print("left trade: ", CLIENT.chosen_resources_trade, " right trade: ", CLIENT.chosen_resources_bank_trade)
+							#print("left trade: ", CLIENT.chosen_resources_trade, " right trade: ", CLIENT.chosen_resources_bank_trade)
 							
 							for j in range(0, 4):
 								CLIENT.resources[left_trade[0]] -= 1
@@ -597,6 +596,8 @@ func check_if_valid_bank_trade() -> bool:
 							ui_add_to_resource_bar(right_trade)
 							ui_remove_resource_from_supply(right_trade)
 							
+					ui_update_resources(CLIENT)
+							
 					return true
 				else:
 					return false
@@ -607,7 +608,7 @@ func check_if_valid_bank_trade() -> bool:
 					var left_trade = CLIENT.chosen_resources_trade.slice(i, i+4)
 					var right_trade = CLIENT.chosen_resources_bank_trade.pop_at(0)
 					
-					print("left trade: ", CLIENT.chosen_resources_trade, " right trade: ", CLIENT.chosen_resources_bank_trade)
+					#print("left trade: ", CLIENT.chosen_resources_trade, " right trade: ", CLIENT.chosen_resources_bank_trade)
 					
 					for j in range(0, 4):
 						CLIENT.resources[left_trade[0]] -= 1
@@ -620,6 +621,8 @@ func check_if_valid_bank_trade() -> bool:
 					CLIENT.total_resources += 1
 					ui_add_to_resource_bar(right_trade)
 					ui_remove_resource_from_supply(right_trade)
+					
+			ui_update_resources(CLIENT)
 					
 			return true
 				
@@ -655,8 +658,8 @@ func activate_robber(player):
 	for p in ALL_PLAYERS:
 		if p.total_resources > 7:
 			var num_of_resources_to_discard = floor(p.total_resources / 2)
-			print(p._name, " total resources: ", p.total_resources)
-			print(p._name, " discarding ", num_of_resources_to_discard, " resources.")
+			#print(p._name, " total resources: ", p.total_resources)
+			#print(p._name, " discarding ", num_of_resources_to_discard, " resources.")
 			if p.type == "Bot":
 				for i in range(num_of_resources_to_discard):
 					if p.resources["Tree"] > 0:
@@ -675,11 +678,14 @@ func activate_robber(player):
 						p.resources["Sheep"] -= 1
 						ui_add_resource_to_supply("Sheep")
 					p.total_resources -= 1
+				ui_update_resources(p)
 			else:
 				ui_robber_discard_resources(p, num_of_resources_to_discard)
 				await done_picking
+				ui_update_resources(p)
 		else:
-			print(p._name, " has ", p.total_resources, " resources, doesn't discard any.")
+			#print(p._name, " has ", p.total_resources, " resources, doesn't discard any.")
+			pass
 	
 	# This player MUST move the robber
 	if player.type == "Bot":
@@ -763,6 +769,8 @@ func resource_discard_pressed(resource_name, resource_id, player):
 	await ui_remove_from_resource_bar(resource_name)
 	await ui_add_resource_to_supply(resource_name)
 	
+	ui_update_resources(player)
+	
 	emit_signal("selection_finished")
 
 func bot_robber_steal(player, local_coords_for_center_of_tile):
@@ -808,10 +816,13 @@ func bot_robber_steal(player, local_coords_for_center_of_tile):
 		player.resources[random_resource] += 1
 		player.total_resources += 1
 		
-		print(player._name, " robbed a ", random_resource, " from ", p._name, "!")
+		chat_log.append_text(player._name + " robbed a " + random_resource + " from " + p._name + "!\n")
 		
 		if p.type == "Player":
 			ui_remove_from_resource_bar(random_resource)
+			
+		ui_update_resources(p)
+		ui_update_resources(player)
 		
 	elif len(rob_players) == 1:
 		var p = rob_players[0]
@@ -839,12 +850,16 @@ func bot_robber_steal(player, local_coords_for_center_of_tile):
 		player.resources[random_resource] += 1
 		player.total_resources += 1
 		
-		print(player._name, " robbed a ", random_resource, " from ", p._name, "!")
+		chat_log.append_text(player._name + " robbed a " + random_resource + " from " + p._name + "!\n")
 		
 		if p.type == "Player":
 			ui_remove_from_resource_bar(random_resource)
+			
+		ui_update_resources(p)
+		ui_update_resources(player)
 	else:
-		print("No one to rob from!")
+		#print("No one to rob from!")
+		pass
 
 func ui_robber_choose_new_location_client():
 	
@@ -943,13 +958,16 @@ func ui_robber_new_location(local_coords_for_center_of_tile):
 		CLIENT.resources[random_resource] += 1
 		CLIENT.total_resources += 1
 		
-		print(CLIENT._name, " robbed a ", random_resource, " from ", player._name, "!")
+		chat_log.append_text(CLIENT._name + " robbed a " + random_resource + " from " + player._name + "!\n")
+		
+		ui_update_resources(CLIENT)
+		ui_update_resources(player)
 		
 		ui_add_to_resource_bar(random_resource)
 	
 	# No one is adjacent, don't steal
 	else:
-		print("No one to steal from!")
+		#print("No one to steal from!")
 		pass
 		
 	emit_signal("done_picking")
@@ -987,7 +1005,10 @@ func ui_choose_who_to_rob(player):
 	
 	ui_add_to_resource_bar(random_resource)
 	
-	print(CLIENT._name, " robbed a ", random_resource, " from ", player._name, "!")
+	chat_log.append_text(CLIENT._name + " robbed a " + random_resource + " from " +  player._name + "!\n")
+	
+	ui_update_resources(CLIENT)
+	ui_update_resources(player)
 	
 	emit_signal("done_picking")
 
@@ -1168,8 +1189,17 @@ func ui_remove_resource_from_supply(resource):
 	else:
 		print("error removing resource from supply: ", resource)
 	
-func ui_update_vp(player):
+func ui_update_vp(player) -> void:
 	get_node("UILayer/Player%sBackground/VP" % player.id).text = "[font_size=18][center]Victory Points: %s" % player.vp
+
+func ui_update_knights_played(player) -> void:
+	get_node("UILayer/Player%sBackground/Knights_Played" % player.id).text = "[font_size=18][center]Knights: %s" % player.knights_played
+
+func ui_update_resources(player) -> void:
+	get_node("UILayer/Player%sBackground/Resource_Num" % player.id).text = "[font_size=18][center]Resources: %s" % player.total_resources
+
+func ui_update_dev_cards(player) -> void:
+	get_node("UILayer/Player%sBackground/Dev_Card_Num" % player.id).text = "[font_size=18][center]Dev Cards: %s" % player.total_dev_cards
 
 func bot_decision_loop(player):
 	# Figure out which bot this is, based on global_turn_num
@@ -1179,25 +1209,25 @@ func bot_decision_loop(player):
 		
 		if player.dev_card_played_this_turn == false:
 			if player.dev_cards["Invention_DevCard"] > 0:
-				print(player._name, " used invention dev card")
+				chat_log.append_text(player._name + " used invention dev card\n")
 				await bot_use_invention_dev_card(player)
 				player.dev_cards["Invention_DevCard"] -= 1
 				continue
 			
 			if player.dev_cards["Knight_DevCard"] > 0:
-				print(player._name, " used knight dev card")
+				chat_log.append_text(player._name + " used knight dev card\n")
 				await bot_use_knight_dev_card(player)
 				player.dev_cards["Knight_DevCard"] -= 1
 				continue
 			
 			if player.dev_cards["Monopoly_DevCard"] > 0:
-				print(player._name, " used monopoly dev card")
+				chat_log.append_text(player._name + " used monopoly dev card\n")
 				await bot_use_monopoly_dev_card(player)
 				player.dev_cards["Monopoly_DevCard"] -= 1
 				continue
 				
 			if player.dev_cards["Road_DevCard"] > 0:
-				print(player._name, " used road dev card")
+				chat_log.append_text(player._name + " used road dev card\n")
 				await bot_use_road_dev_card(player)
 				player.dev_cards["Road_DevCard"] -= 1
 				continue
@@ -1239,7 +1269,7 @@ func bot_decision_loop(player):
 	# go for longest road if close
 
 func bot_build_city(player):
-	print(player._name, " attempting to build city.")
+	#print(player._name, " attempting to build city.")
 	var ui_element_for_selected_settlement = null
 	if player._name == "Bot 1":
 		ui_element_for_selected_settlement = $MapLayer/Bot1_City.duplicate()
@@ -1252,7 +1282,7 @@ func bot_build_city(player):
 	if (len(player.settlements) > 0):
 		rand_city_pos = player.settlements.pick_random()
 	else:
-		print("no settlements available to turn into cities for player: ", player._name)
+		#print("no settlements available to turn into cities for player: ", player._name)
 		return false
 	
 	# remove the settlement UI texture
@@ -1267,6 +1297,7 @@ func bot_build_city(player):
 	player.cities.append(rand_city_pos)
 	player.vp += 1
 	ui_update_vp(player)
+	
 	
 	# Place the City UI element
 	var offset_position = Vector2(-15, -15) + Vector2(-12, -9)
@@ -1290,11 +1321,15 @@ func bot_build_city(player):
 	player.total_resources -= 1
 	ui_add_resource_to_supply("Wheat")
 	
+	ui_update_resources(player)
+	
+	check_win()
+	
 	return true
 	emit_signal("selection_finished")
 	
 func bot_build_settlement(player):
-	print(player._name, " attempting to build settlement.")
+	#print(player._name, " attempting to build settlement.")
 	var ui_element_for_selected_settlement = null
 	if player._name == "Bot 1":
 		ui_element_for_selected_settlement = $MapLayer/Bot1_Settlement.duplicate()
@@ -1343,7 +1378,7 @@ func bot_build_settlement(player):
 			elif source_id == 8:
 				player.harbors.append("Tree")
 				break
-	print(player._name, " harbors: ", player.harbors)
+	#print(player._name, " harbors: ", player.harbors)
 	
 	# Add settlement to bot
 	player.settlements.append(rand_settlement_pos)
@@ -1379,13 +1414,17 @@ func bot_build_settlement(player):
 	ui_add_resource_to_supply("Wheat")
 	ui_add_resource_to_supply("Sheep")
 	
-	print(player._name, "built settlement.")
+	chat_log.append_text(player._name + "built settlement.\n")
+	
+	ui_update_resources(player)
+	
+	check_win()
 	
 	return true
 	emit_signal("selection_finished")
 	
 func bot_build_road(player, devcard):
-	print(player._name, " built road.")
+	chat_log.append_text(player._name + " built road.\n")
 	var read_ALL_ROAD_MIDPOINTS = ALL_ROAD_MIDPOINTS.duplicate(true)
 	
 	var ui_element_for_road = null
@@ -1437,7 +1476,7 @@ func bot_build_road(player, devcard):
 	player.roads.append(rand_road_node_pos)
 	ALL_OWNED_ROADS[ALL_PLAYERS.find(player)] = player.roads
 	
-	check_for_longest_road()
+	print(player._name + "longest road: " + str(LongestRoadFinder.find_longest_road(player.roads)))
 	
 	# Use slope and arctan between two points to calculate how to rotate the UI element
 	# To find the second point, find the closest settlement vertex to this road's midpoint
@@ -1466,6 +1505,8 @@ func bot_build_road(player, devcard):
 		
 		ui_add_resource_to_supply("Tree")
 		ui_add_resource_to_supply("Brick")
+		
+		ui_update_resources(player)
 	
 	return true
 	emit_signal("selection_finished")
@@ -1474,9 +1515,12 @@ func bot_buy_dev_card(player):
 	
 	var dev_card_name = DEVELOPMENT_CARDS.pop_at(0)
 	
+	player.total_dev_cards += 1
+	ui_update_dev_cards(player)
+	
 	dev_card_name = dev_card_name + "_DevCard"
 	
-	print(player._name, " got dev card: ", dev_card_name)
+	chat_log.append_text(player._name + " bought a dev card.\n")
 	
 	player.dev_cards[dev_card_name] += 1
 	
@@ -1498,12 +1542,47 @@ func bot_buy_dev_card(player):
 	
 	ui_remove_resource_from_supply("Development_Card")
 	
+	ui_update_resources(player)
+	
 	return true
+
+func check_if_player_has_longest_road(player):
+	# First person to reach longest road
+	print(player._name + " longest road: ", player.longest_road)
+	if global_player_with_longest_road == null and player.longest_road >= 5:
+		global_player_with_longest_road = player
+		global_player_with_longest_road.vp += 2
+		chat_log.append_text(global_player_with_longest_road._name + " now has the longest road!\n")
+		ui_update_vp(player)
+	elif global_player_with_longest_road != null and player.longest_road > global_player_with_longest_road.longest_road:
+		global_player_with_longest_road.vp -= 2
+		global_player_with_longest_road = player
+		global_player_with_longest_road.vp += 2
+		chat_log.append_text(global_player_with_longest_road._name + " now has the longest road!\n")
+		ui_update_vp(player)
+
+func check_if_player_has_largest_army(player):
+	# First person to reach largest army
+	if global_player_with_largest_army == null and player.knights_played >= 3:
+		global_player_with_largest_army = player
+		global_player_with_largest_army.vp += 2
+		chat_log.append_text(global_player_with_largest_army._name + " now has the largest army!\n")
+	elif global_player_with_largest_army != null and player.knights_played > global_player_with_largest_army.knights_played:
+		global_player_with_largest_army.vp -= 2
+		global_player_with_largest_army = player
+		global_player_with_largest_army.vp += 2
+		chat_log.append_text(global_player_with_largest_army._name + " now has the largest army!\n")
 
 func bot_use_knight_dev_card(player):
 	# For now, just choose randomly
 	
 	player.knights_played += 1
+	player.total_dev_cards -= 1
+	ui_update_dev_cards(player)
+	
+	check_if_player_has_largest_army(player)
+	
+	ui_update_knights_played(player)
 	
 	var random_robber_pos
 	while true:
@@ -1550,6 +1629,11 @@ func bot_use_invention_dev_card(player):
 			continue
 			
 	player.dev_card_played_this_turn = true
+	
+	player.total_dev_cards -= 1
+	ui_update_dev_cards(player)
+	
+	ui_update_resources(player)
 
 func bot_use_monopoly_dev_card(player):
 	var resources = ["Brick", "Tree", "Sheep", "Stone", "Wheat"]
@@ -1568,11 +1652,19 @@ func bot_use_monopoly_dev_card(player):
 			player.total_resources += num_of_resource
 	
 	player.dev_card_played_this_turn = true
+	
+	player.total_dev_cards -= 1
+	ui_update_dev_cards(player)
+	
+	ui_update_resources(player)
 
 func bot_use_road_dev_card(player):
 	
 	await bot_build_road(player, true)
 	await bot_build_road(player, true)
+	
+	player.total_dev_cards -= 1
+	ui_update_dev_cards(player)
 	
 	player.dev_card_played_this_turn = true
 
@@ -1586,7 +1678,7 @@ func ui_remove_from_resource_bar_dev_card(dev_card_name):
 		5: 611
 	}
 	
-	print("player used dev card: ", dev_card_name)
+	#print("player used dev card: ", dev_card_name)
 	var num_of_dev_card = CLIENT.dev_cards[dev_card_name]
 
 	if num_of_dev_card == 0: # Remove resource from bar completely
@@ -1663,9 +1755,12 @@ func ui_add_to_resource_bar_dev_card(dev_card_name):
 			return
 
 func _on_buy_development_card_button_pressed() -> void:
-	print("development card button pressed")
+	#print("development card button pressed")
 	
 	var dev_card_name = DEVELOPMENT_CARDS.pop_at(0)
+	
+	CLIENT.total_dev_cards += 1
+	ui_update_dev_cards(CLIENT)
 	
 	dev_card_name = dev_card_name + "_DevCard"
 	
@@ -1698,6 +1793,8 @@ func _on_buy_development_card_button_pressed() -> void:
 	ui_add_to_resource_bar_dev_card(dev_card_name)
 	
 	ui_remove_resource_from_supply("Development_Card")
+	
+	ui_update_resources(CLIENT)
 
 func ui_hide_all_dev_card_btns():
 	for node in get_node("UILayer/Resource Bar").get_children():
@@ -1712,7 +1809,9 @@ func _on_knight_dev_card_pressed() -> void:
 	if CLIENT.dev_card_played_this_turn == false:
 		
 		CLIENT.knights_played += 1
-		#$UILayer/Player1Background/Knights_Played.text = 
+		ui_update_knights_played(CLIENT)
+		
+		check_if_player_has_largest_army(CLIENT)
 		
 		ui_hide_all_dev_card_btns()
 		
@@ -1730,6 +1829,8 @@ func _on_knight_dev_card_pressed() -> void:
 		
 		CLIENT.dev_card_played_this_turn = true
 		
+		CLIENT.total_dev_cards -= 1
+		ui_update_dev_cards(CLIENT)
 		
 	else:
 		return
@@ -1769,6 +1870,9 @@ func _on_monopoly_dev_card_pressed() -> void:
 			
 			copied_ui_resource.pressed.connect(monopoly_dev_card_choose_resource.bind(supply_resources_in_order[i+1]))
 		
+		CLIENT.total_dev_cards -= 1
+		ui_update_dev_cards(CLIENT)
+		
 		await done_picking
 		
 		# Remove the buttons
@@ -1790,21 +1894,29 @@ func _on_monopoly_dev_card_pressed() -> void:
 	
 func monopoly_dev_card_choose_resource(resource_name):
 	# Transfer all of resource_name to the CLIENT from all other players
-	for p in ALL_PLAYERS:
-		if p == CLIENT:
-			continue
-		else:
-			var num_of_resource = p.resources[resource_name]
-			p.resources[resource_name] = 0
-			p.total_resources -= num_of_resource
-			
-			CLIENT.resources[resource_name] += num_of_resource
-			CLIENT.total_resources += num_of_resource
-			
-			for i in range(num_of_resource):
-				ui_add_to_resource_bar(resource_name)
 	
-	emit_signal("done_picking")
+	if CLIENT.dev_card_played_this_turn == false:
+		for p in ALL_PLAYERS:
+			if p == CLIENT:
+				continue
+			else:
+				var num_of_resource = p.resources[resource_name]
+				p.resources[resource_name] = 0
+				p.total_resources -= num_of_resource
+				
+				CLIENT.resources[resource_name] += num_of_resource
+				CLIENT.total_resources += num_of_resource
+				
+				for i in range(num_of_resource):
+					ui_add_to_resource_bar(resource_name)
+			ui_update_resources(p)
+	
+		CLIENT.total_dev_cards -= 1
+		ui_update_dev_cards(CLIENT)
+	
+		emit_signal("done_picking")
+	else:
+		return
 
 func _on_road_dev_card_pressed() -> void:
 	
@@ -1826,6 +1938,9 @@ func _on_road_dev_card_pressed() -> void:
 		$UILayer/Supply/Road_DevCard_Text.hide()
 		
 		CLIENT.dev_card_played_this_turn = true
+		
+		CLIENT.total_dev_cards -= 1
+		ui_update_dev_cards(CLIENT)
 		
 	else:
 		return
@@ -1885,6 +2000,9 @@ func _on_invention_dev_card_pressed() -> void:
 		
 		CLIENT.dev_card_played_this_turn = true
 		
+		CLIENT.total_dev_cards -= 1
+		ui_update_dev_cards(CLIENT)
+		
 	else:
 		return
 	
@@ -1895,11 +2013,13 @@ func invention_dev_card_resource_from_supply_chosen(resource_name):
 	ui_add_to_resource_bar(resource_name)
 	ui_remove_resource_from_supply(resource_name)
 	
+	ui_update_resources(CLIENT)
+	
 	emit_signal("done_picking")
 
 # Should only be allowed to be pressed if correct resources have been met, see activate_or_deactive_ui_buttons()
 func _on_build_road_button_pressed(devcard=false) -> void:
-	print("Build road button pressed.")
+	#print("Build road button pressed.")
 	
 	var read_ALL_ROAD_MIDPOINTS = ALL_ROAD_MIDPOINTS.duplicate(true)
 	
@@ -1957,6 +2077,8 @@ func _on_build_road_button_pressed(devcard=false) -> void:
 		CLIENT.total_resources -= 1
 		ui_remove_from_resource_bar("Brick")
 		ui_add_resource_to_supply("Brick")
+		
+		ui_update_resources(CLIENT)
 	
 	activate_or_deactivate_ui_buttons()
 	
@@ -1975,7 +2097,7 @@ func road_placement_pressed(midpoint_btn_node, road_midpoint):
 	CLIENT.roads.append(midpoint_btn_node.position)
 	ALL_OWNED_ROADS[CLIENT_INDEX] = CLIENT.roads
 	
-	check_for_longest_road()
+	print(CLIENT._name + "longest road: " + str(LongestRoadFinder.find_longest_road(CLIENT.roads)))
 	
 	# Use slope and arctan between two points to calculate how to rotate the UI element
 	# To find the second point, find the closest settlement vertex to this road's midpoint
@@ -1997,13 +2119,9 @@ func road_placement_pressed(midpoint_btn_node, road_midpoint):
 	
 	emit_signal("selection_finished")
 
-func check_for_longest_road():
-	pass
-	
-
 # Should only be allowed to be pressed if correct resources have been met, see activate_or_deactive_ui_buttons()
 func _on_build_settlement_button_pressed() -> void:
-	print("build settlement button pressed")
+	#print("build settlement button pressed")
 	
 	var possible_settlement_placements = []
 	for i in range(len(ELIGIBLE_SETTLEMENT_VERTICES)):
@@ -2047,6 +2165,7 @@ func _on_build_settlement_button_pressed() -> void:
 	ui_remove_from_resource_bar("Sheep")
 	ui_add_resource_to_supply("Sheep")
 	
+	ui_update_resources(CLIENT)
 	
 	activate_or_deactivate_ui_buttons()
 
@@ -2082,7 +2201,7 @@ func settlement_button_pressed(node, vertex):
 			elif source_id == 8:
 				CLIENT.harbors.append("Tree")
 				break
-	print(CLIENT._name, " harbors: ", CLIENT.harbors)
+	#print(CLIENT._name, " harbors: ", CLIENT.harbors)
 	
 	# Add settlement (position) to player, save selections, will need after placing road to remove
 	CLIENT.settlements.append(vertex)
@@ -2108,6 +2227,8 @@ func settlement_button_pressed(node, vertex):
 		if n.name == "Possible_Placement_Settlement%s" % i:
 			i+=1
 			n.queue_free()
+	
+	check_win()
 	
 	emit_signal("selection_finished")
 
@@ -2149,6 +2270,8 @@ func _on_build_city_button_pressed() -> void:
 	ui_remove_from_resource_bar("Wheat")
 	ui_add_resource_to_supply("Wheat")
 	
+	ui_update_resources(CLIENT)
+	
 	activate_or_deactivate_ui_buttons()
 
 func city_button_pressed(node, vertex):
@@ -2178,6 +2301,8 @@ func city_button_pressed(node, vertex):
 		if n.name == "Possible_Placement_Settlement%s" % i:
 			i+=1
 			n.queue_free()
+			
+	check_win()
 	
 	emit_signal("selection_finished")
 	
@@ -2252,6 +2377,8 @@ func generate_resources_for_all_players(dice_result, tile_positions_local, tile_
 					p.total_resources += 1
 					ui_add_to_resource_bar(resource)
 					
+			ui_update_resources(p)
+					
 		elif p.type == "Bot":
 			var resources = []
 			for i in range(len(p.settlements)):
@@ -2293,6 +2420,8 @@ func generate_resources_for_all_players(dice_result, tile_positions_local, tile_
 				if ui_remove_resource_from_supply(resource) == true:
 					p.resources[resource] += 1
 					p.total_resources += 1
+					
+			ui_update_resources(p)
 			
 # Generate initial resources for the player, bot functionality added in for debug using global turn num
 func generate_initial_resources(map_data, tile_positions, tile_positions_local):
@@ -2325,6 +2454,8 @@ func generate_initial_resources(map_data, tile_positions, tile_positions_local):
 					p.resources[resource] += 1
 					p.total_resources += 1
 					ui_add_to_resource_bar(resource)
+					
+			ui_update_resources(p)
 		
 		# If the client is a bot
 		elif p.type == "Bot":
@@ -2345,6 +2476,8 @@ func generate_initial_resources(map_data, tile_positions, tile_positions_local):
 				if ui_remove_resource_from_supply(resource) == true:
 					p.resources[resource] += 1
 					p.total_resources += 1
+					
+			ui_update_resources(p)
 	
 	emit_signal("end_turn")
 
@@ -2414,7 +2547,7 @@ func ui_remove_from_resource_bar(resource):
 		4: "Wheat",
 		5: "Stone"
 	}
-	print("player discarded resource: ", resource)
+	#print("player discarded resource: ", resource)
 	var num_of_resource = CLIENT.resources[resource]
 	var resource_id = RESOURCE_TO_ID_MAPPING[resource]
 	if num_of_resource == 0: # Remove resource from bar completely
@@ -2465,7 +2598,7 @@ func tile_map_coords_to_local_coords(tile_map, tile_positions, is_harbor) -> Arr
 				325: Vector2(-50, 50)
 			}
 			
-			print(angle_to_offset_mapping[angle])
+			#print(angle_to_offset_mapping[angle])
 			
 			local_coords.append(tile_map.map_to_local(pos) + DEBUG_map_vertex_offset + angle_to_offset_mapping[angle])
 	return local_coords
@@ -2475,18 +2608,17 @@ func place_initial_settlements_and_roads(p):
 
 	# If it is the client's turn and the client is not a bot
 	if p.type == "Player":
-		var fmt_str = "[font_size=%s]\n%s place a settlement and road."
-		var act_str = fmt_str % [chat_log_font_size, p._name]
+		var fmt_str = "%s place a settlement and road.\n"
+		var act_str = fmt_str % [p._name]
 		chat_log.append_text(act_str)
 		
 		for node in get_tree().get_nodes_in_group("UI_settlement_buttons"):
 			node.show()
 		
-		# Await a timer timeout -- timeout the timer in settlement_placement_pressed() when a settlement is chosen before the timer runs out.
-		# otherwise, if timer runs out before settlement is chosen, place settlement randomly for this player using GLOBAL_TURN_NUM
-		$MapLayer/Player1_Settlement_Timer.start()
+		
+		#$MapLayer/Player1_Settlement_Timer.start()
 		await selection_finished # Wait for user input, else timer will timeout and do the same stuff as below
-		$MapLayer/Player1_Settlement_Timer.stop()
+		#$MapLayer/Player1_Settlement_Timer.stop()
 		
 		# Hide settlment_placement_buttons
 		for node in get_tree().get_nodes_in_group("UI_settlement_buttons"):
@@ -2509,8 +2641,8 @@ func place_initial_settlements_and_roads(p):
 	
 	# If the client is a bot
 	elif p.type == "Bot":
-		var fmt_str = "[font_size=%s]\n%s place a settlement and road."
-		var act_str = fmt_str % [chat_log_font_size, p._name]
+		var fmt_str = "%s place a settlement and road.\n"
+		var act_str = fmt_str % [p._name]
 		chat_log.append_text(act_str)
 
 		await bot_place_initial_settlement(p)
@@ -2549,7 +2681,7 @@ func road_placement_pressed_setup_phase(midpoint_btn_node, GLOBAL_TURN_NUM, conn
 	var slope = ((connected_vertex.y - settlement_vertex.y) / (connected_vertex.x - settlement_vertex.x))
 	var degrees = rad_to_deg(atan(slope))
 	
-	print(slope, degrees)
+	#print(slope, degrees)
 	
 	if degrees == 90 or degrees == -90:
 		ui_element_for_road.position = Vector2(ui_element_for_road.position.x + 6.3, ui_element_for_road.position.y)
@@ -2647,7 +2779,7 @@ func settlement_placement_pressed_setup_phase(id, vertex_selection):
 			elif source_id == 8:
 				CLIENT.harbors.append("Tree")
 				break
-	print(CLIENT._name, " harbors: ", CLIENT.harbors)
+	#print(CLIENT._name, " harbors: ", CLIENT.harbors)
 	
 	# Add settlement (position) to player, save selections, will need after placing road to remove
 	CLIENT.settlements.append(vertex_selection)
@@ -2656,38 +2788,38 @@ func settlement_placement_pressed_setup_phase(id, vertex_selection):
 	
 	emit_signal("selection_finished")
 
-func _on_player_1_settlement_timer_non_timeout() -> void:
-	$MapLayer/Player1_Settlement_Timer.stop()
-	print("Timer exited early due to settlement placement, returning to function...")
+#func _on_player_1_settlement_timer_non_timeout() -> void:
+	#$MapLayer/Player1_Settlement_Timer.stop()
+	#print("Timer exited early due to settlement placement, returning to function...")
 
-func _on_player_1_settlement_timer_timeout() -> void:
-	# If timer runs out place settlement randomly
-	$MapLayer/Player1_Settlement_Timer.stop()
-	print("Timer done, placing random settlement...")
-	
-	var rand_index = randi_range(0, len(ELIGIBLE_SETTLEMENT_VERTICES))
-	# Add random settlement as UI element
-	var offset_position = Vector2(-15, -15)
-	var selected_node_position = ELIGIBLE_SETTLEMENT_VERTICES[rand_index]
-	var ui_element_for_selected_settlement = $MapLayer/Player1_Settlement.duplicate()
-	$MapLayer.add_child(ui_element_for_selected_settlement)
-	ui_element_for_selected_settlement.show()
-	ui_element_for_selected_settlement.position = selected_node_position + offset_position
-	
-	# Add settlement to player
-	CLIENT.settlements.append(selected_node_position)
-	
-	# Update eligible vertices
-	var selected_node
-	for node in get_node("MapLayer").get_children(): # node.position is offset
-		if "TextureButton" in node.name:
-			if node.position == (selected_node_position + Vector2(-12, -9)):
-				selected_node = node
-	
-	update_eligible_settlement_vertices(selected_node_position, selected_node)
-	
-	# Return to main function
-	emit_signal("selection_finished")
+#func _on_player_1_settlement_timer_timeout() -> void:
+	## If timer runs out place settlement randomly
+	#$MapLayer/Player1_Settlement_Timer.stop()
+	#print("Timer done, placing random settlement...")
+	#
+	#var rand_index = randi_range(0, len(ELIGIBLE_SETTLEMENT_VERTICES))
+	## Add random settlement as UI element
+	#var offset_position = Vector2(-15, -15)
+	#var selected_node_position = ELIGIBLE_SETTLEMENT_VERTICES[rand_index]
+	#var ui_element_for_selected_settlement = $MapLayer/Player1_Settlement.duplicate()
+	#$MapLayer.add_child(ui_element_for_selected_settlement)
+	#ui_element_for_selected_settlement.show()
+	#ui_element_for_selected_settlement.position = selected_node_position + offset_position
+	#
+	## Add settlement to player
+	#CLIENT.settlements.append(selected_node_position)
+	#
+	## Update eligible vertices
+	#var selected_node
+	#for node in get_node("MapLayer").get_children(): # node.position is offset
+		#if "TextureButton" in node.name:
+			#if node.position == (selected_node_position + Vector2(-12, -9)):
+				#selected_node = node
+	#
+	#update_eligible_settlement_vertices(selected_node_position, selected_node)
+	#
+	## Return to main function
+	#emit_signal("selection_finished")
 
 func bot_place_initial_settlement(player) -> void:
 	var ui_element_for_selected_settlement = null
@@ -2728,7 +2860,7 @@ func bot_place_initial_settlement(player) -> void:
 			elif source_id == 8:
 				player.harbors.append("Tree")
 				break
-	print(player._name, " harbors: ", player.harbors)
+	#print(player._name, " harbors: ", player.harbors)
 	
 	# Add settlement to bot
 	player.settlements.append(selected_node_position)
@@ -2862,7 +2994,7 @@ func _on_roll_dice_pressed() -> int:
 	if result_1 + result_2 == 7:
 		roll_dice_btn.text = "ROBBER!"
 	else:
-		roll_dice_btn.text = "Rolled a " + str(result_1 + result_2) + " (" + str(result_1) + "," + str(result_2) + ")"
+		roll_dice_btn.text = "Rolled a " + str(result_1 + result_2) + " (" + str(result_1) + "," + str(result_2) + ") \n"
 	return result_1 + result_2
 
 func generate_rand_standard_map() -> Array[Vector2i]:
@@ -3093,9 +3225,13 @@ func generate_rand_standard_map() -> Array[Vector2i]:
 func check_win():
 	for p in ALL_PLAYERS:
 		if p.vp > 10:
-			end_game()
+			end_game(p)
 
-func end_game():
+func end_game(player_who_won):
+	ui_disable_all_buttons()
+	$UILayer/End_Game_Screen.show()
+	$UILayer/End_Game_Screen/Game_Over.text = """[font_size=50] [center] Game over!
+												Winner: %s"""  % player_who_won._name
 	print("Game over!")
 
 
@@ -3164,7 +3300,7 @@ func player_trade_add_resource_to_player_area(resource):
 	
 	CLIENT.chosen_resources_trade.append(resource)
 	
-	print(CLIENT.chosen_resources_trade)
+	#print(CLIENT.chosen_resources_trade)
 	
 func player_trade_add_resource_to_bank_area(resource):
 	
@@ -3194,7 +3330,7 @@ func player_trade_add_resource_to_bank_area(resource):
 	
 	CLIENT.chosen_resources_player_trade.append(resource)
 	
-	print(CLIENT.chosen_resources_player_trade)
+	#print(CLIENT.chosen_resources_player_trade)
 	
 func player_trade_remove_resource_from_player_area(node, resource):
 	if int(node.get_child(0).text.get_slice("[font_size=30][center][b]", 1)) == 1:
@@ -3222,7 +3358,7 @@ func player_trade_remove_resource_from_player_area(node, resource):
 		get_node("UILayer/Player_Trade_Popup/%s_Player/%s_Player_Btn" % [resource, resource]).show()
 		get_node("UILayer/Player_Trade_Popup/%s_Player/Num_Remaining" % resource).text = "[font_size=30][center][b]%s" % str(num_remaining)
 	
-	print(CLIENT.chosen_resources_trade)
+	#print(CLIENT.chosen_resources_trade)
 
 func player_trade_remove_resource_from_bank_area(node, resource):
 	if int(node.get_child(0).text.get_slice("[font_size=30][center][b]", 1)) == 1:
@@ -3240,7 +3376,7 @@ func player_trade_remove_resource_from_bank_area(node, resource):
 		CLIENT.chosen_resources_player_trade.remove_at(index_of_element_to_remove)
 		
 	
-	print(CLIENT.chosen_resources_player_trade)
+	#print(CLIENT.chosen_resources_player_trade)
 
 func _on_PLAYER_TRADE_brick_player_btn_pressed() -> void:
 	await player_trade_add_resource_to_player_area("Brick")
@@ -3386,7 +3522,7 @@ func _on_PLAYER_TRADE_finish_trade_btn_pressed() -> void:
 
 		$UILayer.add_child(new_trade)
 		global_player_trades.append(new_trade) # If there are existing trades, then different behavior to positioning will apply
-		print(global_player_trades)
+		#print(global_player_trades)
 
 func client_accept_player_trade_with_bot(bot_trading_with, trade_node, offered_resources, requested_resources):
 	# Swap resources with player_trading_with, and remove the trade_node, adjusting global_player_trades and shifting UI elements if needed
@@ -3446,6 +3582,9 @@ func client_accept_player_trade_with_bot(bot_trading_with, trade_node, offered_r
 	# Refresh the popup with updated resources
 	_on_player_trade_button_pressed() # Close it first
 	_on_player_trade_button_pressed() # Reopen it
+	
+	ui_update_resources(CLIENT)
+	ui_update_resources(bot_trading_with)
 
 func bot_accept_or_decline_player_trade_decision(player, resources_being_offered: Array) -> bool:
 	# TODO: Add some better decision making...
@@ -3458,3 +3597,17 @@ func bot_accept_or_decline_player_trade_decision(player, resources_being_offered
 
 #func accept_player_trade(player, left_trade, right_trade, trade_node):
 	#print(player + " accepted trade: " + trade_node.name + " ( " + left_trade + "for " + right_trade + " ) ")
+
+
+func _on_debug_show_debug_info_pressed() -> void:
+	$UILayer/DEBUG_show_debug_info/debug_info.visible = !$UILayer/DEBUG_show_debug_info/debug_info.visible
+	if $UILayer/DEBUG_show_debug_info/debug_info.visible == true:
+		$UILayer/DEBUG_show_debug_info.text = "Hide debug info"
+	else:
+		$UILayer/DEBUG_show_debug_info.text = "Show debug info"
+	var debug_info_str = str(OS.get_distribution_name() + "\n" + OS.get_model_name() + "\n" + OS.get_name() + OS.get_processor_name() + "\n" + OS.get_version() + "\n" + OS.get_video_adapter_driver_info()[0] + "\n" + str(DisplayServer.screen_get_size(DisplayServer.get_primary_screen())) + "\n" + str(DisplayServer.window_get_size(DisplayServer.get_window_list()[0])))
+	$UILayer/DEBUG_show_debug_info/debug_info.text = debug_info_str
+
+
+func _on_back_to_menu_btn_pressed() -> void:
+	get_tree().change_scene_to_file("res://scenes/game_select.tscn")
