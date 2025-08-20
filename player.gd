@@ -12,6 +12,7 @@ var vp = 0
 var settlements = [] # Max 5
 var cities = [] # Max 4
 var roads = [] # Max 15
+var road_connections = []
 var harbors = [] # 3:1, Sheep, Wheat .. etc.
 var resources = {
 	"Tree": 0,

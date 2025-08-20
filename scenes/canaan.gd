@@ -881,6 +881,14 @@ func ui_robber_choose_new_location_client():
 	
 	emit_signal("done_picking")
 
+func HELPER_does_array_contain_all_same_values(array):
+	var d = {}
+	for item in array:
+		d[item] = 0
+	if d.size() == 1:
+		return true
+	return false
+
 func ui_robber_new_location(local_coords_for_center_of_tile):
 	
 	var i = 2
@@ -912,26 +920,35 @@ func ui_robber_new_location(local_coords_for_center_of_tile):
 					# This player is eligible to be stolen from
 					rob_players.append(p)
 					
-	if len(rob_players) > 1:
+	if len(rob_players) > 1 and HELPER_does_array_contain_all_same_values(rob_players) == false:
 		$MapLayer/Choose_Who_To_Rob_Container.position = local_coords_for_center_of_tile + Vector2(-100, -100)
 		$MapLayer/Choose_Who_To_Rob_Container.show()
 		
+		var can_any_player_be_robbed = false
 		for p in rob_players:
+			if p.total_resources == 0:
+				continue
 			if p._name == "Bot 1":
 				$MapLayer/Choose_Who_To_Rob_Container/Bot1_Choose_To_Rob_Btn.show()
 				$MapLayer/Choose_Who_To_Rob_Container/Bot1_Choose_To_Rob_Btn.pressed.connect(ui_choose_who_to_rob.bind(p))
+				can_any_player_be_robbed = true
 			elif p._name == "Bot 2":
 				$MapLayer/Choose_Who_To_Rob_Container/Bot2_Choose_To_Rob_Btn.show()
 				$MapLayer/Choose_Who_To_Rob_Container/Bot2_Choose_To_Rob_Btn.pressed.connect(ui_choose_who_to_rob.bind(p))
+				can_any_player_be_robbed = true
 			elif p._name == "Bot 3":
 				$MapLayer/Choose_Who_To_Rob_Container/Bot3_Choose_To_Rob_Btn.show()
 				$MapLayer/Choose_Who_To_Rob_Container/Bot3_Choose_To_Rob_Btn.pressed.connect(ui_choose_who_to_rob.bind(p))
+				can_any_player_be_robbed = true
+				
+		if can_any_player_be_robbed == false:
+			emit_signal("done_picking")
 		
 		await done_picking
 		
 	
 	# Randomly steal a resource from the only player you can steal from
-	elif len(rob_players) == 1:
+	elif len(rob_players) == 1 or (len(rob_players) > 1 and HELPER_does_array_contain_all_same_values(rob_players) == true):
 		var player = rob_players[0]
 		
 		var viable_resources_to_steal = []
@@ -1422,7 +1439,128 @@ func bot_build_settlement(player):
 	
 	return true
 	emit_signal("selection_finished")
+
+class node:
+	var position = Vector2()
+	var neighbors = []
+	var targets = []
+	var sources = []
+
+# Given a list of midpoint road node position (player.roads), extrapolate two points from the given road
+func build_road_connection_list(player):
+	# nodes = {position: neighbors}
+	var nodes = {}
+	var road_list = []
 	
+	# Create the nodes
+	for road in player.roads:
+		for vertex in global_vertices:
+			if get_distance(road, vertex) < 50:
+				var n = node.new()
+				n.position = vertex
+				nodes[n.position] = []
+	
+	# Create the neighbors for each node n
+	for n in nodes:
+		for other_node in nodes:
+			if other_node == n:
+				continue
+			if get_distance(n, other_node) < 90:
+				for road in player.roads:
+					if get_distance(n, road) < 50 and get_distance(other_node, road) < 50: # A neighbor is only a neighbor if it's actually a road.
+						nodes[n].append(other_node)
+				
+	for n in nodes:
+		for point in nodes[n]:
+			if [n, point] not in road_list and [point, n] not in road_list:
+				road_list.append([n, point])
+	
+	print(road_list)
+	
+	return road_list
+
+
+# Call this function to find the length of the longest road.
+# It takes an array of roads, where each road is a pair of Vector2 coordinates.
+# Example: var roads = [[Vector2(0,0), Vector2(1,0)], [Vector2(1,0), Vector2(2,0)]]
+func find_longest_road(roads: Array) -> int:
+	# If there are no roads, the longest path is 0.
+	if roads.is_empty():
+		return 0
+
+	# 1. Build an adjacency list to represent the graph.
+	# This makes it easy to find all roads connected to a vertex.
+	var adj = {}
+	var all_vertices = []
+	for road in roads:
+		var u: Vector2 = road[0]
+		var v: Vector2 = road[1]
+
+		# Add vertices to our list of all vertices
+		if u not in all_vertices:
+			all_vertices.append(u)
+		if v not in all_vertices:
+			all_vertices.append(v)
+			
+		# Create entries for vertices if they don't exist
+		if u not in adj:
+			adj[u] = []
+		if v not in adj:
+			adj[v] = []
+		
+		# Add bidirectional connections
+		adj[u].append(v)
+		adj[v].append(u)
+
+	var max_length = 0
+
+	# 2. Iterate through every vertex and perform a DFS from it.
+	# We do this for every vertex to handle disconnected graphs (separate road networks)
+	# and to ensure we find the longest path regardless of where it starts.
+	for start_node in all_vertices:
+		var visited_roads = [] # Keep track of visited roads to avoid cycles
+		# Use Vector2.INF as an impossible parent value for the initial call
+		var current_length = _dfs(start_node, Vector2.INF, adj, visited_roads)
+		if current_length > max_length:
+			max_length = current_length
+			
+	return max_length
+
+# --- Helper Function (Depth-First Search) ---
+# Recursively explores paths to find the longest one from a given starting node.
+func _dfs(current_node: Vector2, parent_node: Vector2, adj: Dictionary, visited_roads: Array) -> int:
+	var max_path = 0
+	
+	# Explore neighbors of the current node
+	if current_node in adj:
+		for neighbor in adj[current_node]:
+			# Don't go back to the node we just came from
+			if neighbor == parent_node:
+				continue
+
+			# Create a canonical representation of the road to check if it's visited.
+			# We order the vectors based on their x and then y components to ensure
+			# the representation for the road (u, v) is the same as (v, u).
+			var road: Array
+			if current_node.x < neighbor.x or (current_node.x == neighbor.x and current_node.y < neighbor.y):
+				road = [current_node, neighbor]
+			else:
+				road = [neighbor, current_node]
+
+			if road in visited_roads:
+				continue
+			
+			# Mark the road as visited and recurse
+			visited_roads.append(road)
+			var path_length = 1 + _dfs(neighbor, current_node, adj, visited_roads)
+			if path_length > max_path:
+				max_path = path_length
+			
+			# Backtrack: un-mark the road so it can be part of other paths
+			visited_roads.erase(road)
+			
+	return max_path
+
 func bot_build_road(player, devcard):
 	chat_log.append_text(player._name + " built road.\n")
 	var read_ALL_ROAD_MIDPOINTS = ALL_ROAD_MIDPOINTS.duplicate(true)
@@ -1476,7 +1614,7 @@ func bot_build_road(player, devcard):
 	player.roads.append(rand_road_node_pos)
 	ALL_OWNED_ROADS[ALL_PLAYERS.find(player)] = player.roads
 	
-	print(player._name + "longest road: " + str(LongestRoadFinder.find_longest_road(player.roads)))
+	print(player._name + " longest road: " + str(find_longest_road(build_road_connection_list(player))))
 	
 	# Use slope and arctan between two points to calculate how to rotate the UI element
 	# To find the second point, find the closest settlement vertex to this road's midpoint
@@ -2097,7 +2235,7 @@ func road_placement_pressed(midpoint_btn_node, road_midpoint):
 	CLIENT.roads.append(midpoint_btn_node.position)
 	ALL_OWNED_ROADS[CLIENT_INDEX] = CLIENT.roads
 	
-	print(CLIENT._name + "longest road: " + str(LongestRoadFinder.find_longest_road(CLIENT.roads)))
+	print(CLIENT._name + " longest road: " + str(find_longest_road(build_road_connection_list(CLIENT))))
 	
 	# Use slope and arctan between two points to calculate how to rotate the UI element
 	# To find the second point, find the closest settlement vertex to this road's midpoint
