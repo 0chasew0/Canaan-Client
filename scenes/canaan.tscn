@@ -1,4 +1,4 @@
-[gd_scene load_steps=95 format=4 uid="uid://jivbdwftiitr"]
+[gd_scene load_steps=94 format=4 uid="uid://jivbdwftiitr"]
 
 [ext_resource type="Script" uid="uid://bw23uon3cp087" path="res://scenes/canaan.gd" id="1_d354y"]
 [ext_resource type="Script" uid="uid://14yc7lvh4r55" path="res://scenes/camera_2d.gd" id="2_sec5m"]
@@ -30,7 +30,6 @@
 [ext_resource type="Texture2D" uid="uid://cskq1akso1233" path="res://images/UI_Place_Settlement_Indicator.png" id="27_fb148"]
 [ext_resource type="Texture2D" uid="uid://c54lbg3xl0ibb" path="res://images/Pieces (White)/pieceWhite_border10.png" id="28_cs0nk"]
 [ext_resource type="Texture2D" uid="uid://bbm1kg3uwpf0v" path="res://images/Pieces (White)/pieceWhite_border08.png" id="28_ot51o"]
-[ext_resource type="Texture2D" uid="uid://knqxx5mol0j8" path="res://images/Pieces (Yellow)/pieceYellow_border11.png" id="29_qc4eu"]
 [ext_resource type="Texture2D" uid="uid://or4ge4y23xg2" path="res://images/Pieces (Red)/pieceRed_border08.png" id="30_btiyb"]
 [ext_resource type="Texture2D" uid="uid://c02e38kxc647g" path="res://images/player3_road_48_6.png" id="30_p4usn"]
 [ext_resource type="Texture2D" uid="uid://bvgbtpbhflsr6" path="res://images/Pieces (Red)/pieceRed_border10.png" id="31_o1kvk"]
@@ -320,6 +319,7 @@ offset_right = 16.5
 offset_bottom = 16.5
 grow_horizontal = 2
 grow_vertical = 2
+tooltip_text = "Click to place settlement"
 texture_normal = ExtResource("27_fb148")
 ignore_texture_size = true
 stretch_mode = 0
@@ -338,6 +338,7 @@ offset_right = 16.5
 offset_bottom = 16.5
 grow_horizontal = 2
 grow_vertical = 2
+tooltip_text = "Click to place the Robber"
 texture_normal = ExtResource("27_fb148")
 ignore_texture_size = true
 stretch_mode = 0
@@ -355,6 +356,7 @@ offset_right = 2.0
 offset_bottom = 17.0
 grow_horizontal = 2
 grow_vertical = 2
+tooltip_text = "Click to place road"
 texture_normal = ExtResource("27_fb148")
 ignore_texture_size = true
 stretch_mode = 0
@@ -584,6 +586,7 @@ layout_mode = 0
 offset_top = 4.0
 offset_right = 64.0
 offset_bottom = 68.0
+tooltip_text = "Rob Bot 1"
 texture_normal = ExtResource("28_ot51o")
 
 [node name="Bot2_Choose_To_Rob_Btn" type="TextureButton" parent="MapLayer/Choose_Who_To_Rob_Container"]
@@ -594,6 +597,7 @@ offset_left = 73.0
 offset_top = 4.0
 offset_right = 137.0
 offset_bottom = 68.0
+tooltip_text = "Rob Bot 2"
 texture_normal = ExtResource("30_btiyb")
 
 [node name="Bot3_Choose_To_Rob_Btn" type="TextureButton" parent="MapLayer/Choose_Who_To_Rob_Container"]
@@ -604,6 +608,7 @@ offset_left = 146.0
 offset_top = 4.0
 offset_right = 210.0
 offset_bottom = 68.0
+tooltip_text = "Rob Bot 3"
 texture_normal = ExtResource("45_1t8uu")
 
 [node name="UILayer" type="CanvasLayer" parent="."]
@@ -633,6 +638,8 @@ color = Color(0.701961, 0.803922, 0.662745, 1)
 layout_mode = 0
 offset_right = 554.0
 offset_bottom = 285.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.709804)
 bbcode_enabled = true
 scroll_following = true
 
@@ -1157,6 +1164,7 @@ offset_left = 914.0
 offset_top = 987.0
 offset_right = 1010.0
 offset_bottom = 1073.0
+tooltip_text = "Trade with the Bank"
 color = Color(0.701593, 0.804474, 0.664316, 1)
 
 [node name="Bank_Trade_Button" type="TextureButton" parent="UILayer/Bank_Trade_Btn_Background"]
@@ -1165,6 +1173,7 @@ offset_left = 14.0
 offset_top = 11.0
 offset_right = 78.0
 offset_bottom = 75.0
+tooltip_text = "Trade with the Bank"
 texture_normal = ExtResource("42_luowv")
 
 [node name="Disabled_Mask" type="ColorRect" parent="UILayer/Bank_Trade_Btn_Background"]
@@ -1179,6 +1188,7 @@ offset_left = 1016.0
 offset_top = 987.0
 offset_right = 1112.0
 offset_bottom = 1073.0
+tooltip_text = "Trade with a Player"
 color = Color(0.701593, 0.804474, 0.664316, 1)
 
 [node name="Player_Trade_Button" type="TextureButton" parent="UILayer/Player_Trade_Btn_Background"]
@@ -1187,6 +1197,7 @@ offset_left = 14.0
 offset_top = 11.0
 offset_right = 78.0
 offset_bottom = 75.0
+tooltip_text = "Trade with a Player"
 texture_normal = ExtResource("43_c1tvx")
 
 [node name="Disabled_Mask" type="ColorRect" parent="UILayer/Player_Trade_Btn_Background"]
@@ -1201,6 +1212,7 @@ offset_left = 1120.0
 offset_top = 987.0
 offset_right = 1216.0
 offset_bottom = 1073.0
+tooltip_text = "Buy a Development Card"
 color = Color(0.701593, 0.804474, 0.664316, 1)
 
 [node name="Buy_Development_Card_Button" type="TextureButton" parent="UILayer/Buy_Development_Card_Background"]
@@ -1209,6 +1221,7 @@ offset_left = 24.0
 offset_top = 11.0
 offset_right = 70.0
 offset_bottom = 75.0
+tooltip_text = "Buy a Development Card"
 texture_normal = ExtResource("51_lbwaw")
 ignore_texture_size = true
 stretch_mode = 0
@@ -1225,16 +1238,17 @@ offset_left = 1225.0
 offset_top = 987.0
 offset_right = 1321.0
 offset_bottom = 1073.0
+tooltip_text = "Build a Road"
 color = Color(0.701593, 0.804474, 0.664316, 1)
 
 [node name="Build_Road_Button" type="TextureButton" parent="UILayer/Build_Road_Btn_Background"]
 layout_mode = 0
-offset_left = 41.0
-offset_top = 81.0
-offset_right = 119.0
-offset_bottom = 92.0
-rotation = -1.57079
-texture_normal = ExtResource("29_qc4eu")
+offset_left = 14.0
+offset_top = 41.0
+offset_right = 79.0
+offset_bottom = 50.0
+tooltip_text = "Build a Road"
+texture_normal = ExtResource("39_p4usn")
 ignore_texture_size = true
 stretch_mode = 0
 
@@ -1256,6 +1270,7 @@ offset_left = 1329.0
 offset_top = 987.0
 offset_right = 1425.0
 offset_bottom = 1073.0
+tooltip_text = "Build a Settlement"
 color = Color(0.701593, 0.804474, 0.664316, 1)
 
 [node name="Build_Settlement_Button" type="TextureButton" parent="UILayer/Build_Settlement_Btn_Background"]
@@ -1264,6 +1279,7 @@ offset_left = 24.0
 offset_top = 17.0
 offset_right = 72.0
 offset_bottom = 65.0
+tooltip_text = "Build a Settlement"
 texture_normal = ExtResource("34_lxjc8")
 ignore_texture_size = true
 stretch_mode = 0
@@ -1280,6 +1296,7 @@ offset_left = 1434.0
 offset_top = 987.0
 offset_right = 1530.0
 offset_bottom = 1073.0
+tooltip_text = "Build a City"
 color = Color(0.701593, 0.804474, 0.664316, 1)
 
 [node name="Build_City_Button" type="TextureButton" parent="UILayer/Build_City_Btn_Background"]
@@ -1288,6 +1305,7 @@ offset_left = 20.0
 offset_top = 17.0
 offset_right = 76.0
 offset_bottom = 70.0
+tooltip_text = "Build a City"
 texture_normal = ExtResource("44_ppdgm")
 ignore_texture_size = true
 stretch_mode = 0
@@ -1304,6 +1322,7 @@ offset_left = 1540.0
 offset_top = 987.0
 offset_right = 1636.0
 offset_bottom = 1073.0
+tooltip_text = "End Turn"
 color = Color(0.701593, 0.804474, 0.664316, 1)
 
 [node name="End_Turn_Button" type="TextureButton" parent="UILayer/End_Turn_Btn_Background"]
@@ -1312,6 +1331,7 @@ offset_left = 20.0
 offset_top = 17.0
 offset_right = 76.0
 offset_bottom = 70.0
+tooltip_text = "End Turn"
 texture_normal = ExtResource("45_kovk3")
 ignore_texture_size = true
 stretch_mode = 0

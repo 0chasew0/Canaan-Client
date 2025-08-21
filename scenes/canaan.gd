@@ -309,10 +309,11 @@ func roll_for_who_goes_first():
 		if ALL_PLAYERS[i].type == "Player":
 			CLIENT_INDEX = i
 		# Store bot indexes too?
-
+	
+	var suffixes = ['st', 'nd', 'rd', 'th']
 	for i in ALL_PLAYERS.size():
-		var fmt_str = "%s %s goes %s!\n"
-		var act_str = fmt_str % [ALL_PLAYERS[i].type, ALL_PLAYERS[i].id, i+1]
+		var fmt_str = "%s %s goes %s%s!\n"
+		var act_str = fmt_str % [ALL_PLAYERS[i].type, ALL_PLAYERS[i].id, i+1, suffixes[i]]
 		chat_log.append_text(act_str)
 		
 	is_roll_for_turn = false
