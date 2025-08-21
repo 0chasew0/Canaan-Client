@@ -1,4 +1,4 @@
-[gd_scene load_steps=94 format=4 uid="uid://jivbdwftiitr"]
+[gd_scene load_steps=95 format=4 uid="uid://jivbdwftiitr"]
 
 [ext_resource type="Script" uid="uid://bw23uon3cp087" path="res://scenes/canaan.gd" id="1_d354y"]
 [ext_resource type="Script" uid="uid://14yc7lvh4r55" path="res://scenes/camera_2d.gd" id="2_sec5m"]
@@ -60,6 +60,7 @@
 [ext_resource type="Texture2D" uid="uid://b2ccd7w12v3gb" path="res://images/development_card_knight.png" id="57_0kw8m"]
 [ext_resource type="Texture2D" uid="uid://ownui7vg6ac8" path="res://images/development_card_monopoly.png" id="58_yqqmq"]
 [ext_resource type="Texture2D" uid="uid://bw8xxdyusr8y3" path="res://images/development_card_road.png" id="59_46m4j"]
+[ext_resource type="Texture2D" uid="uid://drj43vsnjn6pg" path="res://images/development_card_vp.png" id="61_vos2g"]
 [ext_resource type="Texture2D" uid="uid://belbrrenp3qwh" path="res://images/arrow_reserve.png" id="61_yqqmq"]
 [ext_resource type="Texture2D" uid="uid://bxupousf85g7" path="res://images/decline.png" id="62_46m4j"]
 
@@ -1429,6 +1430,26 @@ modulate = Color(1, 1, 1, 0.592157)
 layout_mode = 0
 offset_right = 140.0
 offset_bottom = 189.0
+
+[node name="VP_DevCard" type="TextureRect" parent="UILayer"]
+visible = false
+offset_left = 497.0
+offset_top = 467.0
+offset_right = 637.0
+offset_bottom = 657.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("61_vos2g")
+
+[node name="Amount" type="RichTextLabel" parent="UILayer/VP_DevCard"]
+layout_mode = 0
+offset_left = 107.5
+offset_top = -4.54545
+offset_right = 147.5
+offset_bottom = 36.4545
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]0"
+scroll_active = false
 
 [node name="Bank_Trade_Popup" type="ColorRect" parent="UILayer"]
 visible = false

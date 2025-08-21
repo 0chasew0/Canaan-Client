@@ -59,7 +59,7 @@ signal robber_done # Used for returning control back to main game loop
 func _ready() -> void:
 	
 	var PLAYER = load("res://player.gd")
-	var colors = ["#ffcc00", "#f3f3f3", "#1ea7e1", "#e86a17"]
+	var colors = ["#ffcc00", "#f3f3f3", "#e86a17", "#1ea7e1"]
 	for i in range(PLAYER_COUNT):
 		if i == 0: # In multiplayer, this should check for whether this is a bot or player
 			var PLAYER_OBJ = PLAYER.new()
@@ -132,9 +132,12 @@ func _ready() -> void:
 		
 	CLIENT.vp = 2
 	
+	var index = 1
 	for player in ALL_PLAYERS:
 		ui_update_vp(player)
-	
+		get_node("UILayer/Player%sBackground/Longest_Road" % index).text = "[font_size=18][center]Longest Road: 1"
+		index+=1
+		
 	main_game_loop(tile_positions, standard_map)
 	
 func main_game_loop(tile_positions, standard_map):
@@ -876,8 +879,10 @@ func ui_robber_choose_new_location_client():
 		curr_UI_element.show()
 		curr_UI_element.position = local_coords_for_center_of_tile + Vector2(-33, -26)
 		curr_UI_element.pressed.connect(ui_robber_new_location.bind(local_coords_for_center_of_tile))
-		
+	
+	ui_disable_all_buttons()
 	await done_picking
+	activate_or_deactivate_ui_buttons()
 	
 	emit_signal("done_picking")
 
@@ -1166,7 +1171,12 @@ func ui_remove_resource_from_supply(resource):
 	}
 	
 	if resource == "Development_Card":
+		NUM_SUPPLY_DEV_CARD -= 1
+		if NUM_SUPPLY_DEV_CARD == 0:
+			print("No more dev cards left to buy!")
+			return false
 		get_node("UILayer/Supply/%s/Num_Remaining" % resource).text = "[font_size=30][center][b]%s" % NUM_SUPPLY_DEV_CARD
+		
 		return true
 	
 	var resource_id = RESOURCE_TO_ID_MAPPING[resource]
@@ -1217,6 +1227,9 @@ func ui_update_resources(player) -> void:
 
 func ui_update_dev_cards(player) -> void:
 	get_node("UILayer/Player%sBackground/Dev_Card_Num" % player.id).text = "[font_size=18][center]Dev Cards: %s" % player.total_dev_cards
+
+func ui_update_longest_road(player) -> void:
+	get_node("UILayer/Player%sBackground/Longest_Road" % player.id).text = "[font_size=18][center]Longest Road: %s" % player.longest_road
 
 func bot_decision_loop(player):
 	# Figure out which bot this is, based on global_turn_num
@@ -1477,89 +1490,107 @@ func build_road_connection_list(player):
 	
 	print(road_list)
 	
-	return road_list
+	player.road_connections = road_list
+	
+	return 
 
 
-# Call this function to find the length of the longest road.
-# It takes an array of roads, where each road is a pair of Vector2 coordinates.
-# Example: var roads = [[Vector2(0,0), Vector2(1,0)], [Vector2(1,0), Vector2(2,0)]]
-func find_longest_road(roads: Array) -> int:
-	# If there are no roads, the longest path is 0.
+
+# NOTE: This script assumes you have an autoload singleton named 'GlobalGameData'
+# with a variable 'ALL_PLAYERS' which is an array of all player objects.
+
+# A class-level variable to store the maximum length found across all recursive calls.
+var _max_len_so_far: int = 0
+
+# --- Main Function ---
+# Call this to find the longest road for a specific player.
+func find_longest_road(player_to_check: Player) -> int:
+	var roads = player_to_check.road_connections
 	if roads.is_empty():
 		return 0
 
-	# 1. Build an adjacency list to represent the graph.
-	# This makes it easy to find all roads connected to a vertex.
+	# 1. Gather all settlement and city locations from the global player list.
+	var player_settlements = []
+	var opponent_settlements = []
+
+	for player in ALL_PLAYERS:
+		if player == player_to_check:
+			# A player's own settlements/cities do not break their road.
+			# We still need this list for the DFS logic, though it currently isn't used.
+			player_settlements.append_array(player.settlements)
+			player_settlements.append_array(player.cities)
+		else:
+			# Opponent settlements/cities will break the road.
+			opponent_settlements.append_array(player.settlements)
+			opponent_settlements.append_array(player.cities)
+
+	# 2. Build the graph and start the search.
+	_max_len_so_far = 0
+	var adj = _build_adjacency_list(roads)
+	
+	var visited_nodes = []
+	for start_node in adj.keys():
+		if start_node not in visited_nodes:
+			# The _dfs function will explore the entire component and update _max_len_so_far.
+			_dfs(start_node, Vector2.INF, adj, player_settlements, opponent_settlements)
+
+	return _max_len_so_far
+
+
+# --- Helper to build the graph representation ---
+func _build_adjacency_list(roads: Array) -> Dictionary:
 	var adj = {}
-	var all_vertices = []
 	for road in roads:
 		var u: Vector2 = road[0]
 		var v: Vector2 = road[1]
-
-		# Add vertices to our list of all vertices
-		if u not in all_vertices:
-			all_vertices.append(u)
-		if v not in all_vertices:
-			all_vertices.append(v)
-			
-		# Create entries for vertices if they don't exist
 		if u not in adj:
 			adj[u] = []
 		if v not in adj:
 			adj[v] = []
-		
-		# Add bidirectional connections
 		adj[u].append(v)
 		adj[v].append(u)
+	return adj
 
-	var max_length = 0
-
-	# 2. Iterate through every vertex and perform a DFS from it.
-	# We do this for every vertex to handle disconnected graphs (separate road networks)
-	# and to ensure we find the longest path regardless of where it starts.
-	for start_node in all_vertices:
-		var visited_roads = [] # Keep track of visited roads to avoid cycles
-		# Use Vector2.INF as an impossible parent value for the initial call
-		var current_length = _dfs(start_node, Vector2.INF, adj, visited_roads)
-		if current_length > max_length:
-			max_length = current_length
-			
-	return max_length
 
 # --- Helper Function (Depth-First Search) ---
-# Recursively explores paths to find the longest one from a given starting node.
-func _dfs(current_node: Vector2, parent_node: Vector2, adj: Dictionary, visited_roads: Array) -> int:
-	var max_path = 0
+# This function's logic does not need to change, as it receives the settlement data from the main function.
+func _dfs(current_node: Vector2, parent_node: Vector2, adj: Dictionary, player_settlements: Array, opponent_settlements: Array) -> int:
+	var branch_lengths = []
+
+	for neighbor in adj[current_node]:
+		if neighbor == parent_node:
+			continue
+		
+		var branch_len = 1 + _dfs(neighbor, current_node, adj, player_settlements, opponent_settlements)
+		branch_lengths.append(branch_len)
+
+	# Case 1: The current node is blocked by an opponent's settlement.
+	if current_node in opponent_settlements:
+		var longest_branch = 0
+		if not branch_lengths.is_empty():
+			longest_branch = branch_lengths.max()
+		
+		_max_len_so_far = max(_max_len_so_far, longest_branch)
+		return 0
 	
-	# Explore neighbors of the current node
-	if current_node in adj:
-		for neighbor in adj[current_node]:
-			# Don't go back to the node we just came from
-			if neighbor == parent_node:
-				continue
+	# Case 2: The node is empty or has the current player's settlement.
+	else:
+		branch_lengths.sort()
+		branch_lengths.reverse()
+		
+		var len_through_this_node = 0
+		if branch_lengths.size() >= 2:
+			len_through_this_node = branch_lengths[0] + branch_lengths[1]
+		elif not branch_lengths.is_empty():
+			len_through_this_node = branch_lengths[0]
+		
+		_max_len_so_far = max(_max_len_so_far, len_through_this_node)
+		
+		if not branch_lengths.is_empty():
+			return branch_lengths[0]
+		else:
+			return 0
 
-			# Create a canonical representation of the road to check if it's visited.
-			# We order the vectors based on their x and then y components to ensure
-			# the representation for the road (u, v) is the same as (v, u).
-			var road: Array
-			if current_node.x < neighbor.x or (current_node.x == neighbor.x and current_node.y < neighbor.y):
-				road = [current_node, neighbor]
-			else:
-				road = [neighbor, current_node]
-
-			if road in visited_roads:
-				continue
-			
-			# Mark the road as visited and recurse
-			visited_roads.append(road)
-			var path_length = 1 + _dfs(neighbor, current_node, adj, visited_roads)
-			if path_length > max_path:
-				max_path = path_length
-			
-			# Backtrack: un-mark the road so it can be part of other paths
-			visited_roads.erase(road)
-			
-	return max_path
 
 func bot_build_road(player, devcard):
 	chat_log.append_text(player._name + " built road.\n")
@@ -1614,7 +1645,11 @@ func bot_build_road(player, devcard):
 	player.roads.append(rand_road_node_pos)
 	ALL_OWNED_ROADS[ALL_PLAYERS.find(player)] = player.roads
 	
-	print(player._name + " longest road: " + str(find_longest_road(build_road_connection_list(player))))
+	build_road_connection_list(player)
+	player.longest_road = find_longest_road(player)
+	print(player._name + " longest road: " + str(player.longest_road))
+	check_if_player_has_longest_road(player)
+	ui_update_longest_road(player)
 	
 	# Use slope and arctan between two points to calculate how to rotate the UI element
 	# To find the second point, find the closest settlement vertex to this road's midpoint
@@ -1705,11 +1740,13 @@ func check_if_player_has_largest_army(player):
 		global_player_with_largest_army = player
 		global_player_with_largest_army.vp += 2
 		chat_log.append_text(global_player_with_largest_army._name + " now has the largest army!\n")
+		ui_update_vp(player)
 	elif global_player_with_largest_army != null and player.knights_played > global_player_with_largest_army.knights_played:
 		global_player_with_largest_army.vp -= 2
 		global_player_with_largest_army = player
 		global_player_with_largest_army.vp += 2
 		chat_log.append_text(global_player_with_largest_army._name + " now has the largest army!\n")
+		ui_update_vp(player)
 
 func bot_use_knight_dev_card(player):
 	# For now, just choose randomly
@@ -1859,7 +1896,7 @@ func ui_add_to_resource_bar_dev_card(dev_card_name):
 			dev_card_node = get_node("UILayer/Monopoly_DevCard").duplicate(1)
 		"Road_DevCard":
 			dev_card_node = get_node("UILayer/Road_DevCard").duplicate(1)
-		"VP_DevCard":
+		"VP_DevCard": 
 			dev_card_node = get_node("UILayer/VP_DevCard").duplicate(1)
 		_:
 			print("Dev Card not found!")
@@ -2157,7 +2194,25 @@ func invention_dev_card_resource_from_supply_chosen(resource_name):
 
 # Should only be allowed to be pressed if correct resources have been met, see activate_or_deactive_ui_buttons()
 func _on_build_road_button_pressed(devcard=false) -> void:
-	#print("Build road button pressed.")
+	
+	#var reset = false
+	#var index = 2
+	#for node in get_node("MapLayer").get_children():
+		#if node.name == ("Possible_Placement_Road%s" % str(index)):
+			#index+=1
+			#reset = true
+			#
+	#if reset:
+		#index = 2
+		#for node in get_node("MapLayer").get_children():
+			#if node.name == ("Possible_Placement_Road%s" % str(index)):
+				#index+=1
+				#$MapLayer.remove_child(node)
+				#node.queue_free()
+		#activate_or_deactivate_ui_buttons()
+		#return
+		#
+	#print('here')
 	
 	var read_ALL_ROAD_MIDPOINTS = ALL_ROAD_MIDPOINTS.duplicate(true)
 	
@@ -2194,6 +2249,7 @@ func _on_build_road_button_pressed(devcard=false) -> void:
 
 		curr_UI_element.pressed.connect(road_placement_pressed.bind(curr_UI_element, vertex))
 	
+	ui_disable_all_buttons()
 	await selection_finished
 	
 	# Remove UI elements
@@ -2235,7 +2291,10 @@ func road_placement_pressed(midpoint_btn_node, road_midpoint):
 	CLIENT.roads.append(midpoint_btn_node.position)
 	ALL_OWNED_ROADS[CLIENT_INDEX] = CLIENT.roads
 	
-	print(CLIENT._name + " longest road: " + str(find_longest_road(build_road_connection_list(CLIENT))))
+	build_road_connection_list(CLIENT)
+	CLIENT.longest_road = find_longest_road(CLIENT)
+	check_if_player_has_longest_road(CLIENT)
+	ui_update_longest_road(CLIENT)
 	
 	# Use slope and arctan between two points to calculate how to rotate the UI element
 	# To find the second point, find the closest settlement vertex to this road's midpoint
@@ -2280,7 +2339,10 @@ func _on_build_settlement_button_pressed() -> void:
 
 		curr_UI_element.pressed.connect(settlement_button_pressed.bind(curr_UI_element, vertex))
 	
+	ui_disable_all_buttons()
+	
 	await selection_finished
+	
 	
 	# Remove resources from player and from resource bar
 	CLIENT.resources["Tree"] -= 1
@@ -2380,6 +2442,7 @@ func _on_build_city_button_pressed() -> void:
 		curr_UI_element.position = CLIENT.settlements[i] + settlement_placement_offset
 		curr_UI_element.pressed.connect(city_button_pressed.bind(curr_UI_element, CLIENT.settlements[i]))
 	
+	ui_disable_all_buttons()
 	await selection_finished
 	
 	# Remove resources from player and from resource bar
