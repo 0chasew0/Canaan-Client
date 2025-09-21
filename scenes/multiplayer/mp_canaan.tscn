@@ -1,0 +1,2737 @@
+[gd_scene load_steps=94 format=4 uid="uid://bw121fp3afg8d"]
+
+[ext_resource type="Script" uid="uid://dcduswq3kte40" path="res://scenes/multiplayer/mp_canaan.gd" id="1_d4aao"]
+[ext_resource type="Script" uid="uid://b5w0tdvbgqc34" path="res://scenes/multiplayer/camera_2d.gd" id="2_e6jfq"]
+[ext_resource type="VideoStream" uid="uid://c70hkwtyb021d" path="res://images/water_background.ogv" id="3_v0pfn"]
+[ext_resource type="Texture2D" uid="uid://djglnqvthqtah" path="res://images/Dirt/dirt_14.png" id="4_uy1sc"]
+[ext_resource type="Texture2D" uid="uid://bv63g4podrub6" path="res://images/Grass/grass_05.png" id="5_234qs"]
+[ext_resource type="Texture2D" uid="uid://b6n4bu03fr25o" path="res://images/Mars/mars_07.png" id="6_0dxbs"]
+[ext_resource type="Texture2D" uid="uid://bpyol5iri4dvd" path="res://images/wheat.png" id="7_2qgc1"]
+[ext_resource type="Texture2D" uid="uid://dg2dv2u158wo8" path="res://images/Stone/stone_07.png" id="8_0je0l"]
+[ext_resource type="Texture2D" uid="uid://d3fmtt7g8agjt" path="res://images/Sand/sand_12.png" id="9_5jf2k"]
+[ext_resource type="Shader" uid="uid://bht0hwgucsd1y" path="res://scenes/resource_num_scaling.gdshader" id="10_bn82o"]
+[ext_resource type="Texture2D" uid="uid://i6l1uby721ou" path="res://images/Resource_Numbers/tile2_new.png" id="11_lem47"]
+[ext_resource type="Texture2D" uid="uid://cmu7h11y77ykt" path="res://images/Resource_Numbers/tile12.png" id="12_gpok4"]
+[ext_resource type="Texture2D" uid="uid://gdsegqt3j67e" path="res://images/Resource_Numbers/tile3.png" id="13_ei5m6"]
+[ext_resource type="Texture2D" uid="uid://cm38b034qap7q" path="res://images/Resource_Numbers/tile4.png" id="14_6vvci"]
+[ext_resource type="Texture2D" uid="uid://bggbks5nhm88n" path="res://images/Resource_Numbers/tile5.png" id="15_bsadv"]
+[ext_resource type="Texture2D" uid="uid://chjv2wh07vwnn" path="res://images/Resource_Numbers/tile6.png" id="16_xlk5n"]
+[ext_resource type="Texture2D" uid="uid://dsy07w1lk71t2" path="res://images/Resource_Numbers/tile8.png" id="17_a6jp3"]
+[ext_resource type="Texture2D" uid="uid://d4ltpj374puxy" path="res://images/Resource_Numbers/tile9.png" id="18_lyh5k"]
+[ext_resource type="Texture2D" uid="uid://cqn0vl10rhjl8" path="res://images/Resource_Numbers/tile10.png" id="19_61625"]
+[ext_resource type="Texture2D" uid="uid://bsgxbs4n5jlci" path="res://images/Resource_Numbers/tile11.png" id="20_2x202"]
+[ext_resource type="Shader" uid="uid://wb3gs0xrqypk" path="res://scenes/harbor_rotation.gdshader" id="21_1nwru"]
+[ext_resource type="Texture2D" uid="uid://ipi6t7tunf6e" path="res://images/Harbors/generic_harbor.png" id="22_a84vg"]
+[ext_resource type="Texture2D" uid="uid://banatarpnxdpj" path="res://images/Harbors/brick_harbor.png" id="23_n4ndp"]
+[ext_resource type="Texture2D" uid="uid://c8rq22diap2nq" path="res://images/Harbors/sheep_harbor.png" id="24_76ltc"]
+[ext_resource type="Texture2D" uid="uid://bk6m2j4v01x3f" path="res://images/Harbors/stone_harbor.png" id="25_ymypq"]
+[ext_resource type="Texture2D" uid="uid://5plym3wvhuun" path="res://images/Harbors/wheat_harbor.png" id="26_gp33o"]
+[ext_resource type="Texture2D" uid="uid://cxelann5cdetv" path="res://images/Harbors/wood_harbor.png" id="27_3eswm"]
+[ext_resource type="Texture2D" uid="uid://cskq1akso1233" path="res://images/UI_Place_Settlement_Indicator.png" id="28_tu3pp"]
+[ext_resource type="Texture2D" uid="uid://c54lbg3xl0ibb" path="res://images/Pieces (White)/pieceWhite_border10.png" id="29_avv8d"]
+[ext_resource type="Texture2D" uid="uid://bbm1kg3uwpf0v" path="res://images/Pieces (White)/pieceWhite_border08.png" id="30_vkpfm"]
+[ext_resource type="Texture2D" uid="uid://c02e38kxc647g" path="res://images/player3_road_48_6.png" id="31_e0wje"]
+[ext_resource type="Texture2D" uid="uid://bvgbtpbhflsr6" path="res://images/Pieces (Red)/pieceRed_border10.png" id="32_ageuq"]
+[ext_resource type="Texture2D" uid="uid://or4ge4y23xg2" path="res://images/Pieces (Red)/pieceRed_border08.png" id="33_yvsoe"]
+[ext_resource type="Texture2D" uid="uid://dcursql60xfub" path="res://images/player4_road_48_6.png" id="34_2sjqv"]
+[ext_resource type="Texture2D" uid="uid://d0c5p4vjq6cw1" path="res://images/Pieces (Blue)/pieceBlue_border11.png" id="35_7clh4"]
+[ext_resource type="Texture2D" uid="uid://ctkx6eiltpvxy" path="res://images/Pieces (Blue)/pieceBlue_border09.png" id="36_ows1f"]
+[ext_resource type="Texture2D" uid="uid://byje4xwiu686y" path="res://images/player2_road_48_6.png" id="37_epmnl"]
+[ext_resource type="Texture2D" uid="uid://bx2eqmglx0kkd" path="res://images/Pieces (Yellow)/pieceYellow_border07.png" id="38_tv1yn"]
+[ext_resource type="Texture2D" uid="uid://bnkbrkh0re7tt" path="res://images/Pieces (Yellow)/pieceYellow_border09.png" id="39_0hsl4"]
+[ext_resource type="Texture2D" uid="uid://clhg04mhm10yj" path="res://images/player1_road_48_6.png" id="40_favqi"]
+[ext_resource type="Texture2D" uid="uid://d1j8tq3cl3vwb" path="res://images/robber.png" id="41_vbyd4"]
+[ext_resource type="Texture2D" uid="uid://cmvidq1ewbjau" path="res://images/circle_select_normal_btn.png" id="42_kvvpi"]
+[ext_resource type="Texture2D" uid="uid://coa5imoaw8l75" path="res://images/circle_select_pressed_btn.png" id="43_uhvue"]
+[ext_resource type="Texture2D" uid="uid://unj21qye07gs" path="res://images/circle_select_hover_btn.png" id="44_g8r4b"]
+[ext_resource type="BitMap" uid="uid://bsrbh8jw5rnlm" path="res://images/circle_select_normal_btn.bmp" id="45_s3c1t"]
+[ext_resource type="Texture2D" uid="uid://bmi55g22wau02" path="res://images/Pieces (Blue)/pieceBlue_border08.png" id="46_bna0l"]
+[ext_resource type="Texture2D" uid="uid://cxrlfge3dtkrn" path="res://images/Resource_Cards/brick.png" id="47_a2omc"]
+[ext_resource type="Texture2D" uid="uid://ffptporsopha" path="res://images/Resource_Cards/sheep.png" id="48_fwydo"]
+[ext_resource type="Texture2D" uid="uid://b80kxahhsfvqb" path="res://images/Resource_Cards/stone.png" id="49_mis1q"]
+[ext_resource type="Texture2D" uid="uid://d0qovvy8by45j" path="res://images/Resource_Cards/tree.png" id="50_5as3n"]
+[ext_resource type="Texture2D" uid="uid://c8l7lbpbq5huv" path="res://images/Resource_Cards/wheat.png" id="51_xmntw"]
+[ext_resource type="Texture2D" uid="uid://dpeqktfbl3a2i" path="res://images/development_card_back.png" id="52_td71v"]
+[ext_resource type="Texture2D" uid="uid://b3nqnchiq288i" path="res://images/bank_trade_icon.png" id="53_og2wp"]
+[ext_resource type="Texture2D" uid="uid://bp52owf8bkx6j" path="res://images/player_trade_icon.png" id="54_fmue4"]
+[ext_resource type="Texture2D" uid="uid://d2xema0qmnjg5" path="res://images/end_turn_icon.png" id="55_ijsim"]
+[ext_resource type="Texture2D" uid="uid://dcybl63c7hrea" path="res://images/development_card_invention.png" id="56_6o0aa"]
+[ext_resource type="Texture2D" uid="uid://b2ccd7w12v3gb" path="res://images/development_card_knight.png" id="57_yn210"]
+[ext_resource type="Texture2D" uid="uid://ownui7vg6ac8" path="res://images/development_card_monopoly.png" id="58_vluoc"]
+[ext_resource type="Texture2D" uid="uid://bw8xxdyusr8y3" path="res://images/development_card_road.png" id="59_rxj52"]
+[ext_resource type="Texture2D" uid="uid://drj43vsnjn6pg" path="res://images/development_card_vp.png" id="60_b6q76"]
+[ext_resource type="Texture2D" uid="uid://belbrrenp3qwh" path="res://images/arrow_reserve.png" id="61_gb0bj"]
+[ext_resource type="Texture2D" uid="uid://bxupousf85g7" path="res://images/decline.png" id="62_2jxby"]
+
+[sub_resource type="TileMapPattern" id="TileMapPattern_or3yt"]
+tile_data = PackedInt32Array(131072, 1, 0, 1, 1, 0, 65536, 1, 0, 131073, 1, 0, 196608, 1, 0, 262145, 1, 0, 2, 1, 0, 65537, 1, 0, 131074, 1, 0, 196609, 1, 0, 262146, 1, 0, 3, 1, 0, 65538, 1, 0, 131075, 1, 0, 196610, 1, 0, 262147, 1, 0, 65539, 1, 0, 131076, 1, 0, 196611, 1, 0)
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_tlbur"]
+resource_name = "Tree"
+texture = ExtResource("4_uy1sc")
+texture_region_size = Vector2i(120, 140)
+use_texture_padding = false
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bl4lj"]
+resource_name = "Sheep"
+texture = ExtResource("5_234qs")
+texture_region_size = Vector2i(120, 140)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_igenq"]
+resource_name = "Brick"
+texture = ExtResource("6_0dxbs")
+texture_region_size = Vector2i(120, 140)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_kjc6j"]
+resource_name = "Wheat"
+texture = ExtResource("7_2qgc1")
+texture_region_size = Vector2i(120, 140)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_7igx8"]
+resource_name = "Stone"
+texture = ExtResource("8_0je0l")
+texture_region_size = Vector2i(120, 140)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_qx8ov"]
+texture = ExtResource("9_5jf2k")
+texture_region_size = Vector2i(120, 140)
+0:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_051m2"]
+tile_shape = 3
+tile_size = Vector2i(120, 140)
+sources/2 = SubResource("TileSetAtlasSource_bl4lj")
+sources/3 = SubResource("TileSetAtlasSource_igenq")
+sources/4 = SubResource("TileSetAtlasSource_kjc6j")
+sources/5 = SubResource("TileSetAtlasSource_7igx8")
+sources/6 = SubResource("TileSetAtlasSource_qx8ov")
+sources/1 = SubResource("TileSetAtlasSource_tlbur")
+pattern_0 = SubResource("TileMapPattern_or3yt")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_jbqwa"]
+shader = ExtResource("10_bn82o")
+shader_parameter/scale = Vector2(0.45, 0.45)
+shader_parameter/uv_margin = Vector2(-0.21, -0.085)
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_5ecsg"]
+texture = ExtResource("11_lem47")
+texture_region_size = Vector2i(130, 130)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_4jkhf"]
+texture = ExtResource("12_gpok4")
+texture_region_size = Vector2i(130, 130)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_k3sic"]
+texture = ExtResource("13_ei5m6")
+texture_region_size = Vector2i(130, 130)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_8ypy5"]
+texture = ExtResource("14_6vvci")
+texture_region_size = Vector2i(130, 130)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_yr6ya"]
+texture = ExtResource("15_bsadv")
+texture_region_size = Vector2i(130, 130)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ad0m0"]
+texture = ExtResource("16_xlk5n")
+texture_region_size = Vector2i(130, 130)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_jueuo"]
+texture = ExtResource("17_a6jp3")
+texture_region_size = Vector2i(130, 130)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bpbkq"]
+texture = ExtResource("18_lyh5k")
+texture_region_size = Vector2i(130, 130)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ynsv6"]
+texture = ExtResource("19_61625")
+texture_region_size = Vector2i(130, 130)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_1cj5d"]
+texture = ExtResource("20_2x202")
+texture_region_size = Vector2i(130, 130)
+0:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_bq0il"]
+tile_shape = 3
+tile_size = Vector2i(120, 140)
+sources/1 = SubResource("TileSetAtlasSource_5ecsg")
+sources/2 = SubResource("TileSetAtlasSource_k3sic")
+sources/3 = SubResource("TileSetAtlasSource_8ypy5")
+sources/4 = SubResource("TileSetAtlasSource_yr6ya")
+sources/5 = SubResource("TileSetAtlasSource_ad0m0")
+sources/6 = SubResource("TileSetAtlasSource_jueuo")
+sources/7 = SubResource("TileSetAtlasSource_bpbkq")
+sources/8 = SubResource("TileSetAtlasSource_ynsv6")
+sources/9 = SubResource("TileSetAtlasSource_1cj5d")
+sources/10 = SubResource("TileSetAtlasSource_4jkhf")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_evleq"]
+shader = ExtResource("21_1nwru")
+shader_parameter/angle = 0.0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_budli"]
+texture = ExtResource("22_a84vg")
+texture_region_size = Vector2i(120, 140)
+0:0/0 = 0
+0:0/0/material = SubResource("ShaderMaterial_evleq")
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_cya4c"]
+texture = ExtResource("22_a84vg")
+texture_region_size = Vector2i(120, 140)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_4r4km"]
+texture = ExtResource("22_a84vg")
+texture_region_size = Vector2i(120, 140)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_cga06"]
+texture = ExtResource("22_a84vg")
+texture_region_size = Vector2i(120, 140)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_aft66"]
+texture = ExtResource("23_n4ndp")
+texture_region_size = Vector2i(120, 140)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_huu54"]
+texture = ExtResource("24_76ltc")
+texture_region_size = Vector2i(120, 140)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wecpy"]
+texture = ExtResource("25_ymypq")
+texture_region_size = Vector2i(120, 140)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_atw5d"]
+texture = ExtResource("26_gp33o")
+texture_region_size = Vector2i(120, 140)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_5aaxl"]
+texture = ExtResource("27_3eswm")
+texture_region_size = Vector2i(120, 140)
+0:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_m4nik"]
+tile_shape = 3
+tile_size = Vector2i(120, 140)
+sources/1 = SubResource("TileSetAtlasSource_cya4c")
+sources/0 = SubResource("TileSetAtlasSource_budli")
+sources/2 = SubResource("TileSetAtlasSource_4r4km")
+sources/3 = SubResource("TileSetAtlasSource_cga06")
+sources/4 = SubResource("TileSetAtlasSource_aft66")
+sources/5 = SubResource("TileSetAtlasSource_huu54")
+sources/6 = SubResource("TileSetAtlasSource_wecpy")
+sources/7 = SubResource("TileSetAtlasSource_atw5d")
+sources/8 = SubResource("TileSetAtlasSource_5aaxl")
+
+[node name="Canaan" type="Node2D"]
+y_sort_enabled = true
+script = ExtResource("1_d4aao")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(960, 536)
+script = ExtResource("2_e6jfq")
+min_zoom = 1.0
+max_zoom = 4.0
+
+[node name="VideoStreamPlayer" type="VideoStreamPlayer" parent="."]
+visible = false
+z_index = 1
+offset_left = -1010.0
+offset_top = -127.0
+offset_right = 3103.0
+offset_bottom = 2120.0
+mouse_filter = 2
+stream = ExtResource("3_v0pfn")
+autoplay = true
+expand = true
+loop = true
+
+[node name="Background" type="ColorRect" parent="."]
+z_index = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40878.0
+offset_top = -19765.0
+offset_right = 39861.0
+offset_bottom = 17382.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.294118, 0.533333, 0.980392, 1)
+
+[node name="MapLayer" type="CanvasLayer" parent="."]
+follow_viewport_enabled = true
+
+[node name="StandardMap" type="TileMapLayer" parent="MapLayer"]
+z_index = 2
+position = Vector2(908, 679)
+tile_map_data = PackedByteArray("AAAXAC8ACAAAAAYAAAALACAACAAAAAAAAAASACoACAAAAAYAAAAUAC0ACAAAAAYAAAAMACcACAAAAAYAAAAZABYACAANAAAAAABCACIACAAGAAAAAABCACgACAAGAAYAAAA9ACkACAAGAAYAAAAwAC4ACAAAAAYAAAA2ABIACAAGAAAAAAANABkACAAAAAAAAAD+//3/AQAAAAAAAAD///3/AQAAAAAAAAAAAP3/AQAAAAAAAAABAP7/AQAAAAAAAAAAAP7/AQAAAAAAAAD///7/AQAAAAAAAAD+//7/AQAAAAAAAAD9////AQAAAAAAAAD/////AQAAAAAAAAAAAP//AQAAAAAAAAABAP//AQAAAAAAAAABAAAAAQAAAAAAAAAAAAAAAQAAAAAAAAD//wAAAQAAAAAAAAD+/wAAAQAAAAAAAAD+/wEAAQAAAAAAAAD//wEAAQAAAAAAAAAAAAEAAQAAAAAAAAD+////AQAAAAAAAAA=")
+tile_set = SubResource("TileSet_051m2")
+
+[node name="ResourceNumbers" type="TileMapLayer" parent="MapLayer"]
+z_index = 2
+material = SubResource("ShaderMaterial_jbqwa")
+position = Vector2(908, 679)
+tile_set = SubResource("TileSet_bq0il")
+
+[node name="Harbors" type="TileMapLayer" parent="MapLayer"]
+z_index = 2
+position = Vector2(908, 679)
+tile_set = SubResource("TileSet_m4nik")
+
+[node name="Possible_Placement_Settlement" type="TextureButton" parent="MapLayer"]
+visible = false
+z_index = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -16.5
+offset_top = -16.5
+offset_right = 16.5
+offset_bottom = 16.5
+grow_horizontal = 2
+grow_vertical = 2
+tooltip_text = "Click to place settlement"
+texture_normal = ExtResource("28_tu3pp")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Possible_Placement_Robber" type="TextureButton" parent="MapLayer"]
+visible = false
+z_index = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -16.5
+offset_top = -16.5
+offset_right = 16.5
+offset_bottom = 16.5
+grow_horizontal = 2
+grow_vertical = 2
+tooltip_text = "Click to place the Robber"
+texture_normal = ExtResource("28_tu3pp")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Possible_Placement_Road" type="TextureButton" parent="MapLayer"]
+visible = false
+z_index = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -16.0
+offset_right = 2.0
+offset_bottom = 17.0
+grow_horizontal = 2
+grow_vertical = 2
+tooltip_text = "Click to place road"
+texture_normal = ExtResource("28_tu3pp")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Bot1_City" type="TextureRect" parent="MapLayer"]
+visible = false
+z_index = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 26.0
+offset_top = 5.0
+offset_right = 74.0
+offset_bottom = 53.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("29_avv8d")
+expand_mode = 1
+
+[node name="Bot1_Settlement" type="TextureRect" parent="MapLayer"]
+visible = false
+z_index = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -24.0
+offset_top = -24.0
+offset_right = 24.0
+offset_bottom = 24.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("30_vkpfm")
+expand_mode = 1
+
+[node name="Bot1_Road" type="TextureRect" parent="MapLayer"]
+visible = false
+z_index = 2
+offset_left = 653.0
+offset_top = 630.0
+offset_right = 713.0
+offset_bottom = 636.0
+texture = ExtResource("31_e0wje")
+expand_mode = 1
+
+[node name="Bot2_City" type="TextureRect" parent="MapLayer"]
+visible = false
+z_index = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -24.0
+offset_top = 47.0
+offset_right = 24.0
+offset_bottom = 95.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("32_ageuq")
+expand_mode = 1
+
+[node name="Bot2_Settlement" type="TextureRect" parent="MapLayer"]
+visible = false
+z_index = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -24.0
+offset_top = -24.0
+offset_right = 24.0
+offset_bottom = 24.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("33_yvsoe")
+expand_mode = 1
+
+[node name="Bot2_Road" type="TextureRect" parent="MapLayer"]
+visible = false
+z_index = 2
+offset_left = 653.0
+offset_top = 624.0
+offset_right = 713.0
+offset_bottom = 630.0
+texture = ExtResource("34_2sjqv")
+expand_mode = 1
+
+[node name="Bot3_City" type="TextureRect" parent="MapLayer"]
+visible = false
+z_index = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -24.0
+offset_top = -24.0
+offset_right = 24.0
+offset_bottom = 24.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("35_7clh4")
+expand_mode = 1
+
+[node name="Bot3_Settlement" type="TextureRect" parent="MapLayer"]
+visible = false
+z_index = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -24.0
+offset_top = -24.0
+offset_right = 24.0
+offset_bottom = 24.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("36_ows1f")
+expand_mode = 1
+
+[node name="Bot3_Road" type="TextureRect" parent="MapLayer"]
+visible = false
+z_index = 2
+offset_left = 653.0
+offset_top = 612.0
+offset_right = 713.0
+offset_bottom = 618.0
+texture = ExtResource("37_epmnl")
+expand_mode = 1
+
+[node name="Player1_Settlement" type="TextureRect" parent="MapLayer"]
+visible = false
+z_index = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -24.0
+offset_top = -24.0
+offset_right = 24.0
+offset_bottom = 24.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("38_tv1yn")
+expand_mode = 1
+
+[node name="Player1_City" type="TextureRect" parent="MapLayer"]
+visible = false
+z_index = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -24.0
+offset_top = -24.0
+offset_right = 24.0
+offset_bottom = 24.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("39_0hsl4")
+expand_mode = 1
+
+[node name="Player1_Road" type="TextureRect" parent="MapLayer"]
+visible = false
+z_index = 2
+offset_left = 653.0
+offset_top = 618.0
+offset_right = 713.0
+offset_bottom = 624.0
+texture = ExtResource("40_favqi")
+expand_mode = 1
+
+[node name="Player1_Settlement_Timer" type="Timer" parent="MapLayer"]
+wait_time = 120.0
+
+[node name="Robber" type="TextureRect" parent="MapLayer"]
+z_index = 2
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -32.0
+offset_top = -32.0
+offset_right = 32.0
+offset_bottom = 32.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(32, 32)
+texture = ExtResource("41_vbyd4")
+
+[node name="Robber_Choose_Resource_Tile_Btn" type="TextureButton" parent="MapLayer"]
+visible = false
+modulate = Color(1, 1, 1, 0.513726)
+z_index = 2
+offset_left = 488.0
+offset_top = 447.0
+offset_right = 638.0
+offset_bottom = 597.0
+scale = Vector2(0.45, 0.45)
+texture_normal = ExtResource("42_kvvpi")
+texture_pressed = ExtResource("43_uhvue")
+texture_hover = ExtResource("44_g8r4b")
+texture_click_mask = ExtResource("45_s3c1t")
+
+[node name="Choose_Who_To_Rob_Container" type="ColorRect" parent="MapLayer"]
+visible = false
+z_index = 4
+offset_left = 28.0
+offset_top = 27.0
+offset_right = 247.0
+offset_bottom = 101.0
+color = Color(0, 0, 0, 1)
+
+[node name="Bot1_Choose_To_Rob_Btn" type="TextureButton" parent="MapLayer/Choose_Who_To_Rob_Container"]
+visible = false
+z_index = 3
+layout_mode = 0
+offset_top = 4.0
+offset_right = 64.0
+offset_bottom = 68.0
+tooltip_text = "Rob Bot 1"
+texture_normal = ExtResource("30_vkpfm")
+
+[node name="Bot2_Choose_To_Rob_Btn" type="TextureButton" parent="MapLayer/Choose_Who_To_Rob_Container"]
+visible = false
+z_index = 3
+layout_mode = 0
+offset_left = 73.0
+offset_top = 4.0
+offset_right = 137.0
+offset_bottom = 68.0
+tooltip_text = "Rob Bot 2"
+texture_normal = ExtResource("33_yvsoe")
+
+[node name="Bot3_Choose_To_Rob_Btn" type="TextureButton" parent="MapLayer/Choose_Who_To_Rob_Container"]
+visible = false
+z_index = 3
+layout_mode = 0
+offset_left = 146.0
+offset_top = 4.0
+offset_right = 210.0
+offset_bottom = 68.0
+tooltip_text = "Rob Bot 3"
+texture_normal = ExtResource("46_bna0l")
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+
+[node name="Roll_Dice" type="Button" parent="UILayer"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 740.0
+offset_top = 441.0
+offset_right = 915.0
+offset_bottom = 536.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Roll Dice"
+
+[node name="Chat" type="ColorRect" parent="UILayer"]
+offset_left = 1349.0
+offset_top = 8.0
+offset_right = 1903.0
+offset_bottom = 293.0
+color = Color(0.701961, 0.803922, 0.662745, 1)
+
+[node name="Chat_Log" type="RichTextLabel" parent="UILayer/Chat"]
+layout_mode = 0
+offset_right = 554.0
+offset_bottom = 285.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.709804)
+bbcode_enabled = true
+scroll_following = true
+
+[node name="Supply" type="ColorRect" parent="UILayer"]
+offset_left = 1547.0
+offset_top = 307.0
+offset_right = 1903.0
+offset_bottom = 422.0
+color = Color(1, 0.701961, 1, 1)
+
+[node name="Supply" type="RichTextLabel" parent="UILayer/Supply"]
+layout_mode = 0
+offset_left = 126.0
+offset_right = 239.0
+offset_bottom = 27.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center][b]Bank"
+scroll_active = false
+
+[node name="Brick" type="TextureRect" parent="UILayer/Supply"]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 27.0
+offset_right = 144.0
+offset_bottom = 217.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("47_a2omc")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Supply/Brick"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Sheep" type="TextureRect" parent="UILayer/Supply"]
+layout_mode = 0
+offset_left = 61.0
+offset_top = 27.0
+offset_right = 201.0
+offset_bottom = 217.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("48_fwydo")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Supply/Sheep"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 6.81821
+offset_right = 133.0
+offset_bottom = 47.8182
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Stone" type="TextureRect" parent="UILayer/Supply"]
+layout_mode = 0
+offset_left = 119.0
+offset_top = 27.0
+offset_right = 259.0
+offset_bottom = 217.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("49_mis1q")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Supply/Stone"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 6.81821
+offset_right = 133.0
+offset_bottom = 47.8182
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Tree" type="TextureRect" parent="UILayer/Supply"]
+layout_mode = 0
+offset_left = 178.0
+offset_top = 27.0
+offset_right = 318.0
+offset_bottom = 217.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("50_5as3n")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Supply/Tree"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 6.81821
+offset_right = 133.0
+offset_bottom = 47.8182
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Wheat" type="TextureRect" parent="UILayer/Supply"]
+layout_mode = 0
+offset_left = 237.0
+offset_top = 27.0
+offset_right = 377.0
+offset_bottom = 217.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("51_xmntw")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Supply/Wheat"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 6.81821
+offset_right = 133.0
+offset_bottom = 47.8182
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Development_Card" type="TextureRect" parent="UILayer/Supply"]
+layout_mode = 0
+offset_left = 296.0
+offset_top = 27.0
+offset_right = 436.0
+offset_bottom = 217.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("52_td71v")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Supply/Development_Card"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 9.09094
+offset_right = 133.0
+offset_bottom = 50.0909
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]25"
+scroll_active = false
+
+[node name="Select_Resource_From_Supply_Btn" type="Button" parent="UILayer/Supply"]
+visible = false
+modulate = Color(1, 1, 1, 0.490196)
+layout_mode = 0
+offset_left = 237.0
+offset_top = 27.0
+offset_right = 377.0
+offset_bottom = 217.0
+scale = Vector2(0.4, 0.44)
+
+[node name="Invention_DevCard_Text" type="RichTextLabel" parent="UILayer/Supply"]
+visible = false
+layout_mode = 0
+offset_left = -1546.0
+offset_top = 631.0
+offset_right = -639.0
+offset_bottom = 671.0
+bbcode_enabled = true
+text = "[font_size=26][center]Invention! Select any two resources from the supply."
+
+[node name="Knight_DevCard_Text" type="RichTextLabel" parent="UILayer/Supply"]
+visible = false
+layout_mode = 0
+offset_left = -1546.0
+offset_top = 631.0
+offset_right = -639.0
+offset_bottom = 671.0
+bbcode_enabled = true
+text = "[font_size=26][center]Knight! Choose a new location for the robber."
+
+[node name="Road_DevCard_Text" type="RichTextLabel" parent="UILayer/Supply"]
+visible = false
+layout_mode = 0
+offset_left = -1546.0
+offset_top = 631.0
+offset_right = -639.0
+offset_bottom = 671.0
+bbcode_enabled = true
+text = "[font_size=26][center]Road building! Build two roads for free."
+
+[node name="Monopoly_DevCard_Text" type="RichTextLabel" parent="UILayer/Supply"]
+visible = false
+layout_mode = 0
+offset_left = -1546.0
+offset_top = 631.0
+offset_right = -603.0
+offset_bottom = 671.0
+bbcode_enabled = true
+text = "[font_size=26][center]Monopoly! Select a resource, then all players give you all of that resource."
+
+[node name="Player1Background" type="ColorRect" parent="UILayer"]
+offset_left = 1547.0
+offset_top = 435.0
+offset_right = 1903.0
+offset_bottom = 550.0
+color = Color(0.952941, 0.952941, 0.952941, 1)
+
+[node name="PlayerName" type="RichTextLabel" parent="UILayer/Player1Background"]
+layout_mode = 0
+offset_left = 13.0
+offset_top = 6.0
+offset_right = 126.0
+offset_bottom = 33.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center][b]Player Name"
+scroll_active = false
+
+[node name="VP" type="RichTextLabel" parent="UILayer/Player1Background"]
+layout_mode = 0
+offset_left = 13.0
+offset_top = 64.0
+offset_right = 126.0
+offset_bottom = 115.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Victory Points: 0"
+scroll_active = false
+
+[node name="Resource_Num" type="RichTextLabel" parent="UILayer/Player1Background"]
+layout_mode = 0
+offset_left = 133.0
+offset_top = 6.0
+offset_right = 246.0
+offset_bottom = 32.0
+theme_override_colors/table_border = Color(0, 0, 0, 1)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Resources: 0"
+scroll_active = false
+
+[node name="Dev_Card_Num" type="RichTextLabel" parent="UILayer/Player1Background"]
+layout_mode = 0
+offset_left = 133.0
+offset_top = 64.0
+offset_right = 246.0
+offset_bottom = 90.0
+theme_override_colors/table_border = Color(0, 0, 0, 1)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Dev Cards: 0"
+scroll_active = false
+
+[node name="Knights_Played" type="RichTextLabel" parent="UILayer/Player1Background"]
+layout_mode = 0
+offset_left = 246.0
+offset_top = 6.0
+offset_right = 359.0
+offset_bottom = 32.0
+theme_override_colors/table_border = Color(0, 0, 0, 1)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Knights: 0"
+scroll_active = false
+
+[node name="Longest_Road" type="RichTextLabel" parent="UILayer/Player1Background"]
+layout_mode = 0
+offset_left = 246.0
+offset_top = 64.0
+offset_right = 359.0
+offset_bottom = 115.0
+theme_override_colors/table_border = Color(0, 0, 0, 1)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Longest Road: 0"
+scroll_active = false
+
+[node name="Player2Background" type="ColorRect" parent="UILayer"]
+offset_left = 1547.0
+offset_top = 564.0
+offset_right = 1903.0
+offset_bottom = 679.0
+
+[node name="PlayerName" type="RichTextLabel" parent="UILayer/Player2Background"]
+layout_mode = 0
+offset_left = 13.0
+offset_top = 6.0
+offset_right = 126.0
+offset_bottom = 33.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center][b]Player Name"
+scroll_active = false
+
+[node name="VP" type="RichTextLabel" parent="UILayer/Player2Background"]
+layout_mode = 0
+offset_left = 13.0
+offset_top = 64.0
+offset_right = 126.0
+offset_bottom = 115.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Victory Points: 0"
+scroll_active = false
+
+[node name="Resource_Num" type="RichTextLabel" parent="UILayer/Player2Background"]
+layout_mode = 0
+offset_left = 133.0
+offset_top = 6.0
+offset_right = 246.0
+offset_bottom = 32.0
+theme_override_colors/table_border = Color(0, 0, 0, 1)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Resources: 0"
+scroll_active = false
+
+[node name="Dev_Card_Num" type="RichTextLabel" parent="UILayer/Player2Background"]
+layout_mode = 0
+offset_left = 133.0
+offset_top = 64.0
+offset_right = 246.0
+offset_bottom = 90.0
+theme_override_colors/table_border = Color(0, 0, 0, 1)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Dev Cards: 0"
+scroll_active = false
+
+[node name="Knights_Played" type="RichTextLabel" parent="UILayer/Player2Background"]
+layout_mode = 0
+offset_left = 246.0
+offset_top = 6.0
+offset_right = 359.0
+offset_bottom = 32.0
+theme_override_colors/table_border = Color(0, 0, 0, 1)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Knights: 0"
+scroll_active = false
+
+[node name="Longest_Road" type="RichTextLabel" parent="UILayer/Player2Background"]
+layout_mode = 0
+offset_left = 246.0
+offset_top = 64.0
+offset_right = 359.0
+offset_bottom = 115.0
+theme_override_colors/table_border = Color(0, 0, 0, 1)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Longest Road: 0"
+scroll_active = false
+
+[node name="Player3Background" type="ColorRect" parent="UILayer"]
+offset_left = 1547.0
+offset_top = 694.0
+offset_right = 1903.0
+offset_bottom = 809.0
+
+[node name="PlayerName" type="RichTextLabel" parent="UILayer/Player3Background"]
+layout_mode = 0
+offset_left = 13.0
+offset_top = 6.0
+offset_right = 126.0
+offset_bottom = 33.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center][b]Player Name"
+scroll_active = false
+
+[node name="VP" type="RichTextLabel" parent="UILayer/Player3Background"]
+layout_mode = 0
+offset_left = 13.0
+offset_top = 64.0
+offset_right = 126.0
+offset_bottom = 115.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Victory Points: 0"
+scroll_active = false
+
+[node name="Resource_Num" type="RichTextLabel" parent="UILayer/Player3Background"]
+layout_mode = 0
+offset_left = 133.0
+offset_top = 6.0
+offset_right = 246.0
+offset_bottom = 32.0
+theme_override_colors/table_border = Color(0, 0, 0, 1)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Resources: 0"
+scroll_active = false
+
+[node name="Dev_Card_Num" type="RichTextLabel" parent="UILayer/Player3Background"]
+layout_mode = 0
+offset_left = 133.0
+offset_top = 64.0
+offset_right = 246.0
+offset_bottom = 90.0
+theme_override_colors/table_border = Color(0, 0, 0, 1)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Dev Cards: 0"
+scroll_active = false
+
+[node name="Knights_Played" type="RichTextLabel" parent="UILayer/Player3Background"]
+layout_mode = 0
+offset_left = 246.0
+offset_top = 6.0
+offset_right = 359.0
+offset_bottom = 32.0
+theme_override_colors/table_border = Color(0, 0, 0, 1)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Knights: 0"
+scroll_active = false
+
+[node name="Longest_Road" type="RichTextLabel" parent="UILayer/Player3Background"]
+layout_mode = 0
+offset_left = 246.0
+offset_top = 64.0
+offset_right = 359.0
+offset_bottom = 115.0
+theme_override_colors/table_border = Color(0, 0, 0, 1)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Longest Road: 0"
+scroll_active = false
+
+[node name="Player4Background" type="ColorRect" parent="UILayer"]
+offset_left = 1547.0
+offset_top = 823.0
+offset_right = 1903.0
+offset_bottom = 938.0
+
+[node name="PlayerName" type="RichTextLabel" parent="UILayer/Player4Background"]
+layout_mode = 0
+offset_left = 13.0
+offset_top = 6.0
+offset_right = 126.0
+offset_bottom = 33.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center][b]Player Name"
+scroll_active = false
+
+[node name="VP" type="RichTextLabel" parent="UILayer/Player4Background"]
+layout_mode = 0
+offset_left = 13.0
+offset_top = 64.0
+offset_right = 126.0
+offset_bottom = 115.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Victory Points: 0"
+scroll_active = false
+
+[node name="Resource_Num" type="RichTextLabel" parent="UILayer/Player4Background"]
+layout_mode = 0
+offset_left = 133.0
+offset_top = 6.0
+offset_right = 246.0
+offset_bottom = 32.0
+theme_override_colors/table_border = Color(0, 0, 0, 1)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Resources: 0"
+scroll_active = false
+
+[node name="Dev_Card_Num" type="RichTextLabel" parent="UILayer/Player4Background"]
+layout_mode = 0
+offset_left = 133.0
+offset_top = 64.0
+offset_right = 246.0
+offset_bottom = 90.0
+theme_override_colors/table_border = Color(0, 0, 0, 1)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Dev Cards: 0"
+scroll_active = false
+
+[node name="Knights_Played" type="RichTextLabel" parent="UILayer/Player4Background"]
+layout_mode = 0
+offset_left = 246.0
+offset_top = 6.0
+offset_right = 359.0
+offset_bottom = 32.0
+theme_override_colors/table_border = Color(0, 0, 0, 1)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Knights: 0"
+scroll_active = false
+
+[node name="Longest_Road" type="RichTextLabel" parent="UILayer/Player4Background"]
+layout_mode = 0
+offset_left = 246.0
+offset_top = 64.0
+offset_right = 359.0
+offset_bottom = 115.0
+theme_override_colors/table_border = Color(0, 0, 0, 1)
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Longest Road: 0"
+scroll_active = false
+
+[node name="Resource Bar" type="ColorRect" parent="UILayer"]
+offset_left = 1.0
+offset_top = 981.0
+offset_right = 908.0
+offset_bottom = 1080.0
+color = Color(0.999998, 0.996531, 0.729055, 1)
+
+[node name="Robber_Discard" type="RichTextLabel" parent="UILayer/Resource Bar"]
+visible = false
+layout_mode = 0
+offset_top = -43.0
+offset_right = 907.0
+offset_bottom = -3.0
+bbcode_enabled = true
+text = "[font_size=26][center]ROBBER! Discard x resources."
+
+[node name="Resource_Discard_Btn" type="Button" parent="UILayer/Resource Bar"]
+visible = false
+modulate = Color(1, 1, 1, 0.490196)
+layout_mode = 0
+offset_right = 140.0
+offset_bottom = 190.0
+scale = Vector2(0.4, 0.44)
+
+[node name="Bank_Trade_Btn_Background" type="ColorRect" parent="UILayer"]
+offset_left = 914.0
+offset_top = 987.0
+offset_right = 1010.0
+offset_bottom = 1073.0
+tooltip_text = "Trade with the Bank"
+color = Color(0.701593, 0.804474, 0.664316, 1)
+
+[node name="Bank_Trade_Button" type="TextureButton" parent="UILayer/Bank_Trade_Btn_Background"]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 11.0
+offset_right = 78.0
+offset_bottom = 75.0
+tooltip_text = "Trade with the Bank"
+texture_normal = ExtResource("53_og2wp")
+
+[node name="Disabled_Mask" type="ColorRect" parent="UILayer/Bank_Trade_Btn_Background"]
+visible = false
+layout_mode = 0
+offset_right = 96.0
+offset_bottom = 86.0
+color = Color(0.14902, 0.14902, 0.14902, 0.678431)
+
+[node name="Player_Trade_Btn_Background" type="ColorRect" parent="UILayer"]
+offset_left = 1016.0
+offset_top = 987.0
+offset_right = 1112.0
+offset_bottom = 1073.0
+tooltip_text = "Trade with a Player"
+color = Color(0.701593, 0.804474, 0.664316, 1)
+
+[node name="Player_Trade_Button" type="TextureButton" parent="UILayer/Player_Trade_Btn_Background"]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 11.0
+offset_right = 78.0
+offset_bottom = 75.0
+tooltip_text = "Trade with a Player"
+texture_normal = ExtResource("54_fmue4")
+
+[node name="Disabled_Mask" type="ColorRect" parent="UILayer/Player_Trade_Btn_Background"]
+visible = false
+layout_mode = 0
+offset_right = 96.0
+offset_bottom = 86.0
+color = Color(0.14902, 0.14902, 0.14902, 0.678431)
+
+[node name="Buy_Development_Card_Background" type="ColorRect" parent="UILayer"]
+offset_left = 1120.0
+offset_top = 987.0
+offset_right = 1216.0
+offset_bottom = 1073.0
+tooltip_text = "Buy a Development Card"
+color = Color(0.701593, 0.804474, 0.664316, 1)
+
+[node name="Buy_Development_Card_Button" type="TextureButton" parent="UILayer/Buy_Development_Card_Background"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 11.0
+offset_right = 70.0
+offset_bottom = 75.0
+tooltip_text = "Buy a Development Card"
+texture_normal = ExtResource("52_td71v")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Disabled_Mask" type="ColorRect" parent="UILayer/Buy_Development_Card_Background"]
+visible = false
+layout_mode = 0
+offset_right = 96.0
+offset_bottom = 86.0
+color = Color(0.14902, 0.14902, 0.14902, 0.678431)
+
+[node name="Build_Road_Btn_Background" type="ColorRect" parent="UILayer"]
+offset_left = 1225.0
+offset_top = 987.0
+offset_right = 1321.0
+offset_bottom = 1073.0
+tooltip_text = "Build a Road"
+color = Color(0.701593, 0.804474, 0.664316, 1)
+
+[node name="Build_Road_Button" type="TextureButton" parent="UILayer/Build_Road_Btn_Background"]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 41.0
+offset_right = 79.0
+offset_bottom = 50.0
+tooltip_text = "Build a Road"
+texture_normal = ExtResource("40_favqi")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Button_DEBUG" type="Button" parent="UILayer/Build_Road_Btn_Background"]
+modulate = Color(0.521569, 0.521569, 0.521569, 0.129412)
+layout_mode = 0
+offset_right = 96.0
+offset_bottom = 86.0
+
+[node name="Disabled_Mask" type="ColorRect" parent="UILayer/Build_Road_Btn_Background"]
+visible = false
+layout_mode = 0
+offset_right = 96.0
+offset_bottom = 86.0
+color = Color(0.14902, 0.14902, 0.14902, 0.678431)
+
+[node name="Build_Settlement_Btn_Background" type="ColorRect" parent="UILayer"]
+offset_left = 1329.0
+offset_top = 987.0
+offset_right = 1425.0
+offset_bottom = 1073.0
+tooltip_text = "Build a Settlement"
+color = Color(0.701593, 0.804474, 0.664316, 1)
+
+[node name="Build_Settlement_Button" type="TextureButton" parent="UILayer/Build_Settlement_Btn_Background"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 17.0
+offset_right = 72.0
+offset_bottom = 65.0
+tooltip_text = "Build a Settlement"
+texture_normal = ExtResource("38_tv1yn")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Disabled_Mask" type="ColorRect" parent="UILayer/Build_Settlement_Btn_Background"]
+visible = false
+layout_mode = 0
+offset_right = 96.0
+offset_bottom = 86.0
+color = Color(0.14902, 0.14902, 0.14902, 0.678431)
+
+[node name="Build_City_Btn_Background" type="ColorRect" parent="UILayer"]
+offset_left = 1434.0
+offset_top = 987.0
+offset_right = 1530.0
+offset_bottom = 1073.0
+tooltip_text = "Build a City"
+color = Color(0.701593, 0.804474, 0.664316, 1)
+
+[node name="Build_City_Button" type="TextureButton" parent="UILayer/Build_City_Btn_Background"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 17.0
+offset_right = 76.0
+offset_bottom = 70.0
+tooltip_text = "Build a City"
+texture_normal = ExtResource("39_0hsl4")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Disabled_Mask" type="ColorRect" parent="UILayer/Build_City_Btn_Background"]
+visible = false
+layout_mode = 0
+offset_right = 96.0
+offset_bottom = 86.0
+color = Color(0.14902, 0.14902, 0.14902, 0.678431)
+
+[node name="End_Turn_Btn_Background" type="ColorRect" parent="UILayer"]
+offset_left = 1540.0
+offset_top = 987.0
+offset_right = 1636.0
+offset_bottom = 1073.0
+tooltip_text = "End Turn"
+color = Color(0.701593, 0.804474, 0.664316, 1)
+
+[node name="End_Turn_Button" type="TextureButton" parent="UILayer/End_Turn_Btn_Background"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 17.0
+offset_right = 76.0
+offset_bottom = 70.0
+tooltip_text = "End Turn"
+texture_normal = ExtResource("55_ijsim")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Disabled_Mask" type="ColorRect" parent="UILayer/End_Turn_Btn_Background"]
+visible = false
+layout_mode = 0
+offset_right = 96.0
+offset_bottom = 86.0
+color = Color(0.14902, 0.14902, 0.14902, 0.678431)
+
+[node name="Invention_DevCard" type="TextureRect" parent="UILayer"]
+visible = false
+offset_left = 627.0
+offset_top = 978.0
+offset_right = 767.0
+offset_bottom = 1168.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("56_6o0aa")
+
+[node name="Amount" type="RichTextLabel" parent="UILayer/Invention_DevCard"]
+layout_mode = 0
+offset_left = 107.5
+offset_top = -4.54545
+offset_right = 147.5
+offset_bottom = 36.4545
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]0"
+scroll_active = false
+
+[node name="Invention_DevCard" type="Button" parent="UILayer/Invention_DevCard"]
+visible = false
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Knight_DevCard" type="TextureRect" parent="UILayer"]
+visible = false
+offset_left = 355.0
+offset_top = 467.0
+offset_right = 495.0
+offset_bottom = 657.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("57_yn210")
+
+[node name="Amount" type="RichTextLabel" parent="UILayer/Knight_DevCard"]
+layout_mode = 0
+offset_left = 107.5
+offset_top = -4.54545
+offset_right = 147.5
+offset_bottom = 36.4545
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]0"
+scroll_active = false
+
+[node name="Knight_DevCard" type="Button" parent="UILayer/Knight_DevCard"]
+visible = false
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Monopoly_DevCard" type="TextureRect" parent="UILayer"]
+visible = false
+offset_left = 426.0
+offset_top = 467.0
+offset_right = 566.0
+offset_bottom = 657.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("58_vluoc")
+
+[node name="Amount" type="RichTextLabel" parent="UILayer/Monopoly_DevCard"]
+layout_mode = 0
+offset_left = 107.5
+offset_top = -4.54545
+offset_right = 147.5
+offset_bottom = 36.4545
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]0"
+scroll_active = false
+
+[node name="Monopoly_DevCard" type="Button" parent="UILayer/Monopoly_DevCard"]
+visible = false
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Road_DevCard" type="TextureRect" parent="UILayer"]
+visible = false
+offset_left = 497.0
+offset_top = 467.0
+offset_right = 637.0
+offset_bottom = 657.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("59_rxj52")
+
+[node name="Amount" type="RichTextLabel" parent="UILayer/Road_DevCard"]
+layout_mode = 0
+offset_left = 107.5
+offset_top = -4.54545
+offset_right = 147.5
+offset_bottom = 36.4545
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]0"
+scroll_active = false
+
+[node name="Road_DevCard" type="Button" parent="UILayer/Road_DevCard"]
+visible = false
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="VP_DevCard" type="TextureRect" parent="UILayer"]
+visible = false
+offset_left = 497.0
+offset_top = 467.0
+offset_right = 637.0
+offset_bottom = 657.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("60_b6q76")
+
+[node name="Amount" type="RichTextLabel" parent="UILayer/VP_DevCard"]
+layout_mode = 0
+offset_left = 107.5
+offset_top = -4.54545
+offset_right = 147.5
+offset_bottom = 36.4545
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]0"
+scroll_active = false
+
+[node name="Bank_Trade_Popup" type="ColorRect" parent="UILayer"]
+visible = false
+offset_left = 1.0
+offset_top = 694.0
+offset_right = 908.0
+offset_bottom = 978.0
+color = Color(0.701961, 0.803922, 0.662745, 0.588235)
+
+[node name="Dynamic_Player_Area" type="ColorRect" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_right = 437.0
+offset_bottom = 142.0
+color = Color(0.701961, 0.803922, 0.662745, 0.588235)
+
+[node name="Dynamic_Bank_Area" type="ColorRect" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 454.0
+offset_right = 907.0
+offset_bottom = 142.0
+color = Color(0.701961, 0.803922, 0.662745, 0.588235)
+
+[node name="Brick_Player" type="TextureRect" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 27.0
+offset_top = 193.0
+offset_right = 167.0
+offset_bottom = 383.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("47_a2omc")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Bank_Trade_Popup/Brick_Player"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Brick_Player_Btn" type="Button" parent="UILayer/Bank_Trade_Popup/Brick_Player"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_top = 5.81741e-05
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Sheep_Player" type="TextureRect" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 84.0
+offset_top = 193.0
+offset_right = 224.0
+offset_bottom = 383.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("48_fwydo")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Bank_Trade_Popup/Sheep_Player"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Sheep_Player_Btn" type="Button" parent="UILayer/Bank_Trade_Popup/Sheep_Player"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_top = 5.81741e-05
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Stone_Player" type="TextureRect" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 142.0
+offset_top = 193.0
+offset_right = 282.0
+offset_bottom = 383.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("49_mis1q")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Bank_Trade_Popup/Stone_Player"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Stone_Player_Btn" type="Button" parent="UILayer/Bank_Trade_Popup/Stone_Player"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_top = 5.81741e-05
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Tree_Player" type="TextureRect" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 201.0
+offset_top = 193.0
+offset_right = 341.0
+offset_bottom = 383.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("50_5as3n")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Bank_Trade_Popup/Tree_Player"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Tree_Player_Btn" type="Button" parent="UILayer/Bank_Trade_Popup/Tree_Player"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_top = 5.81741e-05
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Wheat_Player" type="TextureRect" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 260.0
+offset_top = 193.0
+offset_right = 400.0
+offset_bottom = 383.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("51_xmntw")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Bank_Trade_Popup/Wheat_Player"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Wheat_Player_Btn" type="Button" parent="UILayer/Bank_Trade_Popup/Wheat_Player"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_top = 5.81741e-05
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Brick_Bank" type="TextureRect" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 585.0
+offset_top = 193.0
+offset_right = 725.0
+offset_bottom = 383.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("47_a2omc")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Bank_Trade_Popup/Brick_Bank"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Brick_Bank_Btn" type="Button" parent="UILayer/Bank_Trade_Popup/Brick_Bank"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_top = 5.81741e-05
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Sheep_Bank" type="TextureRect" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 642.0
+offset_top = 193.0
+offset_right = 782.0
+offset_bottom = 383.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("48_fwydo")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Bank_Trade_Popup/Sheep_Bank"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Sheep_Bank_Btn" type="Button" parent="UILayer/Bank_Trade_Popup/Sheep_Bank"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_top = 5.81741e-05
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Tree_Bank" type="TextureRect" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 759.0
+offset_top = 193.0
+offset_right = 899.0
+offset_bottom = 383.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("50_5as3n")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Bank_Trade_Popup/Tree_Bank"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Tree_Bank_Btn" type="Button" parent="UILayer/Bank_Trade_Popup/Tree_Bank"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_top = 5.81741e-05
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Stone_Bank" type="TextureRect" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 700.0
+offset_top = 193.0
+offset_right = 840.0
+offset_bottom = 383.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("49_mis1q")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Bank_Trade_Popup/Stone_Bank"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Stone_Bank_Btn" type="Button" parent="UILayer/Bank_Trade_Popup/Stone_Bank"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_top = 5.81741e-05
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Wheat_Bank" type="TextureRect" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 818.0
+offset_top = 193.0
+offset_right = 958.0
+offset_bottom = 383.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("51_xmntw")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Bank_Trade_Popup/Wheat_Bank"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Wheat_Bank_Btn" type="Button" parent="UILayer/Bank_Trade_Popup/Wheat_Bank"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_top = 5.81741e-05
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Divider1" type="ColorRect" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 907.0
+offset_top = 142.0
+offset_right = 920.0
+offset_bottom = 1050.0
+rotation = 1.5708
+color = Color(1, 0.776471, 0.27451, 1)
+
+[node name="Divider4" type="ColorRect" parent="UILayer/Bank_Trade_Popup"]
+visible = false
+layout_mode = 0
+offset_left = 1065.0
+offset_top = 36.0
+offset_right = 1128.0
+offset_bottom = 245.0
+rotation = 1.5708
+color = Color(1, 0.360784, 0.27451, 1)
+
+[node name="Invalid_Trade_Text" type="RichTextLabel" parent="UILayer/Bank_Trade_Popup/Divider4"]
+layout_mode = 0
+offset_left = 16.0007
+offset_top = 187.0
+offset_right = 178.001
+offset_bottom = 217.0
+rotation = -1.5708
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=25][center]Invalid trade!"
+scroll_active = false
+
+[node name="Divider2" type="ColorRect" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 437.0
+offset_right = 454.0
+offset_bottom = 151.0
+color = Color(1, 0.776471, 0.27451, 1)
+
+[node name="Finish_Trade_Btn" type="ColorRect" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 913.0
+offset_top = 101.0
+offset_right = 1015.0
+offset_bottom = 198.0
+color = Color(0.701961, 0.803922, 0.662745, 1)
+
+[node name="Finish_Trade_Btn" type="TextureButton" parent="UILayer/Bank_Trade_Popup/Finish_Trade_Btn"]
+z_index = 1
+layout_mode = 0
+offset_left = 14.0
+offset_top = 19.0
+offset_right = 88.0
+offset_bottom = 88.0
+texture_normal = ExtResource("55_ijsim")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Tip2" type="RichTextLabel" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 328.0
+offset_top = 214.0
+offset_right = 572.0
+offset_bottom = 267.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Select resources for trading to/from the Bank"
+scroll_active = false
+
+[node name="Tip3" type="RichTextLabel" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 610.0
+offset_top = 162.0
+offset_right = 854.0
+offset_bottom = 189.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Bank's resources"
+scroll_active = false
+
+[node name="Tip" type="RichTextLabel" parent="UILayer/Bank_Trade_Popup"]
+layout_mode = 0
+offset_left = 56.0
+offset_top = 162.0
+offset_right = 300.0
+offset_bottom = 189.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Your resources"
+scroll_active = false
+
+[node name="Player_Trade_Popup" type="ColorRect" parent="UILayer"]
+visible = false
+offset_left = 1.0
+offset_top = 694.0
+offset_right = 908.0
+offset_bottom = 978.0
+color = Color(0.701961, 0.803922, 0.662745, 0.588235)
+
+[node name="Dynamic_Player_Area" type="ColorRect" parent="UILayer/Player_Trade_Popup"]
+layout_mode = 0
+offset_right = 437.0
+offset_bottom = 142.0
+color = Color(0.701961, 0.803922, 0.662745, 0.588235)
+
+[node name="Dynamic_Bank_Area" type="ColorRect" parent="UILayer/Player_Trade_Popup"]
+layout_mode = 0
+offset_left = 454.0
+offset_right = 907.0
+offset_bottom = 142.0
+color = Color(0.701961, 0.803922, 0.662745, 0.588235)
+
+[node name="Brick_Player" type="TextureRect" parent="UILayer/Player_Trade_Popup"]
+layout_mode = 0
+offset_left = 27.0
+offset_top = 193.0
+offset_right = 167.0
+offset_bottom = 383.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("47_a2omc")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Player_Trade_Popup/Brick_Player"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Brick_Player_Btn" type="Button" parent="UILayer/Player_Trade_Popup/Brick_Player"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_top = 5.81741e-05
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Sheep_Player" type="TextureRect" parent="UILayer/Player_Trade_Popup"]
+layout_mode = 0
+offset_left = 84.0
+offset_top = 193.0
+offset_right = 224.0
+offset_bottom = 383.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("48_fwydo")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Player_Trade_Popup/Sheep_Player"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Sheep_Player_Btn" type="Button" parent="UILayer/Player_Trade_Popup/Sheep_Player"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_top = 5.81741e-05
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Stone_Player" type="TextureRect" parent="UILayer/Player_Trade_Popup"]
+layout_mode = 0
+offset_left = 142.0
+offset_top = 193.0
+offset_right = 282.0
+offset_bottom = 383.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("49_mis1q")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Player_Trade_Popup/Stone_Player"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Stone_Player_Btn" type="Button" parent="UILayer/Player_Trade_Popup/Stone_Player"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_top = 5.81741e-05
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Tree_Player" type="TextureRect" parent="UILayer/Player_Trade_Popup"]
+layout_mode = 0
+offset_left = 201.0
+offset_top = 193.0
+offset_right = 341.0
+offset_bottom = 383.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("50_5as3n")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Player_Trade_Popup/Tree_Player"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Tree_Player_Btn" type="Button" parent="UILayer/Player_Trade_Popup/Tree_Player"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_top = 5.81741e-05
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Wheat_Player" type="TextureRect" parent="UILayer/Player_Trade_Popup"]
+layout_mode = 0
+offset_left = 260.0
+offset_top = 193.0
+offset_right = 400.0
+offset_bottom = 383.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("51_xmntw")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Player_Trade_Popup/Wheat_Player"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Wheat_Player_Btn" type="Button" parent="UILayer/Player_Trade_Popup/Wheat_Player"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_top = 5.81741e-05
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Brick_Bank" type="TextureRect" parent="UILayer/Player_Trade_Popup"]
+layout_mode = 0
+offset_left = 585.0
+offset_top = 193.0
+offset_right = 725.0
+offset_bottom = 383.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("47_a2omc")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Player_Trade_Popup/Brick_Bank"]
+visible = false
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Brick_Bank_Btn" type="Button" parent="UILayer/Player_Trade_Popup/Brick_Bank"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_top = 5.81741e-05
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Sheep_Bank" type="TextureRect" parent="UILayer/Player_Trade_Popup"]
+layout_mode = 0
+offset_left = 642.0
+offset_top = 193.0
+offset_right = 782.0
+offset_bottom = 383.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("48_fwydo")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Player_Trade_Popup/Sheep_Bank"]
+visible = false
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Sheep_Bank_Btn" type="Button" parent="UILayer/Player_Trade_Popup/Sheep_Bank"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_top = 5.81741e-05
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Tree_Bank" type="TextureRect" parent="UILayer/Player_Trade_Popup"]
+layout_mode = 0
+offset_left = 759.0
+offset_top = 193.0
+offset_right = 899.0
+offset_bottom = 383.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("50_5as3n")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Player_Trade_Popup/Tree_Bank"]
+visible = false
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Tree_Bank_Btn" type="Button" parent="UILayer/Player_Trade_Popup/Tree_Bank"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_top = 5.81741e-05
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Stone_Bank" type="TextureRect" parent="UILayer/Player_Trade_Popup"]
+layout_mode = 0
+offset_left = 700.0
+offset_top = 193.0
+offset_right = 840.0
+offset_bottom = 383.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("49_mis1q")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Player_Trade_Popup/Stone_Bank"]
+visible = false
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Stone_Bank_Btn" type="Button" parent="UILayer/Player_Trade_Popup/Stone_Bank"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_top = 5.81741e-05
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Wheat_Bank" type="TextureRect" parent="UILayer/Player_Trade_Popup"]
+layout_mode = 0
+offset_left = 818.0
+offset_top = 193.0
+offset_right = 958.0
+offset_bottom = 383.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("51_xmntw")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Player_Trade_Popup/Wheat_Bank"]
+visible = false
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Wheat_Bank_Btn" type="Button" parent="UILayer/Player_Trade_Popup/Wheat_Bank"]
+modulate = Color(1, 1, 1, 0.592157)
+layout_mode = 0
+offset_top = 5.81741e-05
+offset_right = 140.0
+offset_bottom = 189.0
+
+[node name="Divider1" type="ColorRect" parent="UILayer/Player_Trade_Popup"]
+layout_mode = 0
+offset_left = 907.0
+offset_top = 142.0
+offset_right = 920.0
+offset_bottom = 1050.0
+rotation = 1.5708
+color = Color(1, 0.776471, 0.27451, 1)
+
+[node name="Divider4" type="ColorRect" parent="UILayer/Player_Trade_Popup"]
+visible = false
+layout_mode = 0
+offset_left = 1065.0
+offset_top = 36.0
+offset_right = 1128.0
+offset_bottom = 245.0
+rotation = 1.5708
+color = Color(1, 0.360784, 0.27451, 1)
+
+[node name="Invalid_Trade_Text" type="RichTextLabel" parent="UILayer/Player_Trade_Popup/Divider4"]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 208.0
+offset_right = 224.0
+offset_bottom = 238.0
+rotation = -1.5708
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=25][center]3 trades max!"
+scroll_active = false
+
+[node name="Divider2" type="ColorRect" parent="UILayer/Player_Trade_Popup"]
+layout_mode = 0
+offset_left = 437.0
+offset_right = 454.0
+offset_bottom = 151.0
+color = Color(1, 0.776471, 0.27451, 1)
+
+[node name="Finish_Trade_Btn" type="ColorRect" parent="UILayer/Player_Trade_Popup"]
+layout_mode = 0
+offset_left = 913.0
+offset_top = 101.0
+offset_right = 1015.0
+offset_bottom = 198.0
+color = Color(0.701961, 0.803922, 0.662745, 1)
+
+[node name="Finish_Trade_Btn" type="TextureButton" parent="UILayer/Player_Trade_Popup/Finish_Trade_Btn"]
+z_index = 1
+layout_mode = 0
+offset_left = 14.0
+offset_top = 19.0
+offset_right = 88.0
+offset_bottom = 88.0
+texture_normal = ExtResource("55_ijsim")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Tip2" type="RichTextLabel" parent="UILayer/Player_Trade_Popup"]
+layout_mode = 0
+offset_left = 328.0
+offset_top = 214.0
+offset_right = 572.0
+offset_bottom = 267.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Select resources for trading to/from other players"
+scroll_active = false
+
+[node name="Tip3" type="RichTextLabel" parent="UILayer/Player_Trade_Popup"]
+visible = false
+layout_mode = 0
+offset_left = 610.0
+offset_top = 162.0
+offset_right = 854.0
+offset_bottom = 189.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Bank's resources"
+scroll_active = false
+
+[node name="Tip" type="RichTextLabel" parent="UILayer/Player_Trade_Popup"]
+layout_mode = 0
+offset_left = 56.0
+offset_top = 162.0
+offset_right = 300.0
+offset_bottom = 189.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Your resources"
+scroll_active = false
+
+[node name="Player_Trade_Offer_Template" type="ColorRect" parent="UILayer"]
+visible = false
+offset_left = 1225.0
+offset_top = 297.0
+offset_right = 1540.0
+offset_bottom = 540.0
+scale = Vector2(1, 0.880002)
+color = Color(1, 0.996078, 0.729412, 0.678431)
+
+[node name="Who_Offered_Trade" type="RichTextLabel" parent="UILayer/Player_Trade_Offer_Template"]
+layout_mode = 0
+offset_left = 1.0
+offset_top = 5.0
+offset_right = 316.0
+offset_bottom = 44.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=18][center]Player offered trade:"
+
+[node name="Brick_Player" type="TextureRect" parent="UILayer/Player_Trade_Offer_Template"]
+visible = false
+layout_mode = 0
+offset_left = 11.0
+offset_top = 39.0
+offset_right = 151.0
+offset_bottom = 229.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("47_a2omc")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Player_Trade_Offer_Template/Brick_Player"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Sheep_Player" type="TextureRect" parent="UILayer/Player_Trade_Offer_Template"]
+visible = false
+layout_mode = 0
+offset_left = 68.0
+offset_top = 39.0
+offset_right = 208.0
+offset_bottom = 229.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("48_fwydo")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Player_Trade_Offer_Template/Sheep_Player"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 6.81821
+offset_right = 133.0
+offset_bottom = 47.8182
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Stone_Player" type="TextureRect" parent="UILayer/Player_Trade_Offer_Template"]
+visible = false
+layout_mode = 0
+offset_left = 126.0
+offset_top = 39.0
+offset_right = 266.0
+offset_bottom = 229.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("49_mis1q")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Player_Trade_Offer_Template/Stone_Player"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 6.81821
+offset_right = 133.0
+offset_bottom = 47.8182
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Tree_Player" type="TextureRect" parent="UILayer/Player_Trade_Offer_Template"]
+visible = false
+layout_mode = 0
+offset_left = 185.0
+offset_top = 39.0
+offset_right = 325.0
+offset_bottom = 229.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("50_5as3n")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Player_Trade_Offer_Template/Tree_Player"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 6.81821
+offset_right = 133.0
+offset_bottom = 47.8182
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Wheat_Player" type="TextureRect" parent="UILayer/Player_Trade_Offer_Template"]
+visible = false
+layout_mode = 0
+offset_left = 244.0
+offset_top = 39.0
+offset_right = 384.0
+offset_bottom = 229.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("51_xmntw")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Player_Trade_Offer_Template/Wheat_Player"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 6.81821
+offset_right = 133.0
+offset_bottom = 47.8182
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Brick_Bank" type="TextureRect" parent="UILayer/Player_Trade_Offer_Template"]
+visible = false
+layout_mode = 0
+offset_left = 11.0
+offset_top = 151.0
+offset_right = 151.0
+offset_bottom = 341.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("47_a2omc")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Player_Trade_Offer_Template/Brick_Bank"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 7.0
+offset_right = 133.0
+offset_bottom = 48.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Sheep_Bank" type="TextureRect" parent="UILayer/Player_Trade_Offer_Template"]
+visible = false
+layout_mode = 0
+offset_left = 68.0
+offset_top = 151.0
+offset_right = 208.0
+offset_bottom = 341.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("48_fwydo")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Player_Trade_Offer_Template/Sheep_Bank"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 6.81821
+offset_right = 133.0
+offset_bottom = 47.8182
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Stone_Bank" type="TextureRect" parent="UILayer/Player_Trade_Offer_Template"]
+visible = false
+layout_mode = 0
+offset_left = 126.0
+offset_top = 151.0
+offset_right = 266.0
+offset_bottom = 341.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("49_mis1q")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Player_Trade_Offer_Template/Stone_Bank"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 6.81821
+offset_right = 133.0
+offset_bottom = 47.8182
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Tree_Bank" type="TextureRect" parent="UILayer/Player_Trade_Offer_Template"]
+visible = false
+layout_mode = 0
+offset_left = 185.0
+offset_top = 151.0
+offset_right = 325.0
+offset_bottom = 341.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("50_5as3n")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Player_Trade_Offer_Template/Tree_Bank"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 6.81821
+offset_right = 133.0
+offset_bottom = 47.8182
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Wheat_Bank" type="TextureRect" parent="UILayer/Player_Trade_Offer_Template"]
+visible = false
+layout_mode = 0
+offset_left = 244.0
+offset_top = 151.0
+offset_right = 384.0
+offset_bottom = 341.0
+scale = Vector2(0.4, 0.44)
+texture = ExtResource("51_xmntw")
+
+[node name="Num_Remaining" type="RichTextLabel" parent="UILayer/Player_Trade_Offer_Template/Wheat_Bank"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 6.81821
+offset_right = 133.0
+offset_bottom = 47.8182
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=30][center][b]19"
+scroll_active = false
+
+[node name="Trade_Arrows" type="TextureRect" parent="UILayer/Player_Trade_Offer_Template"]
+layout_mode = 0
+offset_left = 172.0
+offset_top = 126.0
+offset_right = 300.0
+offset_bottom = 254.0
+rotation = 1.5708
+scale = Vector2(0.183802, 0.288845)
+texture = ExtResource("61_gb0bj")
+
+[node name="Accept_Or_Decline_Trade_Btn_Background" type="ColorRect" parent="UILayer/Player_Trade_Offer_Template"]
+layout_mode = 0
+offset_left = -62.0
+offset_top = 6.81818
+offset_right = -16.0
+offset_bottom = 50.8182
+color = Color(0.65098, 0.745098, 0.619608, 1)
+
+[node name="Decline_Trade_Btn" type="TextureButton" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background"]
+visible = false
+layout_mode = 0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = 45.0
+offset_bottom = 43.0
+texture_normal = ExtResource("62_2jxby")
+
+[node name="Accept_Trade_Btn" type="TextureButton" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background"]
+visible = false
+layout_mode = 0
+offset_left = 3.0
+offset_top = 3.40909
+offset_right = 43.0
+offset_bottom = 43.4091
+texture_normal = ExtResource("55_ijsim")
+
+[node name="Player_Name" type="RichTextLabel" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background"]
+layout_mode = 0
+offset_left = -25.0
+offset_top = -22.7272
+offset_right = 68.0
+offset_bottom = 0.272785
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+text = "noodlelou"
+scroll_active = false
+horizontal_alignment = 1
+
+[node name="Accept_Or_Decline_Trade_Btn_Background2" type="ColorRect" parent="UILayer/Player_Trade_Offer_Template"]
+layout_mode = 0
+offset_left = -62.0
+offset_top = 72.7271
+offset_right = -16.0
+offset_bottom = 116.727
+color = Color(0.65098, 0.745098, 0.619608, 1)
+
+[node name="Decline_Trade_Btn" type="TextureButton" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background2"]
+visible = false
+layout_mode = 0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = 45.0
+offset_bottom = 43.0
+texture_normal = ExtResource("62_2jxby")
+
+[node name="Accept_Trade_Btn" type="TextureButton" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background2"]
+visible = false
+layout_mode = 0
+offset_left = 3.0
+offset_top = 3.40909
+offset_right = 43.0
+offset_bottom = 43.4091
+texture_normal = ExtResource("55_ijsim")
+
+[node name="Player_Name" type="RichTextLabel" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background2"]
+layout_mode = 0
+offset_left = -25.0
+offset_top = -22.7272
+offset_right = 68.0
+offset_bottom = 0.272785
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+text = "noodlelou"
+scroll_active = false
+horizontal_alignment = 1
+
+[node name="Accept_Or_Decline_Trade_Btn_Background3" type="ColorRect" parent="UILayer/Player_Trade_Offer_Template"]
+layout_mode = 0
+offset_left = -62.0
+offset_top = 138.636
+offset_right = -16.0
+offset_bottom = 182.636
+color = Color(0.65098, 0.745098, 0.619608, 1)
+
+[node name="Decline_Trade_Btn" type="TextureButton" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background3"]
+visible = false
+layout_mode = 0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = 45.0
+offset_bottom = 43.0
+texture_normal = ExtResource("62_2jxby")
+
+[node name="Accept_Trade_Btn" type="TextureButton" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background3"]
+visible = false
+layout_mode = 0
+offset_left = 3.0
+offset_top = 3.40909
+offset_right = 43.0
+offset_bottom = 43.4091
+texture_normal = ExtResource("55_ijsim")
+
+[node name="Player_Name" type="RichTextLabel" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background3"]
+layout_mode = 0
+offset_left = -25.0
+offset_top = -22.7272
+offset_right = 68.0
+offset_bottom = 0.272785
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+text = "noodlelou"
+scroll_active = false
+horizontal_alignment = 1
+
+[node name="Accept_Or_Decline_Trade_Btn_Background4" type="ColorRect" parent="UILayer/Player_Trade_Offer_Template"]
+layout_mode = 0
+offset_left = -62.0
+offset_top = 205.681
+offset_right = -16.0
+offset_bottom = 249.681
+color = Color(0.65098, 0.745098, 0.619608, 1)
+
+[node name="Decline_Trade_Btn" type="TextureButton" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background4"]
+visible = false
+layout_mode = 0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = 45.0
+offset_bottom = 43.0
+texture_normal = ExtResource("62_2jxby")
+
+[node name="Accept_Trade_Btn" type="TextureButton" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background4"]
+visible = false
+layout_mode = 0
+offset_left = 3.0
+offset_top = 3.40909
+offset_right = 43.0
+offset_bottom = 43.4091
+texture_normal = ExtResource("55_ijsim")
+
+[node name="Player_Name" type="RichTextLabel" parent="UILayer/Player_Trade_Offer_Template/Accept_Or_Decline_Trade_Btn_Background4"]
+layout_mode = 0
+offset_left = -25.0
+offset_top = -22.7272
+offset_right = 68.0
+offset_bottom = 0.272785
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+text = "noodlelou"
+scroll_active = false
+horizontal_alignment = 1
+
+[node name="Version" type="RichTextLabel" parent="UILayer"]
+offset_left = -10.0
+offset_top = 7.0
+offset_right = 125.0
+offset_bottom = 41.0
+bbcode_enabled = true
+text = "[center] [font_size=20] v0.0.1 beta
+"
+
+[node name="DEBUG_show_debug_info" type="Button" parent="UILayer"]
+offset_left = 129.0
+offset_top = 5.0
+offset_right = 260.0
+offset_bottom = 46.0
+text = "Show debug info"
+
+[node name="debug_info" type="RichTextLabel" parent="UILayer/DEBUG_show_debug_info"]
+visible = false
+layout_mode = 0
+offset_left = -122.0
+offset_top = 44.0
+offset_right = 299.0
+offset_bottom = 829.0
+bbcode_enabled = true
+
+[node name="End_Game_Screen" type="ColorRect" parent="UILayer"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -370.0
+offset_top = -235.5
+offset_right = 370.0
+offset_bottom = 235.5
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+color = Color(1, 0.996078, 0.729412, 1)
+
+[node name="Game_Over" type="RichTextLabel" parent="UILayer/End_Game_Screen"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -206.0
+offset_top = -244.5
+offset_right = 206.0
+offset_bottom = 114.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "[font_size=50] [center] Game over!
+Winner: "
+
+[node name="Back_To_Menu_Btn" type="Button" parent="UILayer/End_Game_Screen"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -84.5
+offset_top = -91.5
+offset_right = 84.5
+offset_bottom = -36.5
+grow_horizontal = 2
+grow_vertical = 0
+text = "Return to menu"
+
+[connection signal="timeout" from="MapLayer/Player1_Settlement_Timer" to="." method="_on_player_1_settlement_timer_timeout"]
+[connection signal="pressed" from="UILayer/Roll_Dice" to="." method="_on_roll_dice_pressed"]
+[connection signal="pressed" from="UILayer/Bank_Trade_Btn_Background/Bank_Trade_Button" to="." method="_on_bank_trade_button_pressed"]
+[connection signal="pressed" from="UILayer/Player_Trade_Btn_Background/Player_Trade_Button" to="." method="_on_player_trade_button_pressed"]
+[connection signal="pressed" from="UILayer/Buy_Development_Card_Background/Buy_Development_Card_Button" to="." method="_on_buy_development_card_button_pressed"]
+[connection signal="pressed" from="UILayer/Build_Road_Btn_Background/Build_Road_Button" to="." method="_on_build_road_button_pressed"]
+[connection signal="pressed" from="UILayer/Build_Road_Btn_Background/Button_DEBUG" to="." method="_on_build_road_button_pressed"]
+[connection signal="pressed" from="UILayer/Build_Settlement_Btn_Background/Build_Settlement_Button" to="." method="_on_build_settlement_button_pressed"]
+[connection signal="pressed" from="UILayer/Build_City_Btn_Background/Build_City_Button" to="." method="_on_build_city_button_pressed"]
+[connection signal="pressed" from="UILayer/Invention_DevCard/Invention_DevCard" to="." method="_on_invention_dev_card_pressed"]
+[connection signal="pressed" from="UILayer/Knight_DevCard/Knight_DevCard" to="." method="_on_knight_dev_card_pressed"]
+[connection signal="pressed" from="UILayer/Monopoly_DevCard/Monopoly_DevCard" to="." method="_on_monopoly_dev_card_pressed"]
+[connection signal="pressed" from="UILayer/Road_DevCard/Road_DevCard" to="." method="_on_road_dev_card_pressed"]
+[connection signal="pressed" from="UILayer/Bank_Trade_Popup/Brick_Player/Brick_Player_Btn" to="." method="_on_BANK_TRADE_brick_player_btn_pressed"]
+[connection signal="pressed" from="UILayer/Bank_Trade_Popup/Sheep_Player/Sheep_Player_Btn" to="." method="_on_BANK_TRADE_sheep_player_btn_pressed"]
+[connection signal="pressed" from="UILayer/Bank_Trade_Popup/Stone_Player/Stone_Player_Btn" to="." method="_on_BANK_TRADE_stone_player_btn_pressed"]
+[connection signal="pressed" from="UILayer/Bank_Trade_Popup/Tree_Player/Tree_Player_Btn" to="." method="_on_BANK_TRADE_tree_player_btn_pressed"]
+[connection signal="pressed" from="UILayer/Bank_Trade_Popup/Wheat_Player/Wheat_Player_Btn" to="." method="_on_BANK_TRADE_wheat_player_btn_pressed"]
+[connection signal="pressed" from="UILayer/Bank_Trade_Popup/Brick_Bank/Brick_Bank_Btn" to="." method="_on_BANK_TRADE_brick_bank_btn_pressed"]
+[connection signal="pressed" from="UILayer/Bank_Trade_Popup/Sheep_Bank/Sheep_Bank_Btn" to="." method="_on_BANK_TRADE_sheep_bank_btn_pressed"]
+[connection signal="pressed" from="UILayer/Bank_Trade_Popup/Tree_Bank/Tree_Bank_Btn" to="." method="_on_BANK_TRADE_tree_bank_btn_pressed"]
+[connection signal="pressed" from="UILayer/Bank_Trade_Popup/Stone_Bank/Stone_Bank_Btn" to="." method="_on_BANK_TRADE_stone_bank_btn_pressed"]
+[connection signal="pressed" from="UILayer/Bank_Trade_Popup/Wheat_Bank/Wheat_Bank_Btn" to="." method="_on_BANK_TRADE_wheat_bank_btn_pressed"]
+[connection signal="pressed" from="UILayer/Bank_Trade_Popup/Finish_Trade_Btn/Finish_Trade_Btn" to="." method="_on_finish_BANK_trade_btn_pressed"]
+[connection signal="pressed" from="UILayer/Player_Trade_Popup/Brick_Player/Brick_Player_Btn" to="." method="_on_PLAYER_TRADE_brick_player_btn_pressed"]
+[connection signal="pressed" from="UILayer/Player_Trade_Popup/Sheep_Player/Sheep_Player_Btn" to="." method="_on_PLAYER_TRADE_sheep_player_btn_pressed"]
+[connection signal="pressed" from="UILayer/Player_Trade_Popup/Stone_Player/Stone_Player_Btn" to="." method="_on_PLAYER_TRADE_stone_player_btn_pressed"]
+[connection signal="pressed" from="UILayer/Player_Trade_Popup/Tree_Player/Tree_Player_Btn" to="." method="_on_PLAYER_TRADE_tree_player_btn_pressed"]
+[connection signal="pressed" from="UILayer/Player_Trade_Popup/Wheat_Player/Wheat_Player_Btn" to="." method="_on_PLAYER_TRADE_wheat_player_btn_pressed"]
+[connection signal="pressed" from="UILayer/Player_Trade_Popup/Brick_Bank/Brick_Bank_Btn" to="." method="_on_PLAYER_TRADE_brick_bank_btn_pressed"]
+[connection signal="pressed" from="UILayer/Player_Trade_Popup/Sheep_Bank/Sheep_Bank_Btn" to="." method="_on_PLAYER_TRADE_sheep_bank_btn_pressed"]
+[connection signal="pressed" from="UILayer/Player_Trade_Popup/Tree_Bank/Tree_Bank_Btn" to="." method="_on_PLAYER_TRADE_tree_bank_btn_pressed"]
+[connection signal="pressed" from="UILayer/Player_Trade_Popup/Stone_Bank/Stone_Bank_Btn" to="." method="_on_PLAYER_TRADE_stone_bank_btn_pressed"]
+[connection signal="pressed" from="UILayer/Player_Trade_Popup/Wheat_Bank/Wheat_Bank_Btn" to="." method="_on_PLAYER_TRADE_wheat_bank_btn_pressed"]
+[connection signal="pressed" from="UILayer/Player_Trade_Popup/Finish_Trade_Btn/Finish_Trade_Btn" to="." method="_on_PLAYER_TRADE_finish_trade_btn_pressed"]
+[connection signal="pressed" from="UILayer/DEBUG_show_debug_info" to="." method="_on_debug_show_debug_info_pressed"]
+[connection signal="pressed" from="UILayer/End_Game_Screen/Back_To_Menu_Btn" to="." method="_on_back_to_menu_btn_pressed"]

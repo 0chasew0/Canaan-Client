@@ -7,27 +7,77 @@
 script = ExtResource("1_rlsr6")
 
 [node name="Lobby" type="Node2D" parent="."]
-visible = false
 
-[node name="ConnectBtn" type="Button" parent="Lobby"]
-visible = false
-offset_left = 437.0
-offset_top = 166.0
-offset_right = 619.0
-offset_bottom = 243.0
-text = "Connect"
+[node name="Background2" type="ColorRect" parent="Lobby"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 1920.0
+offset_bottom = 1080.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.747305, 0.869658, 0.609046, 1)
+
+[node name="HostBtn" type="Button" parent="Lobby"]
+offset_left = 840.0
+offset_top = 410.0
+offset_right = 1022.0
+offset_bottom = 487.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = "Host"
+
+[node name="JoinBtn" type="Button" parent="Lobby"]
+offset_left = 840.0
+offset_top = 505.0
+offset_right = 1022.0
+offset_bottom = 582.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = "Join
+"
 
 [node name="DisconnectBtn" type="Button" parent="Lobby"]
 visible = false
-offset_left = 437.0
-offset_top = 261.0
-offset_right = 619.0
-offset_bottom = 338.0
-text = "Disconnect"
+offset_left = 840.0
+offset_top = 602.0
+offset_right = 1022.0
+offset_bottom = 679.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = "Disconnect
+"
+
+[node name="Players" type="RichTextLabel" parent="Lobby"]
+visible = false
+offset_left = 415.0
+offset_top = 381.0
+offset_right = 704.0
+offset_bottom = 607.0
+bbcode_enabled = true
+text = "[font_size=20][center][color=black]
+Players Connected:
+
+"
+
+[node name="Player_Name" type="RichTextLabel" parent="Lobby"]
+visible = false
+offset_left = 1187.0
+offset_top = 391.0
+offset_right = 1476.0
+offset_bottom = 617.0
+bbcode_enabled = true
+text = "[font_size=30][center][color=black]
+Player Name:
+
+"
 
 [node name="GameSelect" parent="." instance=ExtResource("2_n05k4")]
+visible = false
 
-[connection signal="pressed" from="Lobby/ConnectBtn" to="." method="_on_connect_btn_pressed"]
+[connection signal="pressed" from="Lobby/HostBtn" to="." method="_on_host_btn_pressed"]
+[connection signal="pressed" from="Lobby/JoinBtn" to="." method="_on_join_btn_pressed"]
 [connection signal="pressed" from="Lobby/DisconnectBtn" to="." method="_on_disconnect_btn_pressed"]
+[connection signal="pressed" from="GameSelect/VBoxContainer/Canaan_4_Player" to="." method="_on_canaan_4_player_pressed"]
 
 [editable path="GameSelect"]

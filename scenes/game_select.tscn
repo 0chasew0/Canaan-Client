@@ -65,7 +65,6 @@ text = "Play Singleplayer (with bots)"
 [node name="Canaan_4_Player" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
-disabled = true
 text = "Play Multiplayer (2-4 players) (Coming soon!)"
 
 [connection signal="pressed" from="VBoxContainer/Canaan_Singleplayer" to="." method="_on_canaan_singleplayer_pressed"]

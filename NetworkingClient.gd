@@ -1,63 +1,104 @@
 extends Node
 
-const DEV = false
+const DEV = true
 
-@onready var connect_btn = $Lobby/ConnectBtn
-@onready var disconnect_btn = $Lobby/DisconnectBtn
-
-var multiplayer_peer = ENetMultiplayerPeer.new()
+var peer = ENetMultiplayerPeer.new()
 var url : String = "209.38.137.131"
 const PORT = 9009
 
 var connected_peer_ids = []
-
+var PLAYER_COUNT = 0
 
 func _ready():
 	if DEV == true:
 		url = "127.0.0.1"
-	update_connection_buttons()
-	multiplayer.server_disconnected.connect(_on_server_disconnected)
+	
+# Creates a server, then adds this client as a player
+func _on_host_btn_pressed() -> void:
+	disable_connection_buttons()
+	peer.create_server(9009)
+	print("Creating server...")
+	multiplayer.multiplayer_peer = peer
+	print("Server is up and running.")
+	peer.peer_connected.connect(_on_peer_connected)
+	peer.peer_disconnected.connect(_on_peer_disconnected)
+	connected_peer_ids.append(peer.get_unique_id())
+	$Lobby/Players.show()
+	$Lobby/Player_Name.show()
+	$Lobby/Players.text = "[font_size=40][center][color=black]Players Connected: %s" % str(connected_peer_ids)
+	$Lobby/Player_Name.text = "[font_size=30][center][color=black]Player Name: Host (Player 1)"
 
-@rpc
-func sync_player_list(updated_connected_peer_ids):
-	connected_peer_ids = updated_connected_peer_ids
-	multiplayer_peer.get_unique_id()
-	update_connection_buttons()
-	print("Currently connected Players: " + str(connected_peer_ids))
+func _on_join_btn_pressed() -> void:
+	disable_connection_buttons()
+	peer.create_client(url, PORT)
+	multiplayer.multiplayer_peer = peer
+	await get_tree().create_timer(1).timeout
+	$Lobby/Players.show()
+	$Lobby/Player_Name.show()
 
+func _on_peer_connected(new_peer_id : int) -> void:
+	print("Player " + str(new_peer_id) + " is joining...")
+	await get_tree().create_timer(1).timeout
+	connected_peer_ids.append(new_peer_id)
+	print("Player " + str(new_peer_id) + " joined.")
+	rpc("_sync_player_list", connected_peer_ids)
+	send_data_to_peers(connected_peer_ids, new_peer_id)
 
-func _on_connect_btn_pressed() -> void:
-	print("Connecting ...")
-	multiplayer_peer.create_client(url, PORT)
-	multiplayer.multiplayer_peer = multiplayer_peer
-	update_connection_buttons()
-
-
+func _on_peer_disconnected(leaving_peer_id : int) -> void:
+	print("Player " + str(leaving_peer_id) + " disconnected.")
+	connected_peer_ids.remove_at(connected_peer_ids.find(leaving_peer_id))
+	print(connected_peer_ids)
+	rpc("_sync_player_list", connected_peer_ids)
+	
 func _on_disconnect_btn_pressed():
-	multiplayer_peer.close()
-	update_connection_buttons()
-	print("Disconnected.")
+	if multiplayer.is_server():
+		rpc("kick_all_peers_to_menu")
+		for p in connected_peer_ids:
+			multiplayer.multiplayer_peer.disconnect_peer(1)
+		await get_tree().create_timer(1).timeout
+		peer.close()
+		print("Shut down server since this is the host client.")
+		connected_peer_ids.clear()
+		$Lobby/Players.hide()
+		$Lobby/Player_Name.hide()
+		enable_connection_buttons()
+	else:
+		multiplayer.multiplayer_peer.disconnect_peer(1)
+		await get_tree().create_timer(1).timeout
+		$Lobby/Players.hide()
+		$Lobby/Player_Name.hide()
+		enable_connection_buttons()
 
+@rpc("call_remote")
+func kick_all_peers_to_menu():
+	$Lobby/Players.hide()
+	$Lobby/Player_Name.hide()
+	enable_connection_buttons()
 
-func _on_server_disconnected():
-	multiplayer_peer.close()
-	update_connection_buttons()
-	print("Connection to server lost.")
+@rpc("any_peer", "call_local")
+func _sync_player_list(updated_connected_peer_ids):
+	connected_peer_ids = updated_connected_peer_ids
+	$Lobby/Players.text = "[font_size=40][center][color=black]Players Connected: %s" % str(connected_peer_ids)
 
+@rpc("call_remote")
+func get_data_from_host(data, peer_id):
+	$Lobby/Player_Name.text = "[font_size=30][center][color=black]Player Name: Player %s" % peer_id
 
-func update_connection_buttons() -> void:
-	if multiplayer_peer.get_connection_status() == multiplayer_peer.CONNECTION_DISCONNECTED:
-		connect_btn.disabled = false
-		disconnect_btn.disabled = true
-	if multiplayer_peer.get_connection_status() == multiplayer_peer.CONNECTION_CONNECTING:
-		connect_btn.disabled = true
-		disconnect_btn.disabled = true
-	if multiplayer_peer.get_connection_status() == multiplayer_peer.CONNECTION_CONNECTED:
-		connect_btn.disabled = true
-		disconnect_btn.disabled = false
-
+func send_data_to_peers(data, peer_id):
+	rpc_id(peer_id, "get_data_from_host", data, peer_id)
+	
+	
+func disable_connection_buttons() -> void:
+	$Lobby/HostBtn.hide()
+	$Lobby/JoinBtn.hide()
+	$Lobby/DisconnectBtn.show()
+	
+func enable_connection_buttons() -> void:
+	$Lobby/HostBtn.show()
+	$Lobby/JoinBtn.show()
+	$Lobby/DisconnectBtn.hide()
 
 func _on_canaan_4_player_pressed() -> void:
 	$GameSelect.hide()
-	#$Lobby.show() # For multiplayer
+	$Lobby.show() # For multiplayer
 	

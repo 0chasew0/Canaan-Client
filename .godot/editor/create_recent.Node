@@ -1,4 +1,5 @@
 Button
+TextEdit
 RichTextLabel
 ColorRect
 VBoxContainer
@@ -11,4 +12,3 @@ Node2D
 CanvasLayer
 SubViewport
 Camera2D
-Control
