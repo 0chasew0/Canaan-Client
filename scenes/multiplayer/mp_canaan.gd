@@ -113,7 +113,7 @@ func _ready() -> void:
 		await initialize_development_cards()
 		
 
-		rpc_id(CONNECTED_PEERS[1], "append_to_chat_log", str("[font_size=%s]Welcome to Canaan!\n" % chat_log_font_size))
+		rpc("append_to_chat_log", str("[font_size=%s]Welcome to Canaan!\n" % chat_log_font_size))
 		
 		# ALL_PLAYERS, tile_positions, tile_positions_local, local_harbor_positions, global_vertices, ELIGIBLE_SETTLEMENT_VERTICES, $MapLayer/Robber.position, ROBBER_POSITION, ALL_OWNED_ROADS, DEVELOPMENT_CARDS
 		#send_setup_info_to_peers(ALL_PLAYERS, tile_positions, tile_positions_local, local_harbor_positions, global_vertices, ELIGIBLE_SETTLEMENT_VERTICES, $MapLayer/Robber.position, ROBBER_POSITION, ALL_OWNED_ROADS, DEVELOPMENT_CARDS)
