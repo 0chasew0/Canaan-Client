@@ -246,6 +246,7 @@ sources/7 = SubResource("TileSetAtlasSource_atw5d")
 sources/8 = SubResource("TileSetAtlasSource_5aaxl")
 
 [node name="Canaan" type="Node2D"]
+visible = false
 y_sort_enabled = true
 script = ExtResource("1_d4aao")
 

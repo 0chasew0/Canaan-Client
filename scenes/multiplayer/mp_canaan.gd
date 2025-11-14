@@ -59,60 +59,75 @@ signal debug
 
 func _ready() -> void:
 	
-	#var PLAYER = load("res://player.gd")
-	#var colors = ["#ffcc00", "#f3f3f3", "#e86a17", "#1ea7e1"]
-	#for i in range(PLAYER_COUNT):
-		#if i == 0: # In multiplayer, this should check for whether this is a bot or player
-			#var PLAYER_OBJ = PLAYER.new()
-			#PLAYER_OBJ._name = "Player 1"
-			#PLAYER_OBJ.type = "Player"
-			#PLAYER_OBJ.id = i+1
-			#PLAYER_OBJ.color = colors[i]
-			#ALL_PLAYERS.append(PLAYER_OBJ)
-			#CLIENT = PLAYER_OBJ
-		#else:
-			#var BOT = PLAYER.new()
-			#BOT._name = ("Bot %s" % str(i))
-			#BOT.type = "Bot"
-			#BOT.color = colors[i]
-			#BOT.id = i+1
-			#ALL_PLAYERS.append(BOT)
-	#
-	#await initialize_ui_boxes()
-	#randomize() # Initializes randomizer, only call this once
-	#tile_positions = generate_rand_standard_map() # Map data contains coordinates of all cells of the map
+	if multiplayer.is_server():
+		var CONNECTED_PEERS = multiplayer.get_peers()
+		CONNECTED_PEERS.insert(0, 1)
+		NUM_PLAYERS = len(CONNECTED_PEERS)
+		var NUM_BOTS = 4 - NUM_PLAYERS
+		print('Host started game with ', NUM_PLAYERS, ' players and ', NUM_BOTS, ' bots.')
+		
+		var PLAYER = load("res://player.gd")
+		var colors = ["#ffcc00", "#f3f3f3", "#e86a17", "#1ea7e1"]
+		var color_index = 0
+		for i in range(NUM_PLAYERS):
+			var PLAYER_OBJ = PLAYER.new()
+			PLAYER_OBJ._name = "Player %s (%s)" % [str(i+1), CONNECTED_PEERS[i]]
+			PLAYER_OBJ.type = "Player"
+			PLAYER_OBJ.id = CONNECTED_PEERS[i]
+			PLAYER_OBJ.color = colors[color_index]
+			ALL_PLAYERS.append(PLAYER_OBJ)
+			if CONNECTED_PEERS[i] == 1:
+				CLIENT = PLAYER_OBJ
+			color_index += 1
+		for i in range(NUM_BOTS):
+			var BOT = PLAYER.new()
+			BOT._name = "Bot %s" % str(i+1)
+			BOT.type = "Bot"
+			BOT.color = colors[color_index]
+			#BOT.id = p_index
+			ALL_PLAYERS.append(BOT)
+			color_index += 1
+	
+		randomize()
+		tile_positions = generate_rand_standard_map() # Map data contains coordinates of all cells of the map
+		
+		tile_positions_local = tile_map_coords_to_local_coords(standard_map, tile_positions, false)
+		local_harbor_positions = tile_map_coords_to_local_coords(harbor_map_layer, global_harbor_positions, true)
+		
+		global_vertices = await generate_tile_vertices(tile_positions, standard_map)
+		ELIGIBLE_SETTLEMENT_VERTICES = global_vertices.duplicate() # At the beginning of the game, all vertices are eligible
+		ELIGIBLE_ROAD_VERTICES_SETUP = global_vertices.duplicate()
+		
+		# Initialize Robber
+		await initialize_robber(standard_map, tile_positions)
+		
+		# Initialize UI button states
+		await ui_disable_all_buttons()
+		
+		
+		# Initialize road array
+		for i in range(PLAYER_COUNT):
+			ALL_OWNED_ROADS.append([])
+			
+		# Initialize development cards
+		await initialize_development_cards()
+		
+
+		rpc_id(CONNECTED_PEERS[1], "append_to_chat_log", str("[font_size=%s]Welcome to Canaan!\n" % chat_log_font_size))
+		
+		# ALL_PLAYERS, tile_positions, tile_positions_local, local_harbor_positions, global_vertices, ELIGIBLE_SETTLEMENT_VERTICES, $MapLayer/Robber.position, ROBBER_POSITION, ALL_OWNED_ROADS, DEVELOPMENT_CARDS
+		#send_setup_info_to_peers(ALL_PLAYERS, tile_positions, tile_positions_local, local_harbor_positions, global_vertices, ELIGIBLE_SETTLEMENT_VERTICES, $MapLayer/Robber.position, ROBBER_POSITION, ALL_OWNED_ROADS, DEVELOPMENT_CARDS)
+		
+		#await rpc("initialize_ui_boxes")
+	
+	else:
+
+		await ui_disable_all_buttons()
+		
 	
 	await debug
 	
-	tile_positions_local = tile_map_coords_to_local_coords(standard_map, tile_positions, false)
-	local_harbor_positions = tile_map_coords_to_local_coords(harbor_map_layer, global_harbor_positions, true)
-	
-	#for pos in local_harbor_positions:
-		#var debug_icon = $MapLayer/Possible_Placement_Settlement.duplicate()
-		#$MapLayer.add_child(debug_icon)
-		#debug_icon.show()
-		#debug_icon.position = pos
-	
-	global_vertices = await generate_tile_vertices(tile_positions, standard_map)
-	ELIGIBLE_SETTLEMENT_VERTICES = global_vertices.duplicate() # At the beginning of the game, all vertices are eligible
-	ELIGIBLE_ROAD_VERTICES_SETUP = global_vertices.duplicate()
 	init_settlement_buttons(global_vertices)
-	
-	# Initialize Robber
-	await initialize_robber(standard_map, tile_positions)
-	
-	# Initialize UI button states
-	await ui_disable_all_buttons()
-	
-	# Initialize chat box setting(s)
-	chat_log.append_text("[font_size=%s]Welcome to Canaan!\n" % chat_log_font_size)
-	
-	# Initialize road array
-	for i in range(PLAYER_COUNT):
-		ALL_OWNED_ROADS.append([])
-		
-	# Initialize development cards
-	await initialize_development_cards()
 	
 	# Main game loop for a client
 	await roll_for_who_goes_first()
@@ -143,7 +158,30 @@ func _ready() -> void:
 		index+=1
 		
 	main_game_loop(tile_positions, standard_map)
+
+func send_setup_info_to_peers(ALL_PLAYERS, tile_positions, tile_positions_local, local_harbor_positions, global_vertices, ELIGIBLE_SETTLEMENT_VERTICES, UI_Robber_Position, ROBBER_POSITION, ALL_OWNED_ROADS, DEVELOPMENT_CARDS):
+	rpc("get_setup_info_from_host", ALL_PLAYERS, tile_positions, tile_positions_local, local_harbor_positions, global_vertices, ELIGIBLE_SETTLEMENT_VERTICES, UI_Robber_Position, ROBBER_POSITION, ALL_OWNED_ROADS, DEVELOPMENT_CARDS)
+
+@rpc("call_remote")
+func get_setup_info_from_host(ALL_PLAYERS, tile_positions, tile_positions_local, local_harbor_positions, global_vertices, ELIGIBLE_SETTLEMENT_VERTICES, UI_Robber_Position, ROBBER_POSITION, ALL_OWNED_ROADS, DEVELOPMENT_CARDS):
+	ALL_PLAYERS = ALL_PLAYERS
+	tile_positions = tile_positions
+	tile_positions_local = tile_positions_local
+	local_harbor_positions = local_harbor_positions
+	global_vertices = global_vertices
+	ELIGIBLE_SETTLEMENT_VERTICES = ELIGIBLE_SETTLEMENT_VERTICES
+	$MapLayer/Robber.position = UI_Robber_Position
+	ROBBER_POSITION = ROBBER_POSITION
+	ALL_OWNED_ROADS = ALL_OWNED_ROADS
+	DEVELOPMENT_CARDS = DEVELOPMENT_CARDS
 	
+	print(ALL_PLAYERS, tile_positions, tile_positions_local, local_harbor_positions, global_vertices, ELIGIBLE_SETTLEMENT_VERTICES, UI_Robber_Position, ROBBER_POSITION, ALL_OWNED_ROADS, DEVELOPMENT_CARDS)
+
+@rpc("any_peer", "call_local")
+func append_to_chat_log(text_to_add):
+	print(multiplayer.get_unique_id(), " called append to chat log.")
+	chat_log.append_text(text_to_add)
+
 func main_game_loop(tile_positions, standard_map):
 	# Bot functionality added for testing
 	for i in range(100): # Turn limit?
@@ -230,14 +268,13 @@ func DEBUG_assert_resources_are_in_sync():
 	total_resources_in_supply = NUM_SUPPLY_BRICK + NUM_SUPPLY_SHEEP + NUM_SUPPLY_STONE + NUM_SUPPLY_TREE + NUM_SUPPLY_WHEAT
 	assert(total_resources_in_supply + total_resources_for_all_players == 95, "resources are out of sync! total resources between players and supply: " + str(total_resources_for_all_players + total_resources_in_supply) + ". Amount it should be: 95.")
 
+@rpc("call_local")
 func initialize_ui_boxes() -> void:
 	var index = 1
 	for p in ALL_PLAYERS:
 		get_node("UILayer/Player%sBackground/PlayerName" % index).text = "[font_size=18][center][b]%s" % p._name
 		get_node("UILayer/Player%sBackground" % index).color = p.color
 		index += 1
-	
-
 
 func initialize_robber(map_data, tile_positions):
 	# Find desert tile and place robber there

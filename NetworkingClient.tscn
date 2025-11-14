@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://d0qkcvt665q5e" path="res://NetworkingClient.gd" id="1_rlsr6"]
 [ext_resource type="PackedScene" uid="uid://b81k73kbrjw18" path="res://scenes/game_select.tscn" id="2_n05k4"]
 
-[node name="Networking" type="Node"]
+[node name="Main" type="Node"]
 script = ExtResource("1_rlsr6")
 
 [node name="Lobby" type="Node2D" parent="."]
@@ -35,6 +35,17 @@ offset_bottom = 582.0
 size_flags_horizontal = 4
 size_flags_vertical = 4
 text = "Join
+"
+
+[node name="StartBtn" type="Button" parent="Lobby"]
+visible = false
+offset_left = 840.0
+offset_top = 505.0
+offset_right = 1022.0
+offset_bottom = 582.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = "Start Game
 "
 
 [node name="DisconnectBtn" type="Button" parent="Lobby"]
@@ -75,8 +86,15 @@ Player Name:
 [node name="GameSelect" parent="." instance=ExtResource("2_n05k4")]
 visible = false
 
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("uid://bw121fp3afg8d")
+spawn_path = NodePath("../Players")
+
+[node name="Players" type="Node2D" parent="."]
+
 [connection signal="pressed" from="Lobby/HostBtn" to="." method="_on_host_btn_pressed"]
 [connection signal="pressed" from="Lobby/JoinBtn" to="." method="_on_join_btn_pressed"]
+[connection signal="pressed" from="Lobby/StartBtn" to="." method="_on_start_btn_pressed"]
 [connection signal="pressed" from="Lobby/DisconnectBtn" to="." method="_on_disconnect_btn_pressed"]
 [connection signal="pressed" from="GameSelect/VBoxContainer/Canaan_4_Player" to="." method="_on_canaan_4_player_pressed"]
 

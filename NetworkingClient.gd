@@ -1,10 +1,16 @@
 extends Node
 
+
+@onready var game_scene_mp = preload("res://scenes/multiplayer/mp_canaan.tscn")
+@onready var game_scene_sp = preload("res://scenes/canaan.tscn")
+
 const DEV = true
 
 var peer = ENetMultiplayerPeer.new()
 var url : String = "209.38.137.131"
 const PORT = 9009
+
+var _players_spawn_node
 
 var connected_peer_ids = []
 var PLAYER_COUNT = 0
@@ -27,6 +33,8 @@ func _on_host_btn_pressed() -> void:
 	$Lobby/Player_Name.show()
 	$Lobby/Players.text = "[font_size=40][center][color=black]Players Connected: %s" % str(connected_peer_ids)
 	$Lobby/Player_Name.text = "[font_size=30][center][color=black]Player Name: Host (Player 1)"
+	
+	_players_spawn_node = $Players
 
 func _on_join_btn_pressed() -> void:
 	disable_connection_buttons()
@@ -39,9 +47,13 @@ func _on_join_btn_pressed() -> void:
 func _on_peer_connected(new_peer_id : int) -> void:
 	print("Player " + str(new_peer_id) + " is joining...")
 	await get_tree().create_timer(1).timeout
+	
 	connected_peer_ids.append(new_peer_id)
+	
 	print("Player " + str(new_peer_id) + " joined.")
 	rpc("_sync_player_list", connected_peer_ids)
+	
+	
 	send_data_to_peers(connected_peer_ids, new_peer_id)
 
 func _on_peer_disconnected(leaving_peer_id : int) -> void:
@@ -92,13 +104,34 @@ func disable_connection_buttons() -> void:
 	$Lobby/HostBtn.hide()
 	$Lobby/JoinBtn.hide()
 	$Lobby/DisconnectBtn.show()
+	if multiplayer.is_server():
+		$Lobby/StartBtn.show()	
 	
 func enable_connection_buttons() -> void:
 	$Lobby/HostBtn.show()
 	$Lobby/JoinBtn.show()
 	$Lobby/DisconnectBtn.hide()
+	$Lobby/StartBtn.hide()
 
 func _on_canaan_4_player_pressed() -> void:
 	$GameSelect.hide()
 	$Lobby.show() # For multiplayer
 	
+
+# Add main game scene to peers
+#@rpc("call_remote")
+#func instantiate_game_for_peers():
+	#
+	#$Lobby.hide()
+	
+func _on_start_btn_pressed() -> void:
+	var NUM_PLAYERS = len(connected_peer_ids)
+	var NUM_BOTS = 4 - len(connected_peer_ids)
+	#var game_instance = game_scene_mp.instantiate()
+	#add_child(game_instance)
+	$Lobby.hide()
+	
+	var game_instance = game_scene_mp.instantiate()
+	_players_spawn_node.add_child(game_instance, true)
+
+	#rpc("instantiate_game_for_peers")

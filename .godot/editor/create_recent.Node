@@ -1,3 +1,5 @@
+Node2D
+MultiplayerSpawner
 Button
 TextEdit
 RichTextLabel
@@ -8,7 +10,5 @@ TextureButton
 TextureRect
 Timer
 TileMapLayer
-Node2D
 CanvasLayer
 SubViewport
-Camera2D
