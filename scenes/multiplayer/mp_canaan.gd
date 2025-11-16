@@ -112,7 +112,8 @@ func _ready() -> void:
 		# Initialize development cards
 		await initialize_development_cards()
 		
-
+		print(multiplayer.get_unique_id())
+		
 		rpc("append_to_chat_log", str("[font_size=%s]Welcome to Canaan!\n" % chat_log_font_size))
 		
 		# ALL_PLAYERS, tile_positions, tile_positions_local, local_harbor_positions, global_vertices, ELIGIBLE_SETTLEMENT_VERTICES, $MapLayer/Robber.position, ROBBER_POSITION, ALL_OWNED_ROADS, DEVELOPMENT_CARDS
@@ -121,7 +122,7 @@ func _ready() -> void:
 		#await rpc("initialize_ui_boxes")
 	
 	else:
-
+		print(multiplayer.get_unique_id())
 		await ui_disable_all_buttons()
 		
 	
@@ -158,6 +159,7 @@ func _ready() -> void:
 		index+=1
 		
 	main_game_loop(tile_positions, standard_map)
+
 
 func send_setup_info_to_peers(ALL_PLAYERS, tile_positions, tile_positions_local, local_harbor_positions, global_vertices, ELIGIBLE_SETTLEMENT_VERTICES, UI_Robber_Position, ROBBER_POSITION, ALL_OWNED_ROADS, DEVELOPMENT_CARDS):
 	rpc("get_setup_info_from_host", ALL_PLAYERS, tile_positions, tile_positions_local, local_harbor_positions, global_vertices, ELIGIBLE_SETTLEMENT_VERTICES, UI_Robber_Position, ROBBER_POSITION, ALL_OWNED_ROADS, DEVELOPMENT_CARDS)
